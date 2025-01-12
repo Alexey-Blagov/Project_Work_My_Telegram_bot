@@ -15,6 +15,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bots;
 using System.Security.AccessControl;
 using Telegram.Bot.Types.ReplyMarkups;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
 
@@ -43,7 +44,7 @@ namespace Project_Work_My_Telegram_bot
             _myBot.OnUpdate += OnUpdate;
 
             Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
-            while (Console.ReadKey(true).Key != ConsoleKey.Escape);
+            while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
             _cts.Cancel(); // stop the bot
 
         }
@@ -66,16 +67,16 @@ namespace Project_Work_My_Telegram_bot
             }
             catch (Exception ex)
             {
-                OnError (ex, HandleErrorSource.PollingError);
+                OnError(ex, HandleErrorSource.PollingError);
             }
         }
         private static async Task OnMessage(Message message, UpdateType type)
         {
             var chatId = message.Chat.Id;
             var messageText = message.Text;
-            var me = await _myBot!.GetMe();  
+            var me = await _myBot!.GetMe();
             if (messageText == null) return;
-           
+
             //Блок обработки сообщений 
             if (messageText is not { } text)
                 Console.WriteLine($"Получено сообщение {message.Type}");
@@ -92,12 +93,71 @@ namespace Project_Work_My_Telegram_bot
                 await OnCommand(command, text[space..].TrimStart(), message);
             }
             else
-                await OnTextMessage(message); 
+                await OnTextMessage(message);
         }
         private static async Task OnTextMessage(Message message)
         {
             Console.WriteLine($"Received text '{message.Text}' in {message.Chat}");
-            await OnCommand("/start", "", message); // Запускаем комманду старт /start
+
+            switch (message.Text)
+            {
+                case "Администратор":
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут двбиваем пороль после создаем админиа и пропускаем далее 
+                    break;
+                case "Пользователь":
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                    break;
+                case "👤 Профиль":
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                    break;
+                case "📚 Вывести отчет":
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                    break;
+                case "📝 Регистрация поездки":
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                    break;
+                case "💰 Регистрация трат":
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                    break;
+           
+                default:
+                    await _myBot!.SendMessage(message.Chat,
+                        "Неизвестная комманда",
+                        cancellationToken: _cts!.Token);
+
+                    break;
+            }
+            //await OnCommand("/start", "", message); // Запускаем комманду старт /start
         }
 
         private static async Task OnCommand(string command, string v, Message message)
@@ -105,22 +165,22 @@ namespace Project_Work_My_Telegram_bot
             switch (command)
             {
                 case "/start":
-                    await _myBot.SendMessage(message.Chat, """
-                <b><u>Bot menu</u></b>:
-                /start  запуск  - ">url</a>)</i>
-                """, 
-                replyMarkup: KeyBoardSetting.startkeyboard); // also remove keyboard to clean-up things
+                    await _myBot!.SendMessage(message.Chat,
+                        "/start - запуск",
+                        replyMarkup: KeyBoardSetting.startkeyboard,
+                        cancellationToken: _cts!.Token);
                     break;
-                case "/reg":
-
+                case "/main":
+                    await _myBot!.SendMessage(message.Chat,
+                        "/Main - запуск основнного menu ",
+                        replyMarkup: KeyBoardSetting.keyboardMain,
+                        cancellationToken: _cts!.Token);
                     break;
-                case "Пользователь":
                 default:
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
-                         text: $"Полученно неизвестное сообщение......",
-                         cancellationToken: _cts!.Token
-                    );
+                         text: $"Полученно неизвестная комманда",
+                         cancellationToken: _cts!.Token);
                     break;
             }
         }
