@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
+    public enum UserType { Simple = 1, Admin = 2 };
     public class User
     {
         //        UserId(Назначаемый БД) int
@@ -18,17 +19,12 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //Дата  регистрации в БД(берем из текущей даты)  Date.Now Short
         [Key]
         public int Id { get; set; }
+        public UserType Type { get; set; } = UserType.Simple;
         public long? TgChatId { get; set; }
-        public string? Name { get; set; }
-
         public string? FirstName { get; set; }
-
         public string? LastName { get; set; }
-
         public string? Surname { get; set; }
-
         public string? JobTitle { get; set; }
-
         public static DateTime? CreatedAt { get; set; } = DateTime.Now;
     }
 

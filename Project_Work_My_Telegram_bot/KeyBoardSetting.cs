@@ -1,127 +1,75 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
+
 namespace Project_Work_My_Telegram_bot
 {
     public static class KeyBoardSetting
     {
-        // Инлайнер клапвиатура 
-        public static ReplyKeyboardMarkup Register = new(new[]
+        // Клапвиатура Start  
+        public static ReplyKeyboardMarkup startkeyboard = new ReplyKeyboardMarkup(new[] { new KeyboardButton("Пользователь"), new KeyboardButton("Администрация") })
         {
-            new KeyboardButton[] { "/reg" },
-        })
-        { ResizeKeyboard = true };
-        public static InlineKeyboardMarkup Role = new(new[]
+            ResizeKeyboard = true
+        };
+        // Клавиатура Main  
+
+        public static KeyboardButton[][] keyboard =
+        [
+            ["👤 Профиль", "📚 Вывести отчет"],
+            ["📝 Регистрация поездки", "💰 Регистрация трат"],
+
+        ];
+        public static ReplyKeyboardMarkup keyboardMain = new(keyboard: keyboard)
         {
+            ResizeKeyboard = true,
+        };
+
+        // Инлайнер клапвиатура регистрации пользователя тип User         
+        public static InlineKeyboardMarkup ProfileUser = new(new[]
+    {
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "Водитель", callbackData: "driver"),
-                InlineKeyboardButton.WithCallbackData(text: "Диспетчер", callbackData: "controller"),
+                InlineKeyboardButton.WithCallbackData(text: "👤 Ф.И.О", callbackData: "username"),
+                InlineKeyboardButton.WithCallbackData(text: "👤 Должность", callbackData: " jobtitle"),
+                InlineKeyboardButton.WithCallbackData(text: "🚗 Марка машины", callbackData: "carname"),
+                InlineKeyboardButton.WithCallbackData(text: "🚗 Госномер", callbackData: "carnumber"),
+                InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
+                InlineKeyboardButton.WithCallbackData(text: "Расход на 100 км.", callbackData: "gasconsum"),
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию", callbackData: "closed")
             },
         });
-        public static InlineKeyboardMarkup Menu = new(new[]
+        // Инлайнер клапвиатура регистрации пользователя тип User регистрация 
+        public static InlineKeyboardMarkup ProfileAdmin = new(new[]
+    {
+            new []
+            {
+                InlineKeyboardButton.WithCallbackData(text: "🚗 Марка машины", callbackData: "carname"),
+                InlineKeyboardButton.WithCallbackData(text: "🚗 Госномер", callbackData: "carnumber"),
+                InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
+                InlineKeyboardButton.WithCallbackData(text: "Расход на 100 км.", callbackData: "gasconsum"),
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию", callbackData: "closed")
+            },
+        });
+        // Инлайнер клапвиатура регистрации пути следования Admin регистрация 
+        public static InlineKeyboardMarkup RegPath = new(new[]
         {
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "Диалоги", callbackData: "dialogs"),
+                InlineKeyboardButton.WithCallbackData(text: "Место назначения", callbackData: "objectname"),
+                InlineKeyboardButton.WithCallbackData(text: "Полный путь", callbackData: "pathlengh"),
                 InlineKeyboardButton.WithCallbackData(text: "Профиль", callbackData: "profile"),
-            },
-            //new []
-            //{
-            //    InlineKeyboardButton.WithCallbackData(text: "Регистрация", callbackData: "register"),
-            //},
+                InlineKeyboardButton.WithCallbackData(text: "Собственный трансопорт ДА/НЕТ", callbackData: "accept"),
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию", callbackData: "closed")
+            }
         });
-        public static InlineKeyboardMarkup ToMenu = new(new[]
+        public static ReplyKeyboardMarkup actionAccept = new ReplyKeyboardMarkup(new[] { new KeyboardButton("ДА"), new KeyboardButton("НЕТ") })
         {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Меню", callbackData: "menu"),
-            },
-        });
-        public static InlineKeyboardMarkup StartRegistrationUser = new(new[]
-        {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Ваше ФИО", callbackData: "FullName"),
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text:"Должность", callbackData: "JobTitle" ),
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text:"Марка машины", callbackData: "CarName"),
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Рсход на 100 ", callbackData: "DeviceSerialNum"),
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Тип ", callbackData: "DeviceSerialNum"),
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Окончить Регистрацию", callbackData: "FinReg"),
-            },
-        });
-        public static InlineKeyboardMarkup StartRegTC = new(new[]
-        {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Ваше ФИО", callbackData: "TcName"),
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Окончить Регистрацию", callbackData: "FinReg"),
-            },
-        });
-        public static InlineKeyboardMarkup MsgToDriver = new(new[]
-        {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Водитель", callbackData: "driver"),
-                InlineKeyboardButton.WithCallbackData(text: "Диспетчер", callbackData: "controller"),
-            },
-        });
-        public static InlineKeyboardMarkup MsgDispetcher = new(new[]
-        {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Диспетчер", callbackData: "callTC"),
-            },
-        });
-        public static InlineKeyboardMarkup TextAll = new(new[]
-        {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Написать всем", callbackData: "textall"),
-            },
-        });
-
-
-
-
-
-        //    var inlineMarkup = new InlineKeyboardMarkup()
-        //        .AddNewRow("1.1", "1.2", "1.3")
-        //        .AddNewRow()
-        //            .AddButton("WithCallbackData", "CallbackData")
-        //            .AddButton(InlineKeyboardButton.WithUrl("WithUrl", "https://github.com/TelegramBots/Telegram.Bot"));
-        //await bot.SendMessage(msg.Chat, "Inline buttons:", replyMarkup: inlineMarkup);
-        //    break;
-        //case "/keyboard":
-        //    var replyMarkup = new ReplyKeyboardMarkup()
-        //        .AddNewRow("1.1", "1.2", "1.3")
-        //        .AddNewRow().AddButton("2.1").AddButton("2.2");
-        //await bot.SendMessage(msg.Chat, "Keyboard buttons:", replyMarkup: replyMarkup);
-        //    break;
-        //case "/remove":
-        //    await bot.SendMessage(msg.Chat, "Removing keyboard", replyMarkup: new ReplyKeyboardRemove());
-        //    break;
+            ResizeKeyboard = true
+        };
     }
 }
