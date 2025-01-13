@@ -101,10 +101,10 @@ namespace Project_Work_My_Telegram_bot
 
             switch (message.Text)
             {
-                case "Администратор":
+                case "Администратор": 
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
-                         text: $"Введите пололь:",
+                         text: $"Введите пороль администратора:",
                          cancellationToken: _cts!.Token,
                          replyMarkup: new ReplyKeyboardRemove());
                     //Тут двбиваем пороль после создаем админиа и пропускаем далее 
@@ -112,7 +112,7 @@ namespace Project_Work_My_Telegram_bot
                 case "Пользователь":
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
-                         text: $"Введите пололь:",
+                         text: $"Введите пороль пользвателя:",
                          cancellationToken: _cts!.Token,
                          replyMarkup: new ReplyKeyboardRemove());
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
@@ -120,9 +120,15 @@ namespace Project_Work_My_Telegram_bot
                 case "👤 Профиль":
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
-                         text: $"Введите пололь:",
+                         text: $"Меню 👤 Профиль", // Тут нужно добавить UserRole
                          cancellationToken: _cts!.Token,
                          replyMarkup: new ReplyKeyboardRemove());
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Регистрация профиля {"USER"}:", // Тут нужно добавить UserRole
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: KeyBoardSetting.profile);
+
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
                     break;
                 case "📚 Вывести отчет":
@@ -149,7 +155,30 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: new ReplyKeyboardRemove());
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
                     break;
-           
+                case "👤 Устанолвка пороля доступа":     
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                    break;
+                case "📝 Регистрация автопарка компании":
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                    break;
+                case "💰 Стоимость бензина":
+                    await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Введите пололь:",
+                         cancellationToken: _cts!.Token,
+                         replyMarkup: new ReplyKeyboardRemove());
+                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                    break;
                 default:
                     await _myBot!.SendMessage(message.Chat,
                         "Неизвестная комманда",
@@ -173,7 +202,7 @@ namespace Project_Work_My_Telegram_bot
                 case "/main":
                     await _myBot!.SendMessage(message.Chat,
                         "/Main - запуск основнного menu ",
-                        replyMarkup: KeyBoardSetting.keyboardMain,
+                        replyMarkup: KeyBoardSetting.keyboardMainAdmin,
                         cancellationToken: _cts!.Token);
                     break;
                 default:
@@ -184,7 +213,7 @@ namespace Project_Work_My_Telegram_bot
                     break;
             }
         }
-
+        //обработчик Inline 
         private static async Task BotClient_OnCallbackQuery(CallbackQuery callbackQuery)
         {
             var chatId = callbackQuery.Id;
