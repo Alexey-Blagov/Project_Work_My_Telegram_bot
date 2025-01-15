@@ -36,7 +36,7 @@ namespace Project_Work_My_Telegram_bot
         ];
         public static KeyboardButton[][] keyboardGasType =
         [
-            ["🪫 ДТ"], ["🔋 AИ-95"], ["🔋 AИ-92"]
+            ["🪫 ДТ", "🔋 AИ-95", "🔋 AИ-92"]
         ]; 
         public static ReplyKeyboardMarkup keyboardMainUser = new(keyboard: keyboardUser)
         {

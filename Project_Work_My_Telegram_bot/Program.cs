@@ -231,9 +231,9 @@ namespace Project_Work_My_Telegram_bot
         }
         //обработчик Inline 
         private static async Task BotClient_OnCallbackQuery(CallbackQuery callbackQuery)
-        {
+            {
             var datanow = DateTime.Now.ToShortTimeString();
-            var chatId = callbackQuery.Id;
+            var chatId = callbackQuery.Message!.Chat;
             string option = callbackQuery.Data ?? "";
 
             // Обработка выбора пользователя
