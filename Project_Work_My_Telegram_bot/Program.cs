@@ -16,6 +16,8 @@ using Telegram.Bots;
 using System.Security.AccessControl;
 using Telegram.Bot.Types.ReplyMarkups;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Polly;
+using System.Timers;
 
 
 
@@ -101,7 +103,7 @@ namespace Project_Work_My_Telegram_bot
 
             switch (message.Text)
             {
-                case "Администратор": 
+                case "Администратор":
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите пороль администратора:",
@@ -118,36 +120,50 @@ namespace Project_Work_My_Telegram_bot
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
                     break;
                 case "👤 Профиль":
+                    await _myBot!.DeleteMessage(
+                         message.Chat,
+                         messageId: message.MessageId - 1,
+                         cancellationToken: _cts.Token);
+
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
-                         text: $"Меню 👤 Профиль", // Тут нужно добавить UserRole
-                         cancellationToken: _cts!.Token,
-                         replyMarkup: new ReplyKeyboardRemove());
-                    await _myBot!.SendMessage(
-                         chatId: message.Chat,
-                         text: $"Регистрация профиля {"USER"}:", // Тут нужно добавить UserRole
-                         cancellationToken: _cts!.Token,
+                         text: $"Регистрация профиля {"USER"}:", // Тут нужно добавить User ФИО
                          replyMarkup: KeyBoardSetting.profile);
 
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
                     break;
                 case "📚 Вывести отчет":
+                    await _myBot!.DeleteMessage(
+                       message.Chat,
+                       messageId: message.MessageId - 1,
+                       cancellationToken: _cts.Token);
+
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите пололь:",
                          cancellationToken: _cts!.Token,
-                         replyMarkup: new ReplyKeyboardRemove());
-                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                         replyMarkup: KeyBoardSetting.regPath);
+                    //Тут вбиваем поhоль на доступ  после создаем юзера и пропускаем далее 
                     break;
                 case "📝 Регистрация поездки":
+                    await _myBot!.DeleteMessage(
+                      message.Chat,
+                      messageId: message.MessageId - 1,
+                      cancellationToken: _cts.Token);
+
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите пололь:",
                          cancellationToken: _cts!.Token,
-                         replyMarkup: new ReplyKeyboardRemove());
+                         replyMarkup: KeyBoardSetting.regPath);
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
                     break;
                 case "💰 Регистрация трат":
+                    await _myBot!.DeleteMessage(
+                         message.Chat,
+                         messageId: message.MessageId - 1,
+                         cancellationToken: _cts.Token);   
+
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите пололь:",
@@ -155,7 +171,7 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: new ReplyKeyboardRemove());
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
                     break;
-                case "👤 Устанолвка пороля доступа":     
+                case "👤 Устанолвка пороля доступа":
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите пололь:",
@@ -174,7 +190,7 @@ namespace Project_Work_My_Telegram_bot
                 case "💰 Стоимость бензина":
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
-                         text: $"Введите пололь:",
+                         text: $"Введите стоимость бензина:",
                          cancellationToken: _cts!.Token,
                          replyMarkup: new ReplyKeyboardRemove());
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
@@ -216,32 +232,82 @@ namespace Project_Work_My_Telegram_bot
         //обработчик Inline 
         private static async Task BotClient_OnCallbackQuery(CallbackQuery callbackQuery)
         {
+            var datanow = DateTime.Now.ToShortTimeString();
             var chatId = callbackQuery.Id;
-            var option = callbackQuery.Data;
+            string option = callbackQuery.Data ?? "";
 
             // Обработка выбора пользователя
-            string response = option switch
+            switch (option)
             {
-                "username" => "Вы выбрали Вариант username",
-                "jobtitle" => "Вы выбрали Вариант jobtitle",
-                "carname" => "Вы выбрали Вариант carname",
-                "carnumber" => "Вы выбрали Вариант carnumber",
-                "typefuel" => "Вы выбрали Вариант typefuel",
-                "gasconsum" => "Вы выбрали Вариант gasconsum",
-                "closed" => "Вы выбрали Вариант closed",
-                "objectname" => "Вы выбрали Вариант objectname",
-                "pathlengh" => "Вы выбрали Вариант pathlengh",
-                "profile" => "Вы выбрали Вариант profile",
-                "accept" => "Вы выбрали Вариант accept",
-
-                _ => "Неизвестный вариант."
+                case "username":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Введите Ф.И.О:",
+                    replyMarkup: new ReplyKeyboardRemove());
+                    break;
+                case "jobtitle":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Введите должность",
+                    replyMarkup: new ReplyKeyboardRemove());
+                    break;
+                case "carname":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Введите марку машины",
+                    replyMarkup: new ReplyKeyboardRemove());
+                    break;
+                case "carnumber":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Введите номер авто по шаблону H 000 EE 150",
+                    replyMarkup: new ReplyKeyboardRemove());
+                    break;
+                case "typefuel":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Выберете тип топлива",
+                    replyMarkup: KeyBoardSetting.keyboardMainGasType);
+                    break;
+                case "gasconsum":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Выберете срединй расход на 100 км",
+                    replyMarkup: new ReplyKeyboardRemove()); 
+                    break;
+                case "closed":
+                    await _myBot!.SendMessage(
+                 chatId: chatId,
+                 text: $"Завершено:",
+                 replyMarkup: new ReplyKeyboardRemove());
+                    break;
+                case "objectname":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Наименование объекта",
+                    replyMarkup: new ReplyKeyboardRemove());
+                    break;
+                case "pathlengh":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Введите длинну полного пути в км.",
+                    replyMarkup: new ReplyKeyboardRemove());
+                    break;
+                //case "profile":
+                //    await _myBot!.SendMessage(
+                //    chatId: chatId,
+                //    text: $"Введите длинну полного пути в км.",
+                //    replyMarkup: new ReplyKeyboardRemove());
+                //    break;
+                case "date":
+                    await _myBot!.SendMessage(
+                    chatId: chatId,
+                    text: $"Дата поездки текущая ? {datanow}:",
+                    replyMarkup: KeyBoardSetting.actionAccept);
+                    break;
+                default:
+                    break;
             };
-
-            await _myBot!.AnswerCallbackQuery(chatId, response);
-            await _myBot!.SendMessage(chatId, response);
         }
-
     }
-
-
 }

@@ -18,7 +18,7 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //Должность:  jobTitle string
         //Дата  регистрации в БД(берем из текущей даты)  Date.Now Short
         [Key]
-        public int Id { get; set; }
+        public int IdTg { get; set; }
         public UserType Type { get; set; } = UserType.Simple;
         public long? TgChatId { get; set; }
         public string? FirstName { get; set; }
