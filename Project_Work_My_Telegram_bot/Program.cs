@@ -26,8 +26,13 @@ namespace Project_Work_My_Telegram_bot
     internal class Program
     {
         private const string _token = "7516165506:AAHgVKs9K2zHsyKJqVwSFzY4D8BsDIpVLLE";
+
+        private static string _passAdmin = "12345"; 
+        private static string _passUser = "qwety";  
+
         private static TelegramBotClient? _myBot;
         private static CancellationTokenSource? _cts;
+
 
         static async Task Main()
         {
@@ -92,10 +97,14 @@ namespace Project_Work_My_Telegram_bot
                         command = command[..at];
                     else
                         return; // command was not targeted at me
+
                 await OnCommand(command, text[space..].TrimStart(), message);
             }
             else
+            {
+
                 await OnTextMessage(message);
+            }
         }
         private static async Task OnTextMessage(Message message)
         {
@@ -109,6 +118,14 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Введите пороль администратора:",
                          cancellationToken: _cts!.Token,
                          replyMarkup: new ReplyKeyboardRemove());
+                    if (message.Text != _passAdmin)
+                    {
+                        await _myBot!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Пороль введен не корректно:",
+                         cancellationToken: _cts!.Token);
+                        return;
+                    } 
                     //Тут двбиваем пороль после создаем админиа и пропускаем далее 
                     break;
                 case "Пользователь":
@@ -117,7 +134,7 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Введите пороль пользвателя:",
                          cancellationToken: _cts!.Token,
                          replyMarkup: new ReplyKeyboardRemove());
-                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                         
                     break;
                 case "👤 Профиль":
                     await _myBot!.DeleteMessage(
@@ -143,7 +160,7 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Введите пололь:",
                          cancellationToken: _cts!.Token,
                          replyMarkup: KeyBoardSetting.regPath);
-                    //Тут вбиваем поhоль на доступ  после создаем юзера и пропускаем далее 
+                    
                     break;
                 case "📝 Регистрация поездки":
                     await _myBot!.DeleteMessage(
@@ -156,13 +173,13 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Введите пололь:",
                          cancellationToken: _cts!.Token,
                          replyMarkup: KeyBoardSetting.regPath);
-                    //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
+                     
                     break;
                 case "💰 Регистрация трат":
                     await _myBot!.DeleteMessage(
                          message.Chat,
                          messageId: message.MessageId - 1,
-                         cancellationToken: _cts.Token);   
+                         cancellationToken: _cts!.Token);   
 
                     await _myBot!.SendMessage(
                          chatId: message.Chat,
