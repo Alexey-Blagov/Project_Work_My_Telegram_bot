@@ -21,6 +21,7 @@ using System.Timers;
 
 
 
+
 namespace Project_Work_My_Telegram_bot
 {
     internal class Program
@@ -276,6 +277,11 @@ namespace Project_Work_My_Telegram_bot
                     replyMarkup: new ReplyKeyboardRemove()); 
                     break;
                 case "closed":
+                    await _myBot!.DeleteMessage(
+                    chatId,
+                         messageId: callbackQuery.Message.Id,
+                         cancellationToken: _cts.Token);
+
                     await _myBot!.SendMessage(
                  chatId: chatId,
                  text: $"Завершено:",
