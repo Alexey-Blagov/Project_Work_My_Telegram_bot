@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-    internal class ObjectPath
+    public partial class ObjectPath
     {
         //Дата поездки: 2 варианта(клавиатура (Сегодня поездка) или ввести в формате ДД.ММ.ГГГГ)
         //Переменная отвечающая за транспорт в пути: Личный транспорт или гаражный парк ++ 

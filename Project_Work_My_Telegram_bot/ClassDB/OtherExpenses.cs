@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-    internal class OtherExpenses
+    public partial class OtherExpenses
     {
         //Наименование затрат(string) ++
         //Сумма затраты Decimal ++

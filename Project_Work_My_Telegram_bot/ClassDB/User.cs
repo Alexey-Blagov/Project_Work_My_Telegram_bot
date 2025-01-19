@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
     public enum UserType { Simple = 1, Admin = 2 };
-    public class User
+    public partial class User
     {
         //        UserId(Назначаемый БД) int
         //ID_Chat: Уникальный идентификатор telegram(ChatId)  long
