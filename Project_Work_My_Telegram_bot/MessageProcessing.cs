@@ -20,7 +20,9 @@ namespace Project_Work_My_Telegram_bot
     public class MessageProcessing
     {
         private TelegramBotClient _botClient;
-        
+        private string _passwordUser;
+        private string _passwordAdmin; 
+
         public UserType isRole = UserType.Non; 
         public event handelmessage? OnMeessage;
         public event handelmessage? OnCallbackQuery;
@@ -32,7 +34,9 @@ namespace Project_Work_My_Telegram_bot
         }
         public async Task OnTextMessage(Message message, string passAdmin, string passUser)
         {
-            if (isRole == UserType.Non) { }
+            _passwordAdmin = passAdmin; 
+            _passwordUser = passUser; 
+
             switch (message.Text)
             {
                 case "Администратор":
@@ -52,6 +56,7 @@ namespace Project_Work_My_Telegram_bot
                     OnMeessage += MessageHandlePassUser;
                     break;
                 case "👤 Профиль":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.DeleteMessage(
                          message.Chat,
                          messageId: message.MessageId - 1);
@@ -62,6 +67,7 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: KeyBoardSetting.profile);
                     break;
                 case "📚 Вывести отчет":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.DeleteMessage(
                        message.Chat,
                        messageId: message.MessageId - 1);
@@ -72,6 +78,7 @@ namespace Project_Work_My_Telegram_bot
                         // replyMarkup: KeyBoardSetting.report);
                     break;
                 case "📝 Регистрация поездки":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.DeleteMessage(
                       message.Chat,
                       messageId: message.MessageId - 1);
@@ -82,6 +89,7 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: KeyBoardSetting.regPath);
                     break;
                 case "💰 Регистрация трат":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.DeleteMessage(
                          message.Chat,
                          messageId: message.MessageId - 1
@@ -97,6 +105,7 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: KeyBoardSetting.regCost);
                     break;
                 case "👤 Установка пороля доступа":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите пололь:",
@@ -104,6 +113,7 @@ namespace Project_Work_My_Telegram_bot
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
                     break;
                 case "📝 Регистрация автопарка компании":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите пололь:",
@@ -111,23 +121,27 @@ namespace Project_Work_My_Telegram_bot
                     //Тут вбиваем пороль на доступ  после создаем юзера и пропускаем далее 
                     break;
                 case "💰 Стоимость бензина":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите стоимость бензина:",
                          replyMarkup: new ReplyKeyboardRemove());
                     break;
                 case "🪫 ДТ":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Выбран тип топлива : \U0001faab ДТ ");
                     break;
                 case "🔋 AИ-95":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Выбран тип топлива : 🔋 AИ-95 ");
                     break;
 
                 case "🔋 AИ-92":
+                    if (isRole == UserType.Non) return;
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Выбран тип топлива : 🔋 AИ-92 ");
@@ -135,6 +149,9 @@ namespace Project_Work_My_Telegram_bot
 
                  
                 default:
+                    
+                    if (isRole == UserType.Non) return;
+                    
                     OnMeessage?.Invoke(message.Text!.ToString(), message.Chat);
                     OnCallbackQuery?.Invoke(message.Text!.ToString(), message.Chat);
 
@@ -146,12 +163,18 @@ namespace Project_Work_My_Telegram_bot
 
         private void MessageHandlePassAdmin(string text, Chat chatId)
         {
-            Console.WriteLine("Поллучено сообщение Admin для обработки: {0}", text);
-            
-
+            Console.WriteLine("Получено сообщение завпрос Admin прав ля обработки: {0}", text);
+            if (text == _passwordAdmin) 
+                {
+                    isRole = UserType.Admin;
+                    _botClient.SendMessage(
+                    chatId: chatId,
+                    text: $"Введен пороль администатора",
+                    replyMarkup: new ReplyKeyboardRemove());
+            }
             _botClient.SendMessage(
                          chatId: chatId,
-                         text: $"Пороль {text}",
+                         text: $"Пороль введен не корректно попробуйте снова комманда /start",
                          replyMarkup: new ReplyKeyboardRemove());
             OnMeessage -= MessageHandlePassAdmin;
         }

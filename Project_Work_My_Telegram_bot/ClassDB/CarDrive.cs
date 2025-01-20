@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-    public enum Fuel { dizel = 1, ai95 = 2, ai92 = 3 };
+    
     public partial class CarDrive
     {
         //Марка машины string
