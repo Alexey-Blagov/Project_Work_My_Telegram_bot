@@ -18,7 +18,7 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         public string? CarName { get; set; }
         public string? CarNumber { get; set; }
         public double GasСonsum { get; set; } = 0;
-        public Fuel TypeFuel { get; set; } = Fuel.ai92;
+        public string TypeFuel { get; set; } = Fuel.ai92.ToString();
 
     }
 }

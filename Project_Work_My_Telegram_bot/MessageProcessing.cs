@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,24 +16,23 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 namespace Project_Work_My_Telegram_bot
 {
     public delegate void handelmessage(string text, Chat chatId);
-
+    
     public class MessageProcessing
     {
         private TelegramBotClient _botClient;
-
-        private bool _isUser = false; 
-        private bool _isAdmin = false; 
-
+        
+        public UserType isRole = UserType.Non; 
         public event handelmessage? OnMeessage;
         public event handelmessage? OnCallbackQuery;
 
         public MessageProcessing(TelegramBotClient botClient)
         {
             this._botClient = botClient;
+            
         }
         public async Task OnTextMessage(Message message, string passAdmin, string passUser)
         {
-
+            if (isRole == UserType.Non) { }
             switch (message.Text)
             {
                 case "Администратор":
@@ -148,6 +148,7 @@ namespace Project_Work_My_Telegram_bot
         {
             Console.WriteLine("Поллучено сообщение Admin для обработки: {0}", text);
             
+
             _botClient.SendMessage(
                          chatId: chatId,
                          text: $"Пороль {text}",

@@ -21,6 +21,7 @@ using System.Timers;
 
 namespace Project_Work_My_Telegram_bot
 {
+    public enum UserType { Non = 0, Simple = 1, Admin = 2 };
     internal class Program
     {
         private const string _token = "7516165506:AAHgVKs9K2zHsyKJqVwSFzY4D8BsDIpVLLE";

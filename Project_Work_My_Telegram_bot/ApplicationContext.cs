@@ -26,7 +26,7 @@ namespace Project_Work_My_Telegram_bot
                 "Port=5432;" +
                 "Database=MySQLtable;" +
                 "Username=postgres;" +
-                "Password=20071978");
+                "Password=20071978");           
         }
     }
 }
