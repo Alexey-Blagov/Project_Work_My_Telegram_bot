@@ -8,17 +8,22 @@ using System.Threading.Tasks;
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
     
-    public partial class CarDrive
+    public class CarDrive
     {
-        //Марка машины string
-        //Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 Enum
-        //Средний расход бензина на 100 км.пути
+        //CarId: 
+        //CarName: Марка машины
+        //CarNumber: Нимер машины по шаблону H 000 EE 150
+        //GasСonsum: Средний расход бензина на 100 км.пути
+        //Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 из типа Enum 
+        //UserId: Id user а которому принадлежит транвспорт Null машина конторская  
+        //UserCr: Екземплыр класса Юсера Null машина конторская 
         [Key]
         public int CarId { get; set; }
         public string? CarName { get; set; }
         public string? CarNumber { get; set; }
-        public double GasСonsum { get; set; } = 0;
+        public double GasСonsum { get; set; } = 0.0;
         public string TypeFuel { get; set; } = Fuel.ai92.ToString();
 
+        public List<User>? Users { get; set; } = []; 
     }
 }

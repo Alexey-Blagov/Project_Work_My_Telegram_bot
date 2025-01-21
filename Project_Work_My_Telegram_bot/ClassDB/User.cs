@@ -10,22 +10,29 @@ using System.ComponentModel.DataAnnotations;
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
     
-    public partial class User
+    public class User
     {
-        //        UserId(Назначаемый БД) int
-        //ID_Chat: Уникальный идентификатор telegram(ChatId)  long
-        //Name: ФИО(Surname, Name, SecondName)
-        //Должность:  jobTitle string
-        //Дата  регистрации в БД(берем из текущей даты)  Date.Now Short
-        [Key]
+        //UserId = назначается tgbot ID  + 
+        //UserRol: Идентификатор User Admin права  
+        //TgUsername: Имя при регистрации в боте (может быть не указано) 
+        //UserName: ФИО + 
+        //JobTitle: Должность +
+        //Рersonalcar: Экземпляр персональной авто на данном User 
+        //CarDrive: Личная машина  
+        //ObjectPath Объекты все пути 
+        //OtherExpenses: 
         public int IdTg { get; set; }
-        public string Type { get; set; } = UserType.Simple.ToString(); 
-        public long? TgChatId { get; set; }
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public string? Surname { get; set; }
-        public string? JobTitle { get; set; }
-        public static DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public string TgUserName { get; set; } = string.Empty; 
+        public string UserRol { get; set; } = UserType.Non.ToString();
+        public string? UserName { get; set; }
+        public string? JobTitlel { get; set; }
+        public int CarId { get; set; }    
+        public CarDrive? CarDrive { get; set; } 
+        public List<ObjectPath> ObjectPath { get; set; } = [];
+        public List<OtherExpenses> OtherExpenses { get; set; } = []; 
+
+       
+
     }
 
 }

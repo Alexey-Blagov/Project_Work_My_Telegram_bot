@@ -7,15 +7,20 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-    public partial class OtherExpenses
+    public class OtherExpenses
     {
-        //Наименование затрат(string) ++
-        //Сумма затраты Decimal ++
-        //Дата затрат:  ++
+        //ExpId  ++ (ID затрат) 
+        //NameExpense Наименование затрат(string) ++
+        //Coast: Стоимость затрат тип Decimal ++ 
+        //dateTimeExp Дата трат  
+        //UserId Форинкей на юзера Юсера осуществивший траты
+        //UserExp: Екземплыр класса Юсера осуществивший траты
         [Key]
         public int ExpId { get; set; } 
-        public string? NameExpense { get; set; }
+        public string NameExpense { get; set; } = string.Empty; 
         public decimal Coast { get; set; } = 0;
-        public DateTime dateTime { get; set; } = DateTime.Now; 
+        public DateTime DateTimeExp { get; set; } = DateTime.Now; 
+        public int? UserId { get; set; }
+        public User? UserExp { get; set; }
     }
 }

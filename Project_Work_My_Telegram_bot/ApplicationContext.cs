@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Project_Work_My_Telegram_bot.ClassDB;
+using Project_Work_My_Telegram_bot.Configurations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,11 @@ namespace Project_Work_My_Telegram_bot
 {
     public class ApplicationContext : DbContext
     {
-        public DbSet<User> User { get; set; }
-        public DbSet<CarDrive> CarDrive { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<CarDrive> CarDrives{ get; set; }
         public DbSet<ObjectPath> ObjectPaths { get; set; }
         public DbSet<OtherExpenses> OtherExpenses { get; set; }
-
-        protected ApplicationContext()
+        public ApplicationContext()
         {
             Database.EnsureCreated();
         }
@@ -24,9 +24,18 @@ namespace Project_Work_My_Telegram_bot
             optionsBuilder.UseNpgsql(
                 "Host=localhost;" +
                 "Port=5432;" +
-                "Database=MySQLtable;" +
+                "Database=Users1;" +
                 "Username=postgres;" +
                 "Password=20071978");           
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {       
+            modelBuilder.ApplyConfiguration(new UserConfigurations());
+            modelBuilder.ApplyConfiguration(new ObjectPathDriveConfigurations());
+            modelBuilder.ApplyConfiguration(new CarDriveConfigurations());
+            modelBuilder.ApplyConfiguration(new OtherExpensesConfigurations());
+           
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

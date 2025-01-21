@@ -1,0 +1,27 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Project_Work_My_Telegram_bot.ClassDB;
+
+namespace Project_Work_My_Telegram_bot.Configurations
+{
+    public class UserConfigurations : IEntityTypeConfiguration<User>
+
+    {
+        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<User> builder)
+        {
+            builder.
+                HasKey(a => a.IdTg);
+            builder.HasMany(u => u.ObjectPath).
+                WithOne(p => p.UserPath).
+                HasForeignKey(c => c.CarId); 
+            builder.HasMany (u=>u.OtherExpenses).
+                WithOne(e=>e.UserExp).
+                HasForeignKey(e=>e.UserId);   
+        }
+    }
+}
