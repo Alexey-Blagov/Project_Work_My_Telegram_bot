@@ -109,7 +109,7 @@ namespace Project_Work_My_Telegram_bot
                             return; // command was not targeted at me
 
                     //обработчик комманд
-                    await _messageProcessing.OnCommand(command, text[space..].TrimStart(), message);
+                    _messageProcessing.OnCommand(command, text[space..].TrimStart(), message);
                 }
                 else 
                 {

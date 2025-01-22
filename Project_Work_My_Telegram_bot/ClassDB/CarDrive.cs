@@ -12,6 +12,7 @@ namespace Project_Work_My_Telegram_bot.ClassDB
     {
         //CarId: 
         //CarName: Марка машины
+        //isPersonalCar: true машина личная, false машина конторская 
         //CarNumber: Нимер машины по шаблону H 000 EE 150
         //GasСonsum: Средний расход бензина на 100 км.пути
         //Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 из типа Enum 
@@ -20,10 +21,10 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         [Key]
         public int CarId { get; set; }
         public string? CarName { get; set; }
+        public bool isPersonalCar { get; set; } = true; 
         public string? CarNumber { get; set; }
         public double GasСonsum { get; set; } = 0.0;
         public string TypeFuel { get; set; } = Fuel.ai92.ToString();
-
         public List<User>? Users { get; set; } = []; 
     }
 }

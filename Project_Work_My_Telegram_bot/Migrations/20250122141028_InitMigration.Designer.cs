@@ -12,8 +12,8 @@ using Project_Work_My_Telegram_bot;
 namespace Project_Work_My_Telegram_bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250121184227_InitCreate")]
-    partial class InitCreate
+    [Migration("20250122141028_InitMigration")]
+    partial class InitMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,6 +46,9 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.Property<string>("TypeFuel")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("isPersonalCar")
+                        .HasColumnType("boolean");
 
                     b.HasKey("CarId");
 

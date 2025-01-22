@@ -44,6 +44,9 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("isPersonalCar")
+                        .HasColumnType("boolean");
+
                     b.HasKey("CarId");
 
                     b.HasAlternateKey("CarNumber");

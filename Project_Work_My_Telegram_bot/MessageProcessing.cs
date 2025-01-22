@@ -12,30 +12,30 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bots;
 using Telegram.Bots.Http;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Project_Work_My_Telegram_bot
 {
-    public delegate void handelmessage(string text, Chat chatId);
-    
+    public delegate void handelmessage(Message message);
+
     public class MessageProcessing
     {
         private TelegramBotClient _botClient;
         private string _passwordUser;
-        private string _passwordAdmin; 
+        private string _passwordAdmin;
 
-        public UserType isRole = UserType.Non; 
+        public UserType isRole = UserType.Non;
         public event handelmessage? OnMeessage;
         public event handelmessage? OnCallbackQuery;
 
         public MessageProcessing(TelegramBotClient botClient)
         {
             this._botClient = botClient;
-            
         }
         public async Task OnTextMessage(Message message, string passAdmin, string passUser)
         {
-            _passwordAdmin = passAdmin; 
-            _passwordUser = passUser; 
+            _passwordAdmin = passAdmin;
+            _passwordUser = passUser;
 
             switch (message.Text)
             {
@@ -45,14 +45,14 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Введите пороль администратора:",
                          replyMarkup: new ReplyKeyboardRemove());
                     OnMeessage += MessageHandlePassAdmin;
-                    
+
                     break;
                 case "Пользователь":
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Введите пороль пользвателя:",
                          replyMarkup: new ReplyKeyboardRemove());
-                   
+
                     OnMeessage += MessageHandlePassUser;
                     break;
                 case "👤 Профиль":
@@ -60,7 +60,7 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.DeleteMessage(
                          message.Chat,
                          messageId: message.MessageId - 1);
-                
+
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Регистрация профиля:", // Тут нужно добавить User ФИО
@@ -75,7 +75,7 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Отчет:");
-                        // replyMarkup: KeyBoardSetting.report);
+                    // replyMarkup: KeyBoardSetting.report);
                     break;
                 case "📝 Регистрация поездки":
                     if (isRole == UserType.Non) return;
@@ -147,13 +147,13 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Выбран тип топлива : 🔋 AИ-92 ");
                     break;
 
-                 
+
                 default:
-                    
-                    if (isRole == UserType.Non) return;
-                    
-                    OnMeessage?.Invoke(message.Text!.ToString(), message.Chat);
-                    OnCallbackQuery?.Invoke(message.Text!.ToString(), message.Chat);
+
+                    //if (isRole == UserType.Non) return; - тут нужно закинуть Юзера из bd на проверку 
+
+                    OnMeessage?.Invoke(message);
+                    OnCallbackQuery?.Invoke(message);
 
                     //await  MessageHandler (message.Text!.ToString());
                     break;
@@ -161,38 +161,71 @@ namespace Project_Work_My_Telegram_bot
             //await OnCommand("/start", "", message); // Запускаем комманду старт /start
         }
 
-        private void MessageHandlePassAdmin(string text, Chat chatId)
+        private void MessageHandlePassAdmin(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
+
             Console.WriteLine("Получено сообщение завпрос Admin прав ля обработки: {0}", text);
-            if (text == _passwordAdmin) 
-                {
-                    isRole = UserType.Admin;
-                    _botClient.SendMessage(
-                    chatId: chatId,
-                    text: $"Введен пороль администатора",
-                    replyMarkup: new ReplyKeyboardRemove());
+            if (text == _passwordAdmin)
+            {
+                isRole = UserType.Admin;
+                _botClient.SendMessage(
+                chatId: chatId,
+                text: $"Введен пороль администатора",
+                replyMarkup: new ReplyKeyboardRemove());
+                OnMeessage -= MessageHandlePassAdmin;
+
+                _botClient.SendMessage(
+       chatId: chatId,
+       text: "/Main - запуск основнного menu",
+       replyMarkup: KeyBoardSetting.keyboardMainAdmin);
             }
-            _botClient.SendMessage(
-                         chatId: chatId,
-                         text: $"Пороль введен не корректно попробуйте снова комманда /start",
-                         replyMarkup: new ReplyKeyboardRemove());
-            OnMeessage -= MessageHandlePassAdmin;
+            else
+            {
+                _botClient.SendMessage(
+                             chatId: chatId,
+                             text: $"Пороль введен не корректно попробуйте снова",
+                             replyMarkup: new ReplyKeyboardRemove());
+                OnMeessage -= MessageHandlePassAdmin;
+                OnCommand("/start", "", msg);
+            }
         }
 
-        public void MessageHandlePassUser(string text, Chat chatId)
+        public void MessageHandlePassUser(Message msg)
         {
-            Console.WriteLine("Поллучено сообщение User для обработки: {0}", text);
-            _botClient.SendMessage(
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
+            Console.WriteLine("Поллучено сообщение User завпрос Admin прав ля обработки: {0}", text);
+            if (text == _passwordUser)
+            {
+                _botClient.SendMessage(
                           chatId: chatId,
-                          text: $"Пороль {text}",
+                          text: $"Введен пороль прова доступа User",
                           replyMarkup: new ReplyKeyboardRemove());
-            OnMeessage -= MessageHandlePassUser;
+                OnMeessage -= MessageHandlePassUser;
+
+                _botClient.SendMessage(
+                       chatId: chatId,
+                       text: "/Main - запуск основнного menu",
+                       replyMarkup: KeyBoardSetting.keyboardMainUser
+                       );
+            }
+            else
+            {
+                _botClient.SendMessage(
+                             chatId: chatId,
+                             text: $"Пороль введен не корректно попробуйте снова",
+                             replyMarkup: new ReplyKeyboardRemove());
+                OnMeessage -= MessageHandlePassAdmin;
+                OnCommand("/start", "", msg);
+            }
         }
 
         public async Task BotClientOnCallbackQuery(CallbackQuery callbackQuery)
         {
-           OnCallbackQuery = null; 
-           var datanow = DateTime.Now.ToShortDateString();
+            OnCallbackQuery = null;
+            var datanow = DateTime.Now.ToShortDateString();
             var chatId = callbackQuery.Message!.Chat;
             string option = callbackQuery.Data ?? "";
 
@@ -283,7 +316,7 @@ namespace Project_Work_My_Telegram_bot
                     OnCallbackQuery += EnterCost;
                     break;
                 case "change":
-                    await  OnCommand("/start","", callbackQuery.Message!);
+                    OnCommand("/start", "", callbackQuery.Message!);
                     break;
 
                 case "date":
@@ -306,8 +339,10 @@ namespace Project_Work_My_Telegram_bot
             };
         }
 
-        private void EnterNameCost(string text, Chat chatId)
+        private void EnterNameCost(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             Console.WriteLine("Введена наименование затрат", text);
             _botClient.SendMessage(
                             chatId: chatId,
@@ -315,8 +350,10 @@ namespace Project_Work_My_Telegram_bot
                             replyMarkup: new ReplyKeyboardRemove());
             OnCallbackQuery -= EnterNameCost;
         }
-        private void Enterjobtitle(string text, Chat chatId)
+        private void Enterjobtitle(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             Console.WriteLine("Введена должность", text);
             _botClient.SendMessage(
                             chatId: chatId,
@@ -325,17 +362,21 @@ namespace Project_Work_My_Telegram_bot
             OnCallbackQuery -= Enterjobtitle;
         }
 
-        private void EnterCost(string text, Chat chatId)
+        private void EnterCost(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             Console.WriteLine("Введена стоимость затрат", text);
             _botClient.SendMessage(
                             chatId: chatId,
                             text: $"Введена стоимость затрат {text}",
                             replyMarkup: new ReplyKeyboardRemove());
             OnCallbackQuery -= EnterCost;
-        }  
-        private void EnterlengthPath(string text, Chat chatId)
+        }
+        private void EnterlengthPath(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             Console.WriteLine("Длинна пути {0}", text);
             _botClient.SendMessage(
                            chatId: chatId,
@@ -343,8 +384,10 @@ namespace Project_Work_My_Telegram_bot
                            replyMarkup: new ReplyKeyboardRemove());
             OnCallbackQuery -= EnterlengthPath;
         }
-        private void EnterObject(string text, Chat chatId)
+        private void EnterObject(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             Console.WriteLine("Наименование объекта {0}", text);
             _botClient.SendMessage(
                            chatId: chatId,
@@ -352,16 +395,20 @@ namespace Project_Work_My_Telegram_bot
                            replyMarkup: new ReplyKeyboardRemove());
             OnCallbackQuery -= EnterObject;
         }
-        private void Insertcarnumber(string text, Chat chatId)
+        private void Insertcarnumber(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             _botClient.SendMessage(
                           chatId: chatId,
                           text: $"Номер машины {text}",
                           replyMarkup: new ReplyKeyboardRemove());
             OnCallbackQuery -= Insertcarnumber;
         }
-        private void Insertcarname(string text, Chat chatId)
+        private void Insertcarname(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             Console.WriteLine("Название машины {0}", text);
             _botClient.SendMessage(
                          chatId: chatId,
@@ -369,8 +416,10 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: new ReplyKeyboardRemove());
             OnCallbackQuery -= Insertcarname;
         }
-        private void EnterGasConsum(string text, Chat chatId)
+        private void EnterGasConsum(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             Console.WriteLine("Введен расход топлива: {0}", text);
             _botClient.SendMessage(
                          chatId: chatId,
@@ -378,8 +427,10 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: new ReplyKeyboardRemove());
             OnCallbackQuery -= EnterGasConsum;
         }
-        private void InsertUser(string text, Chat chatId)
+        private void InsertUser(Message msg)
         {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
             Console.WriteLine("Введен расход топлива: {0}", text);
             _botClient.SendMessage(
                          chatId: chatId,
@@ -387,26 +438,26 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: new ReplyKeyboardRemove());
             OnCallbackQuery -= InsertUser;
         }
-        public async Task OnCommand(string command, string v, Message message)
+        public void OnCommand(string command, string v, Message message)
         {
             switch (command)
             {
                 case "/start":
-                    await _botClient.SendMessage(message.Chat,
-                        "/start - запуск",
-                        replyMarkup: KeyBoardSetting.startkeyboard);
+                    _botClient.SendMessage(message.Chat,
+                       "/start - запуск",
+                       replyMarkup: KeyBoardSetting.startkeyboard);
                     break;
                 case "/main":
-                    await _botClient.SendMessage(message.Chat,
-                        "/Main - запуск основнного menu",
-                        replyMarkup: KeyBoardSetting.keyboardMainAdmin
-                        );
+                    _botClient.SendMessage(message.Chat,
+                       "/Main - запуск основнного menu",
+                       replyMarkup: KeyBoardSetting.keyboardMainAdmin
+                       );
                     break;
                 default:
-                    await _botClient.SendMessage(
-                         chatId: message.Chat,
-                         text: $"Полученна неизвестная комманда"
-                        );
+                    _botClient.SendMessage(
+                        chatId: message.Chat,
+                        text: $"Полученна неизвестная комманда"
+                       );
                     break;
             }
         }
