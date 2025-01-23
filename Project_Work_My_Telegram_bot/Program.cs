@@ -72,7 +72,7 @@ namespace Project_Work_My_Telegram_bot
                 switch (update)
                 {
                     case { CallbackQuery: { } callbackQuery }:
-                            
+                           
                             await _messageProcessing.BotClientOnCallbackQuery(callbackQuery);
                     break;
                     default: 

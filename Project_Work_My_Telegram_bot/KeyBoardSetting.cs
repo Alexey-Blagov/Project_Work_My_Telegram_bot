@@ -70,23 +70,13 @@ namespace Project_Work_My_Telegram_bot
                   InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию", callbackData: "closed")
               },
         });
-        // Инлайнер клапвиатура регистрации пользователя тип Admin регистрация 
-        public static InlineKeyboardMarkup curentDate = new(new[]
+        // Инлайнер клавиатура регистрации пользователя тип Admin регистрация 
+        public static InlineKeyboardMarkup report = new(new[]
         {
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "👤 Ф.И.О", callbackData: "curent"),
+                InlineKeyboardButton.WithCallbackData(text: "Сформировать отчет за месяц", callbackData: "reportbyMonth"),
                 InlineKeyboardButton.WithCallbackData(text: "👤 Должность", callbackData: "jobtitle"),
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "🚗 Марка машины", callbackData: "carname"),
-                InlineKeyboardButton.WithCallbackData(text: "🇷🇺 Госномер", callbackData: "carnumber")
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
-                InlineKeyboardButton.WithCallbackData(text: "Расход на 100 км.", callbackData: "gasconsum"),
             },
             new []
             {
