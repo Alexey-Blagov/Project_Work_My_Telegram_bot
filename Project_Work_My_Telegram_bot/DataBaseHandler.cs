@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Project_Work_My_Telegram_bot.ClassDB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Requests;
+
 
 namespace Project_Work_My_Telegram_bot
 {
@@ -13,18 +16,16 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-              
+
             };
         }
-
-        // получение роли юзера
-        //public static async Task <User> GetUserRole(long TgId)
-        //{
-        //    using (ApplicationContext db = new ApplicationContext())
-        //    {
-        //        var user = await db.UserRoles.FirstOrDefaultAsync(x => x.TgId == TgId);
-        //        return user;
-        //    }
-        //}
+        public static async Task<UserType> GetUserRole(long IdTg)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                return (UserType)user.UserRol;
+            }
+        }
     }
 }

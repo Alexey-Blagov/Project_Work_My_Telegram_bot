@@ -11,10 +11,10 @@ namespace Project_Work_My_Telegram_bot
 {
     public class ApplicationContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<CarDrive> CarDrives{ get; set; }
-        public DbSet<ObjectPath> ObjectPaths { get; set; }
-        public DbSet<OtherExpenses> OtherExpenses { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<CarDrive> CarDrive{ get; set; }
+        public DbSet<ObjectPath> ObjectPath { get; set; }
+        public DbSet<OtherExpenses> OtherExpense { get; set; }
         public ApplicationContext()
         {
             Database.EnsureCreated();

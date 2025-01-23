@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-    
+
     public class User
     {
         //UserId = назначается tgbot ID  + 
@@ -21,17 +21,17 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //CarDrive: Личная машина  
         //ObjectPath Объекты все пути 
         //OtherExpenses: 
-        public int IdTg { get; set; }
-        public string TgUserName { get; set; } = string.Empty; 
-        public string UserRol { get; set; } = UserType.Non.ToString();
+        public long IdTg { get; set; }
+        public string TgUserName { get; set; } = string.Empty;
+        public int UserRol { get; set; } = (int)UserType.Non;
         public string? UserName { get; set; }
         public string? JobTitlel { get; set; }
-        public int CarId { get; set; }    
-        public CarDrive? CarDrive { get; set; } 
+        public int CarId { get; set; }
+        public CarDrive? CarDrive { get; set; }
         public List<ObjectPath> ObjectPath { get; set; } = [];
-        public List<OtherExpenses> OtherExpenses { get; set; } = []; 
+        public List<OtherExpenses> OtherExpenses { get; set; } = [];
 
-       
+
 
     }
 

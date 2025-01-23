@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-    
+
     public class CarDrive
     {
         //CarId: 
@@ -21,10 +21,10 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         [Key]
         public int CarId { get; set; }
         public string? CarName { get; set; }
-        public bool isPersonalCar { get; set; } = true; 
+        public bool isPersonalCar { get; set; } = true;
         public string? CarNumber { get; set; }
         public double GasСonsum { get; set; } = 0.0;
-        public string TypeFuel { get; set; } = Fuel.ai92.ToString();
-        public List<User>? Users { get; set; } = []; 
+        public int TypeFuel { get; set; } = (int)Fuel.ai92;
+        public List<User>? Users { get; set; } = [];
     }
 }
