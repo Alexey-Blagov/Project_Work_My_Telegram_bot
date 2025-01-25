@@ -19,12 +19,12 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //UserId: Id user а которому принадлежит транвспорт Null машина конторская  
         //UserCr: Екземплыр класса Юсера Null машина конторская 
         [Key]
-        public int CarId { get; set; }
+        public long CarId { get; set; }
         public string? CarName { get; set; }
         public bool isPersonalCar { get; set; } = true;
         public string? CarNumber { get; set; }
         public double GasСonsum { get; set; } = 0.0;
         public int TypeFuel { get; set; } = (int)Fuel.ai92;
-        public List<User>? Users { get; set; } = [];
+        public List<User>? User { get; set; } = [];
     }
 }

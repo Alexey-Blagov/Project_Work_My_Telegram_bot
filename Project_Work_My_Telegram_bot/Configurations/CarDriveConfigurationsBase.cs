@@ -11,9 +11,8 @@ namespace Project_Work_My_Telegram_bot.Configurations
             builder.
                 HasKey(a => a.CarId);
             builder.
-                HasMany(c=>c.Users).
-                WithOne (u=>u.CarDrive).
-                HasForeignKey(u => u.CarId);
+                HasMany(c=>c.User).
+                WithOne (u=>u.Рersonalcar);
             builder.
                 HasAlternateKey(u => u.CarNumber); 
         }

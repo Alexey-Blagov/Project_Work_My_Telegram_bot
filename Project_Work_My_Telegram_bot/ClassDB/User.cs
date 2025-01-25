@@ -18,7 +18,6 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //UserName: ФИО + 
         //JobTitle: Должность +
         //Рersonalcar: Экземпляр персональной авто на данном User 
-        //CarDrive: Личная машина  
         //ObjectPath Объекты все пути 
         //OtherExpenses: 
         public long IdTg { get; set; }
@@ -26,8 +25,7 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         public int UserRol { get; set; } = (int)UserType.Non;
         public string? UserName { get; set; }
         public string? JobTitlel { get; set; }
-        public int CarId { get; set; }
-        public CarDrive? CarDrive { get; set; }
+        public CarDrive? Рersonalcar { get; set; }
         public List<ObjectPath> ObjectPath { get; set; } = [];
         public List<OtherExpenses> OtherExpenses { get; set; } = [];
 

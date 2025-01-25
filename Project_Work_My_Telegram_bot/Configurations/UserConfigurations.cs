@@ -16,10 +16,10 @@ namespace Project_Work_My_Telegram_bot.Configurations
         {
             builder.
                 HasKey(a => a.IdTg);
-            builder.HasMany(u => u.ObjectPath).
+            builder.HasMany(u => u.ObjectPath). //+
                 WithOne(p => p.UserPath).
-                HasForeignKey(c => c.CarId); 
-            builder.HasMany (u=>u.OtherExpenses).
+                HasForeignKey(c => c.UserId); 
+            builder.HasMany (u=>u.OtherExpenses). //+
                 WithOne(e=>e.UserExp).
                 HasForeignKey(e=>e.UserId);   
         }

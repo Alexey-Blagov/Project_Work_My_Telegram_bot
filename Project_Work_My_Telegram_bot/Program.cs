@@ -54,7 +54,7 @@ namespace Project_Work_My_Telegram_bot
             _myBot.OnUpdate += OnUpdate;
 
             Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
-            while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
+            // while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
             _cts.Cancel(); // stop the bot
 
         }
@@ -122,6 +122,5 @@ namespace Project_Work_My_Telegram_bot
                 OnError(ex, HandleErrorSource.PollingError);
             }
         }
-
     }
 }

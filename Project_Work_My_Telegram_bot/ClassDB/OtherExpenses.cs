@@ -15,12 +15,12 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //dateTimeExp Дата трат  
         //UserId Форинкей на юзера Юсера осуществивший траты
         //UserExp: Екземплыр класса Юсера осуществивший траты
-        [Key]
+     
         public int ExpId { get; set; } 
         public string NameExpense { get; set; } = string.Empty; 
         public decimal Coast { get; set; } = 0;
         public DateTime DateTimeExp { get; set; } = DateTime.Now; 
-        public int? UserId { get; set; }
+        public long? UserId { get; set; }
         public User? UserExp { get; set; }
     }
 }

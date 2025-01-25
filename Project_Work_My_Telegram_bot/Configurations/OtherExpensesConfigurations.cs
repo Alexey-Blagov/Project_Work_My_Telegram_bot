@@ -13,6 +13,7 @@ namespace Project_Work_My_Telegram_bot.Configurations
             builder.
                 HasOne(e => e.UserExp)
                 .WithMany(u => u.OtherExpenses);
+
             
         }
     }
