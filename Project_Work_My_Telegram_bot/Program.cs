@@ -21,14 +21,12 @@ using System.Timers;
 
 namespace Project_Work_My_Telegram_bot
 {
-    public enum UserType { Non = 0, Simple = 1, Admin = 2 };
+    public enum UserType { FirstEnter = 0, Non = 1, User = 2, Admin = 3 };
     public enum Fuel { dizel = 0, ai95 = 1, ai92 = 2 };
     internal class Program
     {
+        //Убрать токен в файл 
         private const string _token = "7516165506:AAHgVKs9K2zHsyKJqVwSFzY4D8BsDIpVLLE";
-
-        private static string _passAdmin = "12345";
-        private static string _passUser = "qwety";
 
         private static TelegramBotClient? _myBot;
         private static CancellationTokenSource? _cts;
@@ -54,7 +52,7 @@ namespace Project_Work_My_Telegram_bot
             _myBot.OnUpdate += OnUpdate;
 
             Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
-            // while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
+            while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
             _cts.Cancel(); // stop the bot
 
         }
@@ -67,22 +65,22 @@ namespace Project_Work_My_Telegram_bot
         {
             try
             {
-                
+
                 //обработка Update 
                 switch (update)
                 {
                     case { CallbackQuery: { } callbackQuery }:
-                           
-                            await _messageProcessing.BotClientOnCallbackQuery(callbackQuery);
-                    break;
-                    default: 
-                        Console.WriteLine($"Получена необработанный Update {update.Type}"); 
-                    break;
+
+                        await _messageProcessing.BotClientOnCallbackQuery(callbackQuery);
+                        break;
+                    default:
+                        Console.WriteLine($"Получена необработанный Update {update.Type}");
+                        break;
                 };
             }
             catch (Exception ex)
             {
-                OnError(ex, HandleErrorSource.PollingError);
+                await OnError(ex, HandleErrorSource.PollingError);
             }
         }
         private static async Task OnMessage(Message message, UpdateType type)
@@ -109,17 +107,17 @@ namespace Project_Work_My_Telegram_bot
                             return; // command was not targeted at me
 
                     //обработчик комманд
-                    _messageProcessing.OnCommand(command, text[space..].TrimStart(), message);
+                    await _messageProcessing.OnCommand(command, text[space..].TrimStart(), message);
                 }
-                else 
+                else
                 {
                     //Обработчик сообщений 
-                    await _messageProcessing.OnTextMessage(message, _passAdmin, _passUser);
+                    await _messageProcessing.OnTextMessage(message);
                 }
             }
             catch (Exception ex)
             {
-                OnError(ex, HandleErrorSource.PollingError);
+                await OnError(ex, HandleErrorSource.PollingError);
             }
         }
     }

@@ -25,10 +25,8 @@ namespace Project_Work_My_Telegram_bot
         ];
         public static KeyboardButton[][] keyboardAdmin =
         [
-            ["👤 Установка пороля доступа"],
-            ["📝 Регистрация автопарка компании"],
-            ["💰 Стоимость бензина"],
-            ["Установка мастер пороля User"]
+            ["👤 Установка пороля User", "💰 Стоимость бензина"],
+            ["📝 Регистрация автопарка компании", "Смена статуа User/Admin"]
         ];
         public static KeyboardButton[][] keyboardGasType =
         [
@@ -38,7 +36,7 @@ namespace Project_Work_My_Telegram_bot
         {
             ResizeKeyboard = true,
         };
-        public static ReplyKeyboardMarkup keyboardMainAdmin = new(keyboard: keyboardUser)
+        public static ReplyKeyboardMarkup keyboardMainAdmin = new(keyboard: keyboardAdmin)
         {
             ResizeKeyboard = true,
         };
@@ -67,7 +65,7 @@ namespace Project_Work_My_Telegram_bot
               new []
               {
                   InlineKeyboardButton.WithCallbackData(text: "Смена User/Admin", callbackData: "change"),
-                  InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию", callbackData: "closed")
+                  InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохраниеть", callbackData: "closed")
               },
         });
         // Инлайнер клавиатура регистрации пользователя тип Admin регистрация 
@@ -80,7 +78,7 @@ namespace Project_Work_My_Telegram_bot
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию", callbackData: "closed")
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closed")
             },
         });
         // Инлайнер клапвиатура регистрации пути следования Admin регистрация 
@@ -93,12 +91,12 @@ namespace Project_Work_My_Telegram_bot
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "📆 Дата поездки", callbackData: "date"),
+                InlineKeyboardButton.WithCallbackData(text: "📆 Дата поездки", callbackData: "datepath"),
                 InlineKeyboardButton.WithCallbackData(text: "Собственный трансопорт ДА/НЕТ", callbackData: "accept"),
             },
             new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию", callbackData: "closed")
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedpath")
              },
         });
         public static ReplyKeyboardMarkup actionAccept = new ReplyKeyboardMarkup(new[] { new KeyboardButton("ДА"), new KeyboardButton("НЕТ") })
@@ -110,11 +108,12 @@ namespace Project_Work_My_Telegram_bot
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "Наименование затрат", callbackData: "namecost"),
-                InlineKeyboardButton.WithCallbackData(text: "Сумма 00,00 руб", callbackData: "sum")
+                InlineKeyboardButton.WithCallbackData(text: "Сумма 00,00 руб", callbackData: "sum"),
+                InlineKeyboardButton.WithCallbackData(text: "📆 Дата траты", callbackData: "dateexp"),
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию", callbackData: "closed")
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closed")
              }
         });
     }

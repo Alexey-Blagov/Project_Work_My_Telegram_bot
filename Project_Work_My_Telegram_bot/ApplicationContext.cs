@@ -24,7 +24,7 @@ namespace Project_Work_My_Telegram_bot
             optionsBuilder.UseNpgsql(
                 "Host=localhost;" +
                 "Port=5432;" +
-                "Database=Users1;" +
+                "Database=MySqlTab;" +
                 "Username=postgres;" +
                 "Password=20071978");           
         }
