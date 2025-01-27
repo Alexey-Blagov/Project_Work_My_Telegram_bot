@@ -38,9 +38,13 @@ namespace Project_Work_My_Telegram_bot
         private string? _setpassword = null;
         private UserType _isRole = UserType.Non;
 
-        private CarDrive _cardrive;
-        private ObjectPath _objPath;
-        private OtherExpenses _otherExpenses;
+        //private CarDrive _cardrive;
+        //private ObjectPath _objpath;
+        //private OtherExpenses _otherexpenses;
+
+        private Dictionary<long, CarDrive> _carDrives = new Dictionary<long, CarDrive>();
+        private Dictionary<long, ObjectPath> _objPaths = new Dictionary<long, ObjectPath>();
+        private Dictionary<long, OtherExpenses> _otherExpenses = new Dictionary<long, OtherExpenses>();
 
         private bool _isSetCar = false;
         private bool _isSetOtherExpenses = false;
@@ -106,9 +110,10 @@ namespace Project_Work_My_Telegram_bot
 
                 case "📝 Регистрация поездки": //Обработан Sub menu 
                     if (_isRole == UserType.Non) return;
-                    //Создаем класс тип ObjectPath поездки 
-                    _objPath = new ObjectPath();
 
+                    //Создаем запись тип ObjectPath поездки для каждого пользователя в  
+
+                    _objPaths[message.Chat.Id] = new ObjectPath();
                     await _botClient!.DeleteMessage(
                       message.Chat,
                       messageId: message.MessageId - 1);
@@ -118,11 +123,13 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Регистрация поездки:",
                          replyMarkup: KeyBoardSetting.regPath);
                     break;
-                //Создаем класс тип OtherExpenses допю тарты  
+
                 case "💰 Регистрация трат": //Обработан Sub menu 
+
                     if (_isRole == UserType.Non) return;
 
-                    _otherExpenses = new OtherExpenses();
+                    //Создаем класс тип OtherExpenses допю тарты  
+                    _otherExpenses[message.Chat.Id] = new OtherExpenses();
 
                     await _botClient!.DeleteMessage(
                          message.Chat,
@@ -152,10 +159,10 @@ namespace Project_Work_My_Telegram_bot
                     }
                     break;
 
-                case "📝 Регистрация автопарка компании":
-                    if (_isRole == UserType.Non) return;
+                case "📝 Регистрация автопарка компании": ////Не обработоано 
 
-                    _cardrive = new CarDrive();
+                    if (_isRole == UserType.Non) return;
+                    _carDrives[message.Chat.Id] = new CarDrive();
 
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
@@ -228,7 +235,7 @@ namespace Project_Work_My_Telegram_bot
                          chatId: chatId,
                          text: $"Расход топлива на {text} л./100 км",
                          replyMarkup: new ReplyKeyboardRemove());
-            _cardrive.CoastFuel = coastgas;
+            _carDrives[msg.Chat.Id].CoastFuel = coastgas;
             OnCallbackQuery -= EnterGasConsum;
         }
 
@@ -283,6 +290,7 @@ namespace Project_Work_My_Telegram_bot
             }
             // Сохранение в БД 
             Console.WriteLine($"Выбран тип топлива {text}");
+
             OnCallbackQuery -= MessageTypeFuel;
         }
         private async Task MessageHandlePassAdmin(Message msg)
@@ -361,7 +369,6 @@ namespace Project_Work_My_Telegram_bot
 
         public async Task BotClientOnCallbackQuery(CallbackQuery callbackQuery)
         {
-            OnCallbackQuery = null;
             var datanow = DateTime.Now.ToShortDateString();
             var chatId = callbackQuery.Message!.Chat;
             string? option = callbackQuery.Data;
@@ -483,8 +490,10 @@ namespace Project_Work_My_Telegram_bot
                     OnCallbackQuery += AcceptCurrentDateExp;
                     break;
                 case "closedpath":
-
                     OnCallbackQuery += ClosedPath;
+                    break;
+                case "closedexpenses":
+                    OnCallbackQuery += ClosedExpenses;
                     break;
                 case "accept":
                     await _botClient!.SendMessage(
@@ -499,7 +508,7 @@ namespace Project_Work_My_Telegram_bot
                     break;
             };
         }
-
+        // Методы обработчики Event 
         private async Task AcceptCurrentDateExp(Message msg)
         {
             var text = msg!.Text!;
@@ -537,46 +546,118 @@ namespace Project_Work_My_Telegram_bot
                      replyMarkup: new ReplyKeyboardRemove());
                 }
                 // отписываемся от сообщений ввода даты 
-                _otherExpenses.DateTimeExp = inputdate;
+                _otherExpenses[msg.Chat.Id].DateTimeExp = inputdate;
                 OnCallbackQuery -= AcceptCurrentDateExp;
             }
             //Сохранение в БД 
 
             Console.WriteLine($"Введена дата затрат {inputdate.ToShortDateString} ");
         }
-
-        private async Task ClosedPath(Message msg)
+        private async Task ClosedDrive(Message msg) //не доделаный метод 
         {
+            // Получить машину из базы данных по номеру 
+            if (_carDrives[msg.Chat.Id] is null)
+            {
+                OnCallbackQuery -= ClosedDrive;
+                await OnCommand("📝 Регистрация поездки", "", msg);
+            }
             var chatId = msg.Chat;
-            string text = $"Наименование объекта: {_objPath.UserPath}" + "\n" +
-                          $"Дата поездки: {_objPath.DatePath.ToShortDateString()}" + "\n" +
-                          $"Длинна пути: {_objPath.PathLengh} км" + "\n" +
-                          $"Номер тс по пути следования: {_objPath.CarDrive!.CarNumber ?? "нет инфомации"}";
+            string text = $"Наименование объекта: {_objPaths[msg.Chat.Id].UserPath}" + "\n" +
+                          $"Дата поездки: {_objPaths[msg.Chat.Id].DatePath.ToShortDateString()}" + "\n" +
+                          $"Длинна пути: {_objPaths[msg.Chat.Id].PathLengh} км" + "\n" +
+                          $"Номер ТС по пути следования: {_objPaths[msg.Chat.Id].CarDrive!.CarNumber ?? "нет инфомации"}";
             await _botClient.SendMessage(
                            msg.Chat.Id,
                            text: text,
                            replyMarkup: KeyBoardSetting.actionAccept
                            );
-
             if (text == "ДА")
             {
                 await _botClient.SendMessage(
                  chatId: chatId,
-                 text: $"Введена текуща дата {text}",
+                 text: $"Данные введены правильно сохраняем?",
                  replyMarkup: new ReplyKeyboardRemove());
+                await DataBaseHandler.SetNewObjectPath(_objPaths[msg.Chat.Id]);
+                //После сохранения удоляем экземпляр из словоря
+                _objPaths.Remove(msg.Chat.Id);
                 // отписываемся от сообщений ввода даты 
-
-                await DataBaseHandler.SetObjectPath(_objPath);
-
                 OnCallbackQuery -= ClosedPath;
             }
             else if (text == "НЕТ")
             {
                 OnCallbackQuery -= ClosedPath;
-                await OnCommand("📝 Регистрация поездки", "", msg); 
+                await OnCommand("📝 Регистрация поездки", "", msg);
             }
         }
-
+        private async Task ClosedPath(Message msg)
+        {
+            if (_otherExpenses[msg.Chat.Id] is null)
+            {
+                OnCallbackQuery -= ClosedPath;
+                await OnCommand("📝 Регистрация поездки", "", msg);
+            }
+            var chatId = msg.Chat;
+            string text = $"Наименование объекта: {_objPaths[msg.Chat.Id].UserPath}" + "\n" +
+                          $"Дата поездки: {_objPaths[msg.Chat.Id].DatePath.ToShortDateString()}" + "\n" +
+                          $"Длинна пути: {_objPaths[msg.Chat.Id].PathLengh} км" + "\n" +
+                          $"Номер ТС по пути следования: {_objPaths[msg.Chat.Id].CarDrive!.CarNumber ?? "нет инфомации"}";
+            await _botClient.SendMessage(
+                           msg.Chat.Id,
+                           text: text,
+                           replyMarkup: KeyBoardSetting.actionAccept
+                           );
+            if (text == "ДА")
+            {
+                await _botClient.SendMessage(
+                 chatId: chatId,
+                 text: $"Данные введены правильно сохраняем?",
+                 replyMarkup: new ReplyKeyboardRemove());
+                await DataBaseHandler.SetNewObjectPath(_objPaths[msg.Chat.Id]);
+                //После сохранения удоляем экземпляр из словоря
+                _objPaths.Remove(msg.Chat.Id);
+                // отписываемся от сообщений ввода даты 
+                OnCallbackQuery -= ClosedPath;
+            }
+            else if (text == "НЕТ")
+            {
+                OnCallbackQuery -= ClosedPath;
+                await OnCommand("📝 Регистрация поездки", "", msg);
+            }
+        }
+        private async Task ClosedExpenses(Message msg)
+        {
+            if (_otherExpenses[msg.Chat.Id] is null)
+            {
+                OnCallbackQuery -= ClosedExpenses;
+                await OnCommand("💰 Регистрация трат", "", msg);
+            }
+            var chatId = msg.Chat;
+            string text = $"Наименование тарт: {_otherExpenses[msg.Chat.Id].NameExpense}" + "\n" +
+                          $"Дата трат : {_otherExpenses[msg.Chat.Id].DateTimeExp.ToShortDateString()}" + "\n" +
+                          $"Сумма затрат: {_otherExpenses[msg.Chat.Id].Coast} руб.";
+            await _botClient.SendMessage(
+                           msg.Chat.Id,
+                           text: text,
+                           replyMarkup: KeyBoardSetting.actionAccept
+                           );
+            if (text == "ДА")
+            {
+                await _botClient.SendMessage(
+                 chatId: chatId,
+                 text: $"Данные тарт введены правильно сохраняем?",
+                 replyMarkup: new ReplyKeyboardRemove());
+                await DataBaseHandler.SetNewOtherExpeses(_otherExpenses[msg.Chat.Id]);
+                //После сохранения удоляем экземпляр из словоря
+                _otherExpenses.Remove(msg.Chat.Id);
+                // отписываемся от сообщений ввода даты 
+                OnCallbackQuery -= ClosedExpenses;
+            }
+            else if (text == "НЕТ")
+            {
+                OnCallbackQuery -= ClosedExpenses;
+                await OnCommand("💰 Регистрация трат", "", msg);
+            }
+        }
         private async Task AcceptCurrentDatePath(Message msg)
         {
             var text = msg!.Text!;
@@ -616,7 +697,7 @@ namespace Project_Work_My_Telegram_bot
                 // отписываемся от сообщений ввода даты 
 
                 OnCallbackQuery -= AcceptCurrentDatePath;
-                _objPath.DatePath = inputdate;
+                _objPaths[msg.Chat.Id].DatePath = inputdate;
             }
             //Сохранение в БД 
             Console.WriteLine($"Введена дата поездки {inputdate.ToShortDateString} ");
@@ -631,7 +712,7 @@ namespace Project_Work_My_Telegram_bot
                             text: $"Введена наименование затрат {text}",
                             replyMarkup: new ReplyKeyboardRemove());
             //Сохранение затрат в БД 
-            _otherExpenses.NameExpense = text;
+            _otherExpenses[msg.Chat.Id].NameExpense = text;
             OnCallbackQuery -= EnterNameCost;
         }
         private async Task Enterjobtitle(Message msg)
@@ -670,7 +751,7 @@ namespace Project_Work_My_Telegram_bot
                          chatId: chatId,
                          text: $"Cумма затрат {text} руб.",
                          replyMarkup: new ReplyKeyboardRemove());
-            _otherExpenses.Coast = coast;
+            _otherExpenses[msg.Chat.Id].Coast = coast;
             OnCallbackQuery -= EnterCost;
         }
         private async Task EnterlengthPath(Message msg)
@@ -696,7 +777,7 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Cумма затрат {text} руб.",
                          replyMarkup: new ReplyKeyboardRemove());
 
-            _objPath.PathLengh = lenghpath;
+            _objPaths[msg.Chat.Id].PathLengh = lenghpath;
             OnCallbackQuery -= EnterlengthPath;
         }
         private async Task EnterObject(Message msg)
@@ -709,7 +790,7 @@ namespace Project_Work_My_Telegram_bot
                            text: $"Наименование объекта  {text}",
                            replyMarkup: new ReplyKeyboardRemove());
             //сохранение в БД 
-            _objPath.ObjectName = text;
+            _objPaths[msg.Chat.Id].ObjectName = text;
             OnCallbackQuery -= EnterObject;
         }
         private async Task Insertcarnumber(Message msg)
@@ -735,10 +816,61 @@ namespace Project_Work_My_Telegram_bot
                          chatId: chatId,
                          text: $"Номер {text} принят",
                          replyMarkup: new ReplyKeyboardRemove());
-            _cardrive.CarNumber = carnumber;
+            _carDrives[msg.Chat.Id].CarNumber = carnumber;
+            
             OnCallbackQuery -= Insertcarnumber;
         }
-        private bool CarNumberParse(string text, out string? carnumber)
+        private async Task Insertcarname(Message msg)
+        {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
+            Console.WriteLine("Название машины {0}", text);
+            await _botClient.SendMessage(
+                         chatId: chatId,
+                         text: $"Название машины {text}",
+                         replyMarkup: new ReplyKeyboardRemove());
+            _carDrives[msg.Chat.Id].CarName = text;
+
+            OnCallbackQuery -= Insertcarname;
+        }
+        private async Task EnterGasConsum(Message msg)
+        {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
+            Console.WriteLine("Введен расход топлива: {0}", text);
+
+            double gas;
+            if (!double.TryParse(text, out gas))
+            {
+                await _botClient.SendMessage(
+                     chatId: chatId,
+                     text: $"Не коректные данные введите еще раз в формате 0.00 ",
+                     replyMarkup: new ReplyKeyboardRemove());
+                return;
+            }
+            await _botClient.SendMessage(
+                         chatId: chatId,
+                         text: $"Расход топлива на {text} л./100 км",
+                         replyMarkup: new ReplyKeyboardRemove());
+            _carDrives[msg.Chat.Id].GasСonsum = gas;
+            OnCallbackQuery -= EnterGasConsum;
+        }
+        private async Task InsertUser(Message msg)
+        {
+            var text = msg!.Text!.ToString();
+            var chatId = msg.Chat;
+            Console.WriteLine("Введена Ф.И.О", text);
+            await _botClient.SendMessage(
+                         chatId: chatId,
+                         text: $"Ф.И.О {text}",
+                         replyMarkup: new ReplyKeyboardRemove());
+            //Сохранение данных в БД
+            
+            await DataBaseHandler.SetUserName(msg.Chat.Id, text);
+
+            OnCallbackQuery -= InsertUser;
+        }
+        public static bool CarNumberParse(string text, out string? carnumber)
         {
             //Удоляем пробелы 
             text = text.Replace(" ", "").ToUpper();
@@ -773,56 +905,6 @@ namespace Project_Work_My_Telegram_bot
             carnumber = result.ToString();
             return true;
         }
-        private async Task Insertcarname(Message msg)
-        {
-            var text = msg!.Text!.ToString();
-            var chatId = msg.Chat;
-            Console.WriteLine("Название машины {0}", text);
-            await _botClient.SendMessage(
-                         chatId: chatId,
-                         text: $"Название машины {text}",
-                         replyMarkup: new ReplyKeyboardRemove());
-            _cardrive.CarName = text;
-
-            OnCallbackQuery -= Insertcarname;
-        }
-        private async Task EnterGasConsum(Message msg)
-        {
-            var text = msg!.Text!.ToString();
-            var chatId = msg.Chat;
-            Console.WriteLine("Введен расход топлива: {0}", text);
-
-            double gas;
-            if (!double.TryParse(text, out gas))
-            {
-                await _botClient.SendMessage(
-                     chatId: chatId,
-                     text: $"Не коректные данные введите еще раз в формате 0.00 ",
-                     replyMarkup: new ReplyKeyboardRemove());
-                return;
-            }
-            await _botClient.SendMessage(
-                         chatId: chatId,
-                         text: $"Расход топлива на {text} л./100 км",
-                         replyMarkup: new ReplyKeyboardRemove());
-            _cardrive.GasСonsum = gas;
-            OnCallbackQuery -= EnterGasConsum;
-        }
-        private async Task InsertUser(Message msg)
-        {
-            var text = msg!.Text!.ToString();
-            var chatId = msg.Chat;
-            Console.WriteLine("Введена Ф.И.О", text);
-            await _botClient.SendMessage(
-                         chatId: chatId,
-                         text: $"Ф.И.О {text}",
-                         replyMarkup: new ReplyKeyboardRemove());
-            //Сохранение данных в БД
-            await DataBaseHandler.SetUserName(msg.Chat.Id, text);
-
-            OnCallbackQuery -= InsertUser;
-        }
-
         public async Task OnCommand(string command, string v, Message message)
         {
             _isRole = (UserType)await DataBaseHandler.GetUserRole(message.Chat.Id);

@@ -92,7 +92,7 @@ namespace Project_Work_My_Telegram_bot
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "📆 Дата поездки", callbackData: "datepath"),
-                InlineKeyboardButton.WithCallbackData(text: "Собственный трансопорт ДА/НЕТ", callbackData: "accept"),
+                InlineKeyboardButton.WithCallbackData(text: "Собственный трансопорт ДА/НЕТ", callbackData: "acceptisCar"),
             },
             new []
              {
@@ -108,12 +108,12 @@ namespace Project_Work_My_Telegram_bot
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "Наименование затрат", callbackData: "namecost"),
-                InlineKeyboardButton.WithCallbackData(text: "Сумма 00,00 руб", callbackData: "sum"),
+                InlineKeyboardButton.WithCallbackData(text: "Сумма 00.00 руб", callbackData: "sum"),
                 InlineKeyboardButton.WithCallbackData(text: "📆 Дата траты", callbackData: "dateexp"),
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closed")
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedexpenses")
              }
         });
     }

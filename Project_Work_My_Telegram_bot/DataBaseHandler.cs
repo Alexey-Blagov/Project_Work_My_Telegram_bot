@@ -33,11 +33,28 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             };
         }
-        public static async Task SetObjectPath(ObjectPath ObjPath, )
+        public static async Task SetNewObjectPath(ObjectPath newObjPath)
         {
-            using (ApplicationContext db = new ApplicationContext()) 
+            using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                await db.AddAsync(newObjPath);
+                await db.SaveChangesAsync();
+            }
+        }
+        public static async Task SetNewOtherExpeses(OtherExpenses newOtherExpenses)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                await db.AddAsync(newOtherExpenses);
+                await db.SaveChangesAsync();
+            }
+        }
+        public static async Task SetNewCarDrive(OtherExpenses newCarDrive)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                await db.AddAsync(newCarDrive);
+                await db.SaveChangesAsync();
             }
         }
         public static async Task SetUserJobTitle(long IdTg, string jobTitle)
