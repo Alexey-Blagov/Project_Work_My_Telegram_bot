@@ -31,7 +31,7 @@ namespace Project_Work_My_Telegram_bot
         public static KeyboardButton[][] keyboardGasType =
         [
             ["🪫 ДТ", "🔋 AИ-95", "🔋 AИ-92"]
-        ]; 
+        ];
         public static ReplyKeyboardMarkup keyboardMainUser = new(keyboard: keyboardUser)
         {
             ResizeKeyboard = true,
@@ -78,7 +78,7 @@ namespace Project_Work_My_Telegram_bot
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closed")
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedReport")
             },
         });
         // Инлайнер клапвиатура регистрации пути следования Admin регистрация 
@@ -87,12 +87,12 @@ namespace Project_Work_My_Telegram_bot
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "Место назначения", callbackData: "objectname"),
-                InlineKeyboardButton.WithCallbackData(text: " Полный путь в, км", callbackData: "pathlengh")
+                InlineKeyboardButton.WithCallbackData(text: "Полный путь в, км", callbackData: "pathlengh")
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "📆 Дата поездки", callbackData: "datepath"),
-                InlineKeyboardButton.WithCallbackData(text: "Собственный трансопорт ДА/НЕТ", callbackData: "acceptisCar"),
+                InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
+                InlineKeyboardButton.WithCallbackData(text: "Собственный трансопорт?", callbackData: "acceptisCar"),
             },
             new []
              {
@@ -107,13 +107,33 @@ namespace Project_Work_My_Telegram_bot
         {
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "Наименование затрат", callbackData: "namecost"),
-                InlineKeyboardButton.WithCallbackData(text: "Сумма 00.00 руб", callbackData: "sum"),
-                InlineKeyboardButton.WithCallbackData(text: "📆 Дата траты", callbackData: "dateexp"),
+                InlineKeyboardButton.WithCallbackData(text: "Наименование затрат", callbackData: "namecost")
+            },
+            new []
+            {
+                InlineKeyboardButton.WithCallbackData(text: "Сумма 00.00 руб", callbackData: "sumexpenses"),
+                InlineKeyboardButton.WithCallbackData(text: "📆 Дата зтраты", callbackData: "dateexpenses"),
             },
              new []
              {
                 InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedexpenses")
+             }
+        });
+        public static InlineKeyboardMarkup regDriveCar = new(new[]
+        {
+            new []
+            {
+                InlineKeyboardButton.WithCallbackData(text: "🚗 Марка машины", callbackData: "carname"),
+                InlineKeyboardButton.WithCallbackData(text: "🇷🇺 Госномер", callbackData: "carnumber"), 
+            },
+            new []
+            {
+                InlineKeyboardButton.WithCallbackData(text:  "Расход на 100 км.", callbackData: "gasconsum"),
+                InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
+            },
+             new []
+             {
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedDrive")
              }
         });
     }
