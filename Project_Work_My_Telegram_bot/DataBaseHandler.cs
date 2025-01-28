@@ -14,7 +14,7 @@ namespace Project_Work_My_Telegram_bot
 {
     public class DataBaseHandler
     {
-        public static async Task SetUserName(long IdTg, string name)
+        public static async Task SetUserNameAsync(long IdTg, string name)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -33,7 +33,7 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             };
         }
-        public static async Task SetNewObjectPath(ObjectPath newObjPath)
+        public static async Task SetNewObjectPathAsync(ObjectPath newObjPath)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -41,7 +41,7 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             }
         }
-        public static async Task SetNewOtherExpeses(OtherExpenses newOtherExpenses)
+        public static async Task SetNewOtherExpesesAsync(OtherExpenses newOtherExpenses)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -49,7 +49,7 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             }
         }
-        public static async Task SetNewCarDrive(OtherExpenses newCarDrive)
+        public static async Task SetNewCarDriveAsync(OtherExpenses newCarDrive)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -57,7 +57,7 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             }
         }
-        public static async Task SetUserJobTitle(long IdTg, string jobTitle)
+        public static async Task SetUserJobTitleAsync(long IdTg, string jobTitle)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -76,7 +76,7 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             };
         }
-        public static async Task<int> GetUserRole(long IdTg)
+        public static async Task<int> GetUserRoleAsync(long IdTg)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -87,7 +87,7 @@ namespace Project_Work_My_Telegram_bot
                 return user.UserRol;
             }
         }
-        public static async Task SetUserRole(long IdTg, UserType role)
+        public static async Task SetUserRoleAsync(long IdTg, UserType role)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -107,31 +107,30 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             }
         }
-        public static async Task AddOrUpdateUser(long IdTg, UserType role, string userTg, string Name, string jobTitle)
+        public static async Task <User> GetUserAsync (long IdTg) 
+        {
+
+            using (ApplicationContext db = new ApplicationContext())
+            { 
+                User? user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg) ?? null;
+
+                return user;
+            }
+        } 
+        public static async Task AddOrUpdateUserAsync(User newUser)  
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                //UserId = назначается tgbot ID  + 
-                //UserRol: Идентификатор User Admin права  
-                //TgUsername: Имя при регистрации в боте (может быть не указано) 
-                //UserName: ФИО + 
-                //JobTitle: Должность +
-
-                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == newUser.IdTg); 
                 if (user is null)
                 {
-                    if (userTg is null) userTg = "Нет имени";
 
-                    User newuser = new User { IdTg = IdTg, UserRol = (int)role, TgUserName = userTg, UserName = Name, JobTitlel = jobTitle };
+                    db.User.Add(newUser); 
                     await db.SaveChangesAsync();
                 }
                 else
                 {
-                    user.UserRol = (int)role;
-                    user.TgUserName = userTg;
-                    user.UserName = Name;
-                    user.JobTitlel = jobTitle;
-                    db.User.Update(user);
+                    db.User.Update(newUser);
                     await db.SaveChangesAsync();
                 }
             }

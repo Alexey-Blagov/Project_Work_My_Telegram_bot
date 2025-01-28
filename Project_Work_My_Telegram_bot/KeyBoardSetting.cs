@@ -124,17 +124,30 @@ namespace Project_Work_My_Telegram_bot
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "🚗 Марка машины", callbackData: "carname"),
-                InlineKeyboardButton.WithCallbackData(text: "🇷🇺 Госномер", callbackData: "carnumber"), 
+                InlineKeyboardButton.WithCallbackData(text: "🇷🇺 Госномер", callbackData: "carnumber"),
             },
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text:  "Расход на 100 км.", callbackData: "gasconsum"),
-                InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
+                InlineKeyboardButton.WithCallbackData(text:  "Используемое топливо", callbackData: "typefuel"),
             },
              new []
              {
                 InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedDrive")
              }
+        });
+        public static InlineKeyboardMarkup regCoastFuel = new(new[]
+        {
+            new []
+            {
+                InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость 🔋 AИ-92", callbackData: "coastAi92"), 
+                InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость 🔋 AИ-95", callbackData: "coastAi95"),
+                InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость  U0001faab ДТ ", callbackData: "coastDizel"),
+            },
+            new []
+            {
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedDrive")
+            }
         });
     }
 }
