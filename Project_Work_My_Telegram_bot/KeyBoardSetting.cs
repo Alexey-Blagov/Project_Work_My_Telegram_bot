@@ -60,7 +60,7 @@ namespace Project_Work_My_Telegram_bot
              },
               new []{
                 InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
-                InlineKeyboardButton.WithCallbackData(text: "Расход на 100 км.", callbackData: "gasconsum"),
+                InlineKeyboardButton.WithCallbackData(text: "Средний расход л.на 100 км. ", callbackData: "gasconsum"),
               },
               new []
               {
@@ -86,20 +86,27 @@ namespace Project_Work_My_Telegram_bot
         {
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "Место назначения", callbackData: "objectname"),
-                InlineKeyboardButton.WithCallbackData(text: "Полный путь в, км", callbackData: "pathlengh")
+                InlineKeyboardButton.WithCallbackData(text: "🏢 Нач. и конечн. точка назначения", callbackData: "objectname")
+            },
+             new []
+            {
+                InlineKeyboardButton.WithCallbackData(text: "🏃‍♀️ Полный путь от начала до конца в, км", callbackData: "pathlengh")
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
-                InlineKeyboardButton.WithCallbackData(text: "Собственный трансопорт?", callbackData: "acceptisCar"),
+                InlineKeyboardButton.WithCallbackData(text: "🚗 Собственный трансопорт?", callbackData: "acceptisCar"),
+                InlineKeyboardButton.WithCallbackData(text: "📆 Дата поездки", callbackData: "datepath"),
             },
             new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedpath")
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedpath")
              },
         });
         public static ReplyKeyboardMarkup actionAccept = new ReplyKeyboardMarkup(new[] { new KeyboardButton("ДА"), new KeyboardButton("НЕТ") })
+        {
+            ResizeKeyboard = true
+        };
+        public static ReplyKeyboardMarkup updateAccept = new ReplyKeyboardMarkup(new[] { new KeyboardButton("Обновить"), new KeyboardButton("Выйти") })
         {
             ResizeKeyboard = true
         };
@@ -112,11 +119,11 @@ namespace Project_Work_My_Telegram_bot
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "Сумма 00.00 руб", callbackData: "sumexpenses"),
-                InlineKeyboardButton.WithCallbackData(text: "📆 Дата зтраты", callbackData: "dateexpenses"),
+                InlineKeyboardButton.WithCallbackData(text: "📆 Дата зтраты", callbackData: "dateexpenses"), 
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedexpenses")
+                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "ClosedExpenses")
              }
         });
         public static InlineKeyboardMarkup regDriveCar = new(new[]

@@ -49,14 +49,36 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             }
         }
-        public static async Task SetNewCarDriveAsync(OtherExpenses newCarDrive)
+        public static async Task <bool> SetNewCarDriveAsync(CarDrive newCarDrive)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                await db.AddAsync(newCarDrive);
-                await db.SaveChangesAsync();
+                CarDrive? cardrive = await db.CarDrive.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
+
+                if (cardrive is null)
+                {
+                    await db.AddAsync(newCarDrive);
+                    await db.SaveChangesAsync();
+                    return true;
+                }
+                return false;
             }
         }
+        public static async Task UpdateNewCarDriveAsync(CarDrive newCarDrive)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                var cardrive = await db.CarDrive.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
+                cardrive.CarNumber = newCarDrive.CarNumber;  
+
+                
+                //await db.CarDrive.Update(cardrive);  
+                await db.SaveChangesAsync();
+
+            }
+
+        }
+        
         public static async Task SetUserJobTitleAsync(long IdTg, string jobTitle)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -135,5 +157,7 @@ namespace Project_Work_My_Telegram_bot
                 }
             }
         }
+
+        
     }
 }

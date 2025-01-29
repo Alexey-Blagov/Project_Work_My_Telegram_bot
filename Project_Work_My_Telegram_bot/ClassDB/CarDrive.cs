@@ -12,11 +12,11 @@ namespace Project_Work_My_Telegram_bot.ClassDB
     {
         //CarId: 
         //CarName: Марка машины
-        //isPersonalCar: true машина личная, false машина конторская 
+        //isPersonalCar: true машина личная, false машина конторская или нет машины false 
         //CarNumber: Нимер машины по шаблону H 000 EE 150
         //GasСonsum: Средний расход бензина на 100 км.пути
-        //Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 из типа Enum 
-        //UserCr: Екземплыр класса Юсера Null машина конторская 
+        //TypeFuel Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 из типа Enum 
+        //UserCr: Екземплыр класса Юсера Null машина конторская или нет машины  конторская или нет ее 
         [Key]
         public long CarId { get; set; }
         public string? CarName { get; set; }

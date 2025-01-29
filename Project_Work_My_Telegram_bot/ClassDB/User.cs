@@ -17,7 +17,7 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //TgUsername: Имя при регистрации в боте (может быть не указано) 
         //UserName: ФИО + 
         //JobTitle: Должность +
-        //Рersonalcar: Экземпляр персональной авто на данном User 
+        //Рersonalcar: Экземпляр персональной авто на данном User  
         //ObjectPath Объекты все пути 
         //OtherExpenses: 
         public long IdTg { get; set; } 
