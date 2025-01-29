@@ -394,7 +394,7 @@ namespace Project_Work_My_Telegram_bot
             string text = $"Id пользователя: {user.IdTg}" + "\n" +
                           $"Гос. номер: {_carDrives[msg.Chat.Id].CarNumber}" + "\n" +
                           $"Средний расход на 100 км. в л. : {_carDrives[msg.Chat.Id].GasСonsum} км" + "\n" +
-                          $"Тип используемого топлива {typefuel}" + "\n" +
+                          $"Тип используемого топлива " + "\n" +
                           $"Машина является : {_objPaths[msg.Chat.Id].CarDrive!.CarNumber ?? "нет инфомации"}";
 
             await _botClient.SendMessage(
