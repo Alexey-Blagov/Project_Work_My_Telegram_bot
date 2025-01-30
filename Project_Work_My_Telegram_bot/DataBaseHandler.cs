@@ -33,6 +33,24 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             };
         }
+        public static async Task SetUserAsync(User newUser)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                var user = await db.User.FirstOrDefaultAsync(x => x  == newUser);
+                if (user is null)
+                {
+                    await db.AddAsync(newUser);
+                }
+                else
+                {  
+                    db.User.Update(newUser);
+                }
+                await db.SaveChangesAsync();
+            };
+        }
+
+
         public static async Task SetNewObjectPathAsync(ObjectPath newObjPath)
         {
             using (ApplicationContext db = new ApplicationContext())
