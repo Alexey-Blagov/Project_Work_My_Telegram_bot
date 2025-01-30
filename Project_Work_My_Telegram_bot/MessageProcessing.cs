@@ -295,15 +295,42 @@ namespace Project_Work_My_Telegram_bot
                     break;
 
                 case "closed":
+                    
+                    if (_carDrives[msg.Chat.Id] is null)
+                    {
+                        OnCallbackQuery -= ClosedCarDrive;
+                        await OnCommand("👤 Профиль", "", msg);
+                    }
+                    if (_users[msg.Chat.Id] is null)
+                    {
+                        OnCallbackQuery -= ClosedCarDrive;
+                        await OnCommand("👤 Профиль", "", msg);
+                    }
+
                     await _botClient!.DeleteMessage(
                     chatId,
                          messageId: callbackQuery.Message.Id
                         );
-                    await _botClient!.SendMessage(
-                    chatId: chatId,
-                    text: $"Ввод завершен, созранить данные?:",
-                    replyMarkup: new ReplyKeyboardRemove());
-
+                    var user = _users[msg.Chat.Id];
+                    var car = _carDrives[msg.Chat.Id];
+                    var typefuel =  GetTypeFuelString((Fuel)car.TypeFuel);
+                    bool isPersonalCar = _carDrives[msg.Chat.Id].isPersonalCar;
+                    var isPersonalCarString = (isPersonalCar == true) ? "Машина личный ранспорт" : "Машина собственность компании";
+                    stringtobot = $"Id пользователя: {user.IdTg}" + "\n" +
+                                  $"SS TgName: {user.TgUserName}" + "\n" +
+                                  $"SS Тип учетной записи: {(UserType)user.UserRol}" + "\n" +
+                                  $"Ф.И.О.: {user.UserName}" + "\n" +
+                                  $"Должность: {user.JobTitlel}" + "\n" +
+                                  $"Название машины: {car.CarName}" + "\n" +
+                                  $"Гос. номер: {car.CarNumber}" + "\n" +
+                                  $"Средний расход на 100 км. в л. : {car.GasСonsum} км" + "\n" +
+                                  $"Транспорт: {isPersonalCarString}  " + "\n" +
+                                  $"Тип используемого топлива {typefuel}";
+                    await _botClient.SendMessage(
+                                   msg.Chat.Id,
+                                   text: stringtobot,
+                                   replyMarkup: KeyBoardSetting.actionAccept
+                                   );
                     OnCallbackQuery += ClosedEnterProfil;
 
                     break;
@@ -348,9 +375,9 @@ namespace Project_Work_My_Telegram_bot
                     }
                     try
                     {
-                        var typefuel = GetTypeFuelString((Fuel)_carDrives[msg.Chat.Id].TypeFuel);
-                        bool isPersonalCar = _carDrives[msg.Chat.Id].isPersonalCar;
-                        var isPersonalCarString = (isPersonalCar == true) ? "Машина личный ранспорт" : "Машина собственность компании";
+                        typefuel = GetTypeFuelString((Fuel)_carDrives[msg.Chat.Id].TypeFuel);
+                        isPersonalCar = _carDrives[msg.Chat.Id].isPersonalCar;
+                        isPersonalCarString = (isPersonalCar == true) ? "Машина личный ранспорт" : "Машина собственность компании";
                         stringtobot = $"Наименование авто : {_carDrives[msg.Chat.Id].CarName}" + "\n" +
                                   $"Гос. номер : {_carDrives[msg.Chat.Id].CarNumber}" + "\n" +
                                   $"Средний расход на 100 км. в л.: {_carDrives[msg.Chat.Id].GasСonsum} км" + "\n" +
@@ -512,8 +539,13 @@ namespace Project_Work_My_Telegram_bot
             //GasСonsum: Средний расход бензина на 100 км.пути +
             //TypeFuel Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 из типа Enum  +
             //UserCr: Екземплыр класса Юсера Null машина конторская или нет машины  конторская или нет ее 
+            
+            var chatId = msg.Chat;
+            var text = msg.Text;
 
-            // Получить машину из базы данных по номеру ID 
+            
+
+            // Получить Users  
             if (_users[msg.Chat.Id] is null)
             {
                 await _botClient!.DeleteMessage(
@@ -529,20 +561,8 @@ namespace Project_Work_My_Telegram_bot
 
             }
 
-            var chatId = msg.Chat;
-            var user = _users[msg.Chat.Id];
-            // var typefuel = GetTypeFuelString((Fuel)_carDrives[msg.Chat.Id].TypeFuel);
-            string text = $"Id пользователя: {user.IdTg}" + "\n" +
-                          $"Гос. номер: {_carDrives[msg.Chat.Id].CarNumber}" + "\n" +
-                          $"Средний расход на 100 км. в л. : {_carDrives[msg.Chat.Id].GasСonsum} км" + "\n" +
-                          $"Тип используемого топлива ";
 
 
-            await _botClient.SendMessage(
-                           msg.Chat.Id,
-                           text: text,
-                           replyMarkup: KeyBoardSetting.actionAccept
-                           );
             if (text == "ДА")
             {
                 await _botClient.SendMessage(
@@ -558,7 +578,57 @@ namespace Project_Work_My_Telegram_bot
             else if (text == "НЕТ")
             {
                 OnCallbackQuery -= ClosedEnterProfil;
-                await OnCommand("📝 Регистрация автопарка компании", "", msg);
+                await OnCommand("👤 Профиль", "", msg);
+            }
+
+        }
+        private async Task ClosedCarDrive(Message msg) //Обработан +++
+        {
+            var chatId = msg.Chat;
+            var text = msg.Text;
+            switch (text)
+            {
+                case "ДА":
+                    var isSet = await DataBaseHandler.SetNewCarDriveAsync(_carDrives[msg.Chat.Id]);
+                    if (!isSet)
+                    {
+                        await _botClient.SendMessage(
+                         chatId: chatId,
+                         text: $"Данные по {_carDrives[msg.Chat.Id].CarName} сохранены",
+                         replyMarkup: new ReplyKeyboardRemove());
+                        //После сохранения удоляем экземпляр из словоря
+                        _carDrives.Remove(msg.Chat.Id);
+                        // отписываемся от сообщений ввода даты 
+                        OnCallbackQuery -= ClosedCarDrive;
+                        return;
+                    }
+                    else
+                    {
+                        await _botClient.SendMessage(
+                         chatId: chatId,
+                         text: $"Машина с таким номером в базе сществует обновить информацию?",
+                         replyMarkup: KeyBoardSetting.updateAccept);
+                    }
+                    break;
+                case "НЕТ":
+
+                    OnCallbackQuery -= ClosedCarDrive;
+                    await OnCommand("📝 Регистрация автопарка компании", "", msg);
+                    break;
+                case "Обновить":
+
+                    await DataBaseHandler.UpdateNewCarDriveAsync(_carDrives[msg.Chat.Id]);
+                    OnCallbackQuery -= ClosedCarDrive;
+                    _carDrives.Remove(msg.Chat.Id);
+                    break;
+                case "Выйти":
+                    OnCallbackQuery -= ClosedCarDrive;
+                    await _botClient.SendMessage(
+                 chatId: chatId,
+                 text: "/Main - запуск основнного menu Админ",
+                 replyMarkup: KeyBoardSetting.keyboardMainAdmin);
+                    break;
+
             }
         }
 
@@ -591,8 +661,7 @@ namespace Project_Work_My_Telegram_bot
                      text: $"Повторите ввод стоимости 🔋 AИ-92, введите еще раз в формате 0.00 ",
                      replyMarkup: new ReplyKeyboardRemove());
             else OnCallbackQuery -= MessageCoastGasai92;
-        } //
-
+        }
         private async Task MessageCoastGasai95(Message msg) //добавить выгрузку в файл 
         {
             decimal coastgas;
@@ -623,7 +692,6 @@ namespace Project_Work_My_Telegram_bot
                      replyMarkup: new ReplyKeyboardRemove());
             else OnCallbackQuery -= MessageCoastGasai95;
         }
-
         private async Task MessageCoastGasDizel(Message msg) //добавить выгрузку в файл 
         {
             decimal coastgas;
@@ -654,7 +722,6 @@ namespace Project_Work_My_Telegram_bot
                      replyMarkup: new ReplyKeyboardRemove());
             else OnCallbackQuery -= MessageCoastGasai95;
         }
-
         private async Task SetPassword(Message msg)
         {
             var text = msg!.Text!.ToString();
@@ -685,7 +752,6 @@ namespace Project_Work_My_Telegram_bot
                 OnMeessage -= SetPassword;
             }
         }
-
         private async Task MessageTypeFuel(Message msg) //++++
         {
             var text = msg!.Text!.ToString();
@@ -788,68 +854,8 @@ namespace Project_Work_My_Telegram_bot
                 await OnCommand("/start", "", msg);
             }
         }
-        private async Task ClosedCarDrive(Message msg)
-        //CarId: 
-        //CarName: Марка машины
-        //isPersonalCar: true машина личная, false машина конторская или нет машины false 
-        //CarNumber: Нимер машины по шаблону H 000 EE 150
-        //GasСonsum: Средний расход бензина на 100 км.пути
-        //TypeFuel Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 из типа Enum 
-        //UserCr: Екземплыр класса Юсера Null машина конторская или нет машины  конторская или нет ее 
 
-        {
-
-            var chatId = msg.Chat;
-            var text = msg.Text;
-
-
-            switch (text)
-            {
-                case "ДА":
-                    var isSet = await DataBaseHandler.SetNewCarDriveAsync(_carDrives[msg.Chat.Id]);
-                    if (!isSet)
-                    {
-                        await _botClient.SendMessage(
-                         chatId: chatId,
-                         text: $"Данные по {_carDrives[msg.Chat.Id].CarName} сохранены",
-                         replyMarkup: new ReplyKeyboardRemove());
-                        //После сохранения удоляем экземпляр из словоря
-                        _carDrives.Remove(msg.Chat.Id);
-                        // отписываемся от сообщений ввода даты 
-                        OnCallbackQuery -= ClosedCarDrive;
-                        return;
-                    }
-                    else
-                    {
-                        await _botClient.SendMessage(
-                         chatId: chatId,
-                         text: $"Машина с таким номером в базе сществует обновить информацию?",
-                         replyMarkup: KeyBoardSetting.updateAccept);
-                    }
-                    break;
-                case "НЕТ":
-
-                    OnCallbackQuery -= ClosedCarDrive;
-                    await OnCommand("📝 Регистрация автопарка компании", "", msg);
-                    break;
-                case "Обновить":
-
-                    await DataBaseHandler.UpdateNewCarDriveAsync(_carDrives[msg.Chat.Id]);
-                    OnCallbackQuery -= ClosedCarDrive;
-                    _carDrives.Remove(msg.Chat.Id);
-                    break;
-                case "Выйти":
-                    OnCallbackQuery -= ClosedCarDrive;
-                    await _botClient.SendMessage(
-                 chatId: chatId,
-                 text: "/Main - запуск основнного menu Админ",
-                 replyMarkup: KeyBoardSetting.keyboardMainAdmin);
-                    break;
-
-            }
-
-        }
-        private async Task InsertSumExpenses(Message msg) //++++
+        private async Task InsertSumExpenses(Message msg) // Обработан ++++
         {
             var text = msg!.Text!.ToString();
             var chatId = msg.Chat;
@@ -914,7 +920,6 @@ namespace Project_Work_My_Telegram_bot
         private async Task ClosedPath(Message msg)
         {
             var text = msg.Text;
-
             if (text == "ДА")
             {
                 await DataBaseHandler.SetNewObjectPathAsync(_objPaths[msg.Chat.Id]);
@@ -1228,5 +1233,7 @@ namespace Project_Work_My_Telegram_bot
             }
         }
     }
+
 }
+
 

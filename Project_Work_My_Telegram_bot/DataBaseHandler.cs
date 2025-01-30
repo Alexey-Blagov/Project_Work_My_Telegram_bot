@@ -37,8 +37,12 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                await db.AddAsync(newObjPath);
-                await db.SaveChangesAsync();
+                var objPath = await db.ObjectPath.FirstOrDefaultAsync(o => o == newObjPath);
+                if (objPath is null)
+                {
+                    await db.AddAsync(newObjPath);
+                    await db.SaveChangesAsync();
+                }
             }
         }
         public static async Task SetNewOtherExpesesAsync(OtherExpenses newOtherExpenses)
@@ -142,12 +146,11 @@ namespace Project_Work_My_Telegram_bot
         }
         public static async Task <User> GetUserAsync (long IdTg) 
         {
-
             using (ApplicationContext db = new ApplicationContext())
             { 
-                User? user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg) ?? null;
+                User? user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
                 
-                return user;
+                return user!;
             }
         } 
         public static async Task AddOrUpdateUserAsync(User newUser)  
