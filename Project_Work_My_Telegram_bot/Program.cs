@@ -17,12 +17,12 @@ namespace Project_Work_My_Telegram_bot
         private static CancellationTokenSource? _cts;
         private static MessageProcessing _messageProcessing;
 
-        static async Task Main(string[] args) 
+        static async Task Main(string[] args)
         {
-            //Console.WriteLine("ЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯ");
+
             PassUser passUser = new PassUser();
 
-            SetPassUser();
+            //SetPassUser();
 
             _cts = new CancellationTokenSource();
             _myBot = new TelegramBotClient(_token, cancellationToken: _cts.Token);
@@ -41,11 +41,12 @@ namespace Project_Work_My_Telegram_bot
             _myBot.OnMessage += OnMessage;
             _myBot.OnUpdate += OnUpdate;
 
-            //Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
+            Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
             while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
             _cts.Cancel(); // stop the bot
 
         }
+
         private static async Task OnError(Exception exception, HandleErrorSource source)
         {
             Console.WriteLine(exception);
