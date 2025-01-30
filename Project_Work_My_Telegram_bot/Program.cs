@@ -1,23 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Polling;
+﻿using Telegram.Bot.Polling;
 using Telegram.Bot;
-using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Telegram.Bots.Http;
-using System.Threading;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bots;
-using System.Security.AccessControl;
-using Telegram.Bot.Types.ReplyMarkups;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Polly;
-using System.Timers;
+using Newtonsoft.Json;
 
 namespace Project_Work_My_Telegram_bot
 {
@@ -32,8 +17,13 @@ namespace Project_Work_My_Telegram_bot
         private static CancellationTokenSource? _cts;
         private static MessageProcessing _messageProcessing;
 
-        static async Task Main()
+        static async Task Main(string[] args) 
         {
+            //Console.WriteLine("ЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯЯ");
+            PassUser passUser = new PassUser();
+
+            SetPassUser();
+
             _cts = new CancellationTokenSource();
             _myBot = new TelegramBotClient(_token, cancellationToken: _cts.Token);
 
@@ -51,7 +41,7 @@ namespace Project_Work_My_Telegram_bot
             _myBot.OnMessage += OnMessage;
             _myBot.OnUpdate += OnUpdate;
 
-            Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
+            //Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
             while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
             _cts.Cancel(); // stop the bot
 
@@ -65,7 +55,6 @@ namespace Project_Work_My_Telegram_bot
         {
             try
             {
-
                 //обработка Update 
                 switch (update)
                 {
@@ -119,6 +108,19 @@ namespace Project_Work_My_Telegram_bot
             {
                 await OnError(ex, HandleErrorSource.PollingError);
             }
+        }
+
+        public static void SetPassUser()
+        {
+            PassUser passUser = new PassUser();
+
+            string filePath = "UsersPass.json";
+            if (System.IO.File.Exists(filePath))
+            {
+                string json = System.IO.File.ReadAllText(filePath);
+            }
+            string updatedJson = JsonConvert.SerializeObject(passUser, Formatting.Indented);
+            System.IO.File.WriteAllText(filePath, updatedJson);
         }
     }
 }

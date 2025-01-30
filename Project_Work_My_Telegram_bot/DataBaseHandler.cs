@@ -109,6 +109,17 @@ namespace Project_Work_My_Telegram_bot
                 return user.UserRol;
             }
         }
+
+        public static async Task<CarDrive> GetIsUserCar(long IdTg)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                CarDrive? usercar = await db.CarDrive.FirstOrDefaultAsync(x => x.isPersonalCar);
+                // случай если нет юзера в БД возврат Null 
+                return usercar!; 
+            }
+        }
+
         public static async Task SetUserRoleAsync(long IdTg, UserType role)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -135,7 +146,7 @@ namespace Project_Work_My_Telegram_bot
             using (ApplicationContext db = new ApplicationContext())
             { 
                 User? user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg) ?? null;
-
+                
                 return user;
             }
         } 
