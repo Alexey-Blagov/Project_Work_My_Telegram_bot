@@ -21,7 +21,12 @@ namespace Project_Work_My_Telegram_bot
         {
 
             PassUser passUser = new PassUser();
+            var getfuel = new FuelPrice();
 
+            Console.WriteLine(getfuel.Ai92);
+            Console.WriteLine(getfuel.Ai95);
+            Console.WriteLine(getfuel.Diesel);
+           
             //SetPassUser();
 
             _cts = new CancellationTokenSource();

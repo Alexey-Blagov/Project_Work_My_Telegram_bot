@@ -11,10 +11,15 @@ namespace Project_Work_My_Telegram_bot.Configurations
             builder.
                 HasKey(a => a.CarId);
             builder.
-                HasMany(c=>c.User).
-                WithOne (u=>u.Рersonalcar);
+                HasOne(c => c.UserPersonalCar).
+                WithOne(u => u.Рersonalcar);
+
             builder.
                 HasAlternateKey(u => u.CarNumber); 
         }
     }
 }
+//         HasOne(c => c.UserPersonalCar) // Связь один-к-одному (или один-ко-многим)
+//        .WithMany(u => u.Рersonalcar) // Навигационное свойство в User
+//        .HasForeignKey(c => c.UserPersonalCarId) // Внешний ключ в CarDrive
+//        .OnDelete(DeleteBehavior.SetNull);

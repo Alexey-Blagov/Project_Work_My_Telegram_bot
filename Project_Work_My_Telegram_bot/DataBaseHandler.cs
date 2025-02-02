@@ -18,7 +18,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
                 if (user is null)
                 {
                     User newuser = new User();
@@ -28,7 +28,7 @@ namespace Project_Work_My_Telegram_bot
                 else
                 {
                     user!.UserName = name;
-                    db.User.Update(user);
+                    db.Users.Update(user);
                 }
                 await db.SaveChangesAsync();
             };
@@ -37,14 +37,14 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.User.FirstOrDefaultAsync(x => x  == newUser);
+                var user = await db.Users.FirstOrDefaultAsync(x => x  == newUser);
                 if (user is null)
                 {
                     await db.AddAsync(newUser);
                 }
                 else
                 {  
-                    db.User.Update(newUser);
+                    db.Users.Update(newUser);
                 }
                 await db.SaveChangesAsync();
             };
@@ -55,7 +55,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var objPath = await db.ObjectPath.FirstOrDefaultAsync(o => o == newObjPath);
+                var objPath = await db.ObjectPaths.FirstOrDefaultAsync(o => o == newObjPath);
                 if (objPath is null)
                 {
                     await db.AddAsync(newObjPath);
@@ -75,7 +75,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                CarDrive? cardrive = await db.CarDrive.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
+                CarDrive? cardrive = await db.CarDrives.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
 
                 if (cardrive is null)
                 {
@@ -90,7 +90,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var cardrive = await db.CarDrive.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
+                var cardrive = await db.CarDrives.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
                 cardrive.CarNumber = newCarDrive.CarNumber;  
 
                 
@@ -105,7 +105,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
                 if (user is null)
                 {
                     User newuser = new User();
@@ -115,7 +115,7 @@ namespace Project_Work_My_Telegram_bot
                 else
                 {
                     user!.JobTitlel = jobTitle;
-                    db.User.Update(user);
+                    db.Users.Update(user);
                 }
                 await db.SaveChangesAsync();
             };
@@ -124,7 +124,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
                 // случай если нет юзера в БД возврат Non 
                 if (user == null) return 0;
 
@@ -136,7 +136,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                CarDrive? usercar = await db.CarDrive.FirstOrDefaultAsync(x => x.isPersonalCar);
+                CarDrive? usercar = await db.CarDrives.FirstOrDefaultAsync(x => x.isPersonalCar);
                 // случай если нет юзера в БД возврат Null 
                 return usercar!; 
             }
@@ -146,7 +146,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
                 if (user is null)
                 {
                     User newuser = new User();
@@ -157,7 +157,7 @@ namespace Project_Work_My_Telegram_bot
                 else
                 {
                     user!.UserRol = (int)role;
-                    db.User.Update(user);
+                    db.Users.Update(user);
                 }
                 await db.SaveChangesAsync();
             }
@@ -166,7 +166,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             { 
-                User? user = await db.User.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                User? user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
                 
                 return user!;
             }
@@ -175,21 +175,26 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.User.FirstOrDefaultAsync(x => x.IdTg == newUser.IdTg); 
+                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == newUser.IdTg); 
                 if (user is null)
                 {
-
-                    db.User.Add(newUser); 
+                    db.Users.Add(newUser); 
                     await db.SaveChangesAsync();
                 }
                 else
                 {
-                    db.User.Update(newUser);
+                    user.TgUserName =  (user.TgUserName == string.Empty ) ? newUser.TgUserName : user.TgUserName;
+                    user.UserName = (user.UserName==string.Empty ) ? newUser.UserName : user.UserName; 
+                    user.JobTitlel = (user.JobTitlel==string.Empty) ? newUser.JobTitlel : user.JobTitlel; 
+                    user.Рersonalcar = (user.Рersonalcar==null) ? newUser.Рersonalcar : user.Рersonalcar;    
+                    user.ObjectPath = newUser.ObjectPath;
+                    user.OtherExpenses =     newUser.OtherExpenses; 
+                    db.Users.Update(user);
                     await db.SaveChangesAsync();
                 }
             }
         }
-
-        
+        //public long IdTg { get; set; }
+        //public int UserRol { get; set; } = (int)UserType.FirstEnter;
     }
 }

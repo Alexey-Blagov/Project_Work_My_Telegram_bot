@@ -11,8 +11,20 @@ namespace Project_Work_My_Telegram_bot.Configurations
             builder.
                 HasKey(a => a.IdPath);
             builder.
-                HasOne(p => p.UserPath).
-                WithMany(u => u.ObjectPath); 
+                HasOne(c => c.CarDrive).
+                WithMany(c => c.objectPath).
+               HasForeignKey(p => p.CarId); 
         }
     }
 }
+.HasOne(p => p.CarDrive)
+        .WithMany(c => c.objectPath)
+        .HasForeignKey(p => p.CarId)
+//public int IdPath { get; set; }
+//public string ObjectName { get; set; } = string.Empty;
+//public double PathLengh { get; set; }
+//public DateTime DatePath { get; set; } = DateTime.UtcNow;
+//public int? CarId { get; set; }
+//public CarDrive? CarDrive { get; set; }
+//public long? UserId { get; set; }
+//public User? UserPath { get; set; }
