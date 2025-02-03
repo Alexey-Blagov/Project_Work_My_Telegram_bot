@@ -67,7 +67,14 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                await db.AddAsync(newOtherExpenses);
+                var otherexpenses = new OtherExpenses();
+
+                otherexpenses.NameExpense = newOtherExpenses.NameExpense;
+                otherexpenses.Coast = newOtherExpenses.Coast;
+                otherexpenses.DateTimeExp = newOtherExpenses.DateTimeExp; 
+
+
+                await db.AddAsync(otherexpenses);
                 await db.SaveChangesAsync();
             }
         }

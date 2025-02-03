@@ -26,8 +26,9 @@ namespace Project_Work_My_Telegram_bot.Configurations
                 WithOne(e => e.UserExp).
                 HasForeignKey(e => e.UserId);
             builder.
-                HasOne(c => c.Рersonalcar).
-                WithOne(u => u.UserPersonalCar);
+                 HasOne(u => u.Рersonalcar).
+                 WithOne(u => u.UserPersonalCar).
+                 HasForeignKey<CarDrive>(k => k.IsPersonalKey);
 
         }
     }
@@ -37,9 +38,8 @@ namespace Project_Work_My_Telegram_bot.Configurations
 //public int UserRol { get; set; } = (int)UserType.FirstEnter;
 //public string? UserName { get; set; }
 //public string? JobTitlel { get; set; }
-//public int? PersonalCarId { get; set; }
 //public CarDrive? Рersonalcar { get; set; }
-//public List<ObjectPath> ObjectPath { get; set; } = new();
+//public List<ObjectPath> ObjectPaths { get; set; } = new();
 //public List<OtherExpenses> OtherExpenses { get; set; } = new();
 
 //public int IdPath { get; set; }
@@ -50,3 +50,14 @@ namespace Project_Work_My_Telegram_bot.Configurations
 //public CarDrive? CarDrive { get; set; }
 //public long? UserId { get; set; }
 //public User? UserPath { get; set; }
+
+//public int CarId { get; set; }
+//public string? CarName { get; set; }
+//public bool isPersonalCar { get; set; } = true;
+//public string? CarNumber { get; set; }
+//public double GasСonsum { get; set; } = 0.0;
+//public int TypeFuel { get; set; } = (int)Fuel.ai92;
+//public long? IsPersonalKey { get; set; }
+//public User? UserPersonalCar { get; set; }
+//public ObjectPath? objectPath { get; set; }
+//public List<User> User { get; set; } = new();

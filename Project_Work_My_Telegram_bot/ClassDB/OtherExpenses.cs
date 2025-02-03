@@ -16,8 +16,8 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //UserId Форинкей на юзера Юсера осуществивший траты
         //UserExp: Екземплыр класса Юсера осуществивший траты
      
-        public int ExpId { get; set; } 
-        public string NameExpense { get; set; } = string.Empty; 
+        public int ExpId { get; set; }
+        public string NameExpense { get; set; } = string.Empty;
         public decimal Coast { get; set; } = 0;
         public DateTime DateTimeExp { get; set; } = DateTime.UtcNow;
         public long? UserId { get; set; }
