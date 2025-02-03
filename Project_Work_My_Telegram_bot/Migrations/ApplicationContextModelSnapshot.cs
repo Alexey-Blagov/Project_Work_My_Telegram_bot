@@ -55,9 +55,6 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.Property<double>("GasСonsum")
                         .HasColumnType("double precision");
 
-                    b.Property<long?>("IsPersonalKey")
-                        .HasColumnType("bigint");
-
                     b.Property<int?>("PathId")
                         .HasColumnType("integer");
 
@@ -70,12 +67,6 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.HasKey("CarId");
 
                     b.HasAlternateKey("CarNumber");
-
-                    b.HasIndex("IsPersonalKey")
-                        .IsUnique();
-
-                    b.HasIndex("PathId")
-                        .IsUnique();
 
                     b.ToTable("CarDrives");
                 });
@@ -105,6 +96,9 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("IdPath");
+
+                    b.HasIndex("CarId")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -180,26 +174,17 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.CarDrive", b =>
-                {
-                    b.HasOne("Project_Work_My_Telegram_bot.ClassDB.User", "UserPersonalCar")
-                        .WithOne("Рersonalcar")
-                        .HasForeignKey("Project_Work_My_Telegram_bot.ClassDB.CarDrive", "IsPersonalKey");
-
-                    b.HasOne("Project_Work_My_Telegram_bot.ClassDB.ObjectPath", "objectPath")
-                        .WithOne("CarDrive")
-                        .HasForeignKey("Project_Work_My_Telegram_bot.ClassDB.CarDrive", "PathId");
-
-                    b.Navigation("UserPersonalCar");
-
-                    b.Navigation("objectPath");
-                });
-
             modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.ObjectPath", b =>
                 {
+                    b.HasOne("Project_Work_My_Telegram_bot.ClassDB.CarDrive", "CarDrive")
+                        .WithOne("objectPath")
+                        .HasForeignKey("Project_Work_My_Telegram_bot.ClassDB.ObjectPath", "CarId");
+
                     b.HasOne("Project_Work_My_Telegram_bot.ClassDB.User", "UserPath")
                         .WithMany("ObjectPaths")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("CarDrive");
 
                     b.Navigation("UserPath");
                 });
@@ -213,9 +198,9 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.Navigation("UserExp");
                 });
 
-            modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.ObjectPath", b =>
+            modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.CarDrive", b =>
                 {
-                    b.Navigation("CarDrive");
+                    b.Navigation("objectPath");
                 });
 
             modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.User", b =>
@@ -223,8 +208,6 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.Navigation("ObjectPaths");
 
                     b.Navigation("OtherExpenses");
-
-                    b.Navigation("Рersonalcar");
                 });
 #pragma warning restore 612, 618
         }

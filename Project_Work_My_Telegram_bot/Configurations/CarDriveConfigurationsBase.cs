@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Project_Work_My_Telegram_bot;
 using Project_Work_My_Telegram_bot.ClassDB;
+using Telegram.Bot.Types;
 
 namespace Project_Work_My_Telegram_bot.Configurations
 {
@@ -11,8 +12,10 @@ namespace Project_Work_My_Telegram_bot.Configurations
         {
             builder.
                 HasKey(a => a.CarId);
-            builder.HasMany(u => u.User).WithMany(c => c.Cars);    
-            
+            builder.
+                HasOne(p => p.objectPath).
+                WithOne(c => c.CarDrive).
+                HasForeignKey<ObjectPath>(i => i.CarId);
             builder.
                 HasAlternateKey(u => u.CarNumber); 
         }

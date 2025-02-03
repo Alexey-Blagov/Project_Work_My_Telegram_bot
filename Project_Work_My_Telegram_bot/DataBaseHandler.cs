@@ -193,7 +193,7 @@ namespace Project_Work_My_Telegram_bot
                     user.TgUserName =  (user.TgUserName == string.Empty ) ? newUser.TgUserName : user.TgUserName;
                     user.UserName = (user.UserName==string.Empty ) ? newUser.UserName : user.UserName; 
                     user.JobTitlel = (user.JobTitlel==string.Empty) ? newUser.JobTitlel : user.JobTitlel; 
-                    user.Рersonalcar = (user.Рersonalcar==null) ? newUser.Рersonalcar : user.Рersonalcar;
+                   
                     user.OtherExpenses =     newUser.OtherExpenses; 
                     db.Users.Update(user);
                     await db.SaveChangesAsync();

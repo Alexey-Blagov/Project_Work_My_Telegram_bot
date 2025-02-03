@@ -330,7 +330,7 @@ namespace Project_Work_My_Telegram_bot
                     {
                         var typefuel = GetTypeFuelString((Fuel)car.TypeFuel);
                         //Вносим данные в личный транспорт в класс User 
-                        user.Рersonalcar = car;
+                       ///user.Рersonalcar = car;
                         stringtobot = $"Id пользователя: {user.IdTg}" + "\n" +
                                       $"SS TgName: {user.TgUserName}" + "\n" +
                                       $"SS Тип учетной записи: {(UserType)user.UserRol}" + "\n" +
