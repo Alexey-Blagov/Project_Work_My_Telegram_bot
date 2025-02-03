@@ -22,11 +22,12 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //OtherExpenses: 
         public long IdTg { get; set; } 
         public string TgUserName { get; set; } = string.Empty;
-        public int UserRol { get; set; } = (int)UserType.FirstEnter;
+        public int UserRol { get; set; } = (int)UserType.Non;
         public string? UserName { get; set; }
         public string? JobTitlel { get; set; }
         public CarDrive? Рersonalcar { get; set; }
         public List<ObjectPath> ObjectPaths { get; set; } = new ();
         public List<OtherExpenses> OtherExpenses { get; set; } = new(); 
+        public List<CarDrive> Cars { get; set; } = new();
     }
 }

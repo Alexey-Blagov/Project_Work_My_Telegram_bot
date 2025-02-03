@@ -12,7 +12,8 @@ namespace Project_Work_My_Telegram_bot.Configurations
                 HasKey(a => a.IdPath);
             builder.
                 HasOne(c => c.CarDrive).
-                WithOne(c => c.objectPath); 
+                WithOne(c => c.objectPath).
+                HasForeignKey<CarDrive>(c=> c.PathId); 
         }
     }
 }

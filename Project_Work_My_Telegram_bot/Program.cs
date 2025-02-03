@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Project_Work_My_Telegram_bot
 {
-    public enum UserType { FirstEnter = 0, Non = 1, User = 2, Admin = 3 };
+    public enum UserType {Non = 0, User = 1, Admin = 2 };
     public enum Fuel { dizel = 0, ai95 = 1, ai92 = 2 };
     internal class Program
     {
