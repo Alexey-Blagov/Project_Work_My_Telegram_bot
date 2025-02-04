@@ -98,7 +98,7 @@ namespace Project_Work_My_Telegram_bot
             using (ApplicationContext db = new ApplicationContext())
             {
                 var cardrive = await db.CarDrives.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
-                cardrive.CarNumber = newCarDrive.CarNumber;  
+                cardrive  = newCarDrive;  
 
                 
                 //await db.CarDrive.Update(cardrive);  
@@ -138,12 +138,11 @@ namespace Project_Work_My_Telegram_bot
                 return user.UserRol;
             }
         }
-
         public static async Task<CarDrive> GetIsUserCar(long IdTg)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                CarDrive? usercar = await db.CarDrives.FirstOrDefaultAsync(x => x.isPersonalCar);
+                CarDrive? usercar = await db.CarDrives.FirstOrDefaultAsync(x => x.isPersonalCar == true);
                 // случай если нет юзера в БД возврат Null 
                 return usercar!; 
             }
@@ -178,26 +177,33 @@ namespace Project_Work_My_Telegram_bot
                 return user!;
             }
         } 
-        public static async Task AddOrUpdateUserAsync(User newUser)  
+        public static async Task <bool> SetNewUserAsync(User newUser)  
         {
             using (ApplicationContext db = new ApplicationContext())
             {
                 var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == newUser.IdTg); 
+                
                 if (user is null)
                 {
                     db.Users.Add(newUser); 
                     await db.SaveChangesAsync();
+                    return true; 
                 }
-                else
-                {
-                    user.TgUserName =  (user.TgUserName == string.Empty ) ? newUser.TgUserName : user.TgUserName;
-                    user.UserName = (user.UserName==string.Empty ) ? newUser.UserName : user.UserName; 
-                    user.JobTitlel = (user.JobTitlel==string.Empty) ? newUser.JobTitlel : user.JobTitlel; 
-                   
-                    user.OtherExpenses =     newUser.OtherExpenses; 
-                    db.Users.Update(user);
-                    await db.SaveChangesAsync();
-                }
+                return false; 
+            }
+        }
+        public static async Task  UpdateUserAsync(User newUser)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == newUser.IdTg);
+                user.TgUserName = (user.TgUserName == string.Empty) ? newUser.TgUserName : user.TgUserName;
+                user.UserName = (user.UserName == string.Empty) ? newUser.UserName : user.UserName;
+                user.JobTitlel = (user.JobTitlel == string.Empty) ? newUser.JobTitlel : user.JobTitlel;
+
+                user.OtherExpenses = newUser.OtherExpenses;
+                db.Users.Update(user);
+                await db.SaveChangesAsync();
             }
         }
         //public long IdTg { get; set; }
