@@ -55,9 +55,6 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.Property<double>("GasСonsum")
                         .HasColumnType("double precision");
 
-                    b.Property<int?>("PathId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("TypeFuel")
                         .HasColumnType("integer");
 

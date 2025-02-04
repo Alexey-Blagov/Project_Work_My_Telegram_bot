@@ -24,7 +24,6 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         public string? CarNumber { get; set; }
         public double GasСonsum { get; set; } = 0.0;
         public int TypeFuel { get; set; } = (int)Fuel.ai92;
-        public int? PathId { get; set; }
         public ObjectPath? objectPath { get; set; }
         public List<User> User { get; set; } = new();
     }

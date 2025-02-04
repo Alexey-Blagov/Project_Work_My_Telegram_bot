@@ -12,8 +12,8 @@ using Project_Work_My_Telegram_bot;
 namespace Project_Work_My_Telegram_bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250203175213_InitMigrations")]
-    partial class InitMigrations
+    [Migration("20250204085248_InitMigr")]
+    partial class InitMigr
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,9 +57,6 @@ namespace Project_Work_My_Telegram_bot.Migrations
 
                     b.Property<double>("GasСonsum")
                         .HasColumnType("double precision");
-
-                    b.Property<int?>("PathId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("TypeFuel")
                         .HasColumnType("integer");

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Project_Work_My_Telegram_bot.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigrations : Migration
+    public partial class InitMigr : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,8 +22,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     isPersonalCar = table.Column<bool>(type: "boolean", nullable: false),
                     CarNumber = table.Column<string>(type: "text", nullable: false),
                     GasСonsum = table.Column<double>(type: "double precision", nullable: false),
-                    TypeFuel = table.Column<int>(type: "integer", nullable: false),
-                    PathId = table.Column<int>(type: "integer", nullable: true)
+                    TypeFuel = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
