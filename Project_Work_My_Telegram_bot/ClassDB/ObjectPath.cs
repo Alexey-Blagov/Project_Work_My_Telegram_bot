@@ -20,8 +20,8 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //CarDrive: Екземплыр класса машины осуществившей поездуку осуществивший траты
        
         public int IdPath { get; set; }
-        public string ObjectName { get; set; } = string.Empty; 
-        public double PathLengh { get; set; }
+        public string? ObjectName { get; set; } 
+        public double? PathLengh { get; set; }
         public DateTime DatePath { get; set; } = DateTime.UtcNow;
         public int? CarId { get; set; } 
         public CarDrive? CarDrive { get; set; }

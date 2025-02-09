@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Project_Work_My_Telegram_bot.ClassDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
 
@@ -16,17 +18,41 @@ namespace Project_Work_My_Telegram_bot
         {
             ResizeKeyboard = true
         };
-        // Клавиатура Main  
+        //Клавиатура 
+        public static KeyboardButton[][] GenerateKeyboard(List<CarDrive> buttonCarsData)
+        {
+            List<KeyboardButton[]> keyboard = new List<KeyboardButton[]>();
 
+            for (int i = 0; i < buttonCarsData.Count; i += 2)
+            {
+                if (i + 1 < buttonCarsData.Count)
+                {
+                    keyboard.Add(new KeyboardButton[] { new KeyboardButton(buttonCarsData[i].CarName + " " + buttonCarsData[i].CarNumber),
+                                                        new KeyboardButton(buttonCarsData[i + 1].CarName + " " + buttonCarsData[i + 1].CarNumber) });
+                }
+                else
+                {
+                    keyboard.Add(new KeyboardButton[] { new KeyboardButton(buttonCarsData[i].CarName + " " + buttonCarsData[i].CarNumber) });
+                }
+            }
+            return keyboard.ToArray();
+        }
+        public static ReplyKeyboardMarkup GetReplyMarkup(List<CarDrive> buttonCarDrivesData)
+        {
+            var keyboard = GenerateKeyboard(buttonCarDrivesData);
+            return new ReplyKeyboardMarkup(keyboard) { ResizeKeyboard = true };
+        }
+        // Клавиатура Main 
         public static KeyboardButton[][] keyboardUser =
         [
             ["👤 Профиль", "📚 Вывести отчет"],
             ["📝 Регистрация поездки", "💰 Регистрация трат"],
+            ["Смена статуа User/Admin"]
         ];
         public static KeyboardButton[][] keyboardAdmin =
         [
             ["👤 Установка пороля User", "💰 Стоимость бензина"],
-            ["📝 Регистрация автопарка компании", "Смена статуа User/Admin"]
+            ["📝 Регистрация автопарка компании", "Смена статуа Admin/User"]
         ];
         public static KeyboardButton[][] keyboardGasType =
         [
@@ -119,7 +145,7 @@ namespace Project_Work_My_Telegram_bot
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "Сумма 00.00 руб", callbackData: "sumexpenses"),
-                InlineKeyboardButton.WithCallbackData(text: "📆 Дата зтраты", callbackData: "dateexpenses"), 
+                InlineKeyboardButton.WithCallbackData(text: "📆 Дата зтраты", callbackData: "dateexpenses"),
             },
              new []
              {
@@ -147,7 +173,7 @@ namespace Project_Work_My_Telegram_bot
         {
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость 🔋 AИ-92", callbackData: "coastAi92"), 
+                InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость 🔋 AИ-92", callbackData: "coastAi92"),
                 InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость 🔋 AИ-95", callbackData: "coastAi95"),
                 InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость  U0001faab ДТ ", callbackData: "coastDizel"),
             },

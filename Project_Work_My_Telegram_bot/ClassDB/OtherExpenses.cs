@@ -17,8 +17,8 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //UserExp: Екземплыр класса Юсера осуществивший траты
      
         public int ExpId { get; set; }
-        public string NameExpense { get; set; } = string.Empty;
-        public decimal Coast { get; set; } = 0;
+        public string? NameExpense { get; set; }
+        public decimal? Coast { get; set; }
         public DateTime DateTimeExp { get; set; } = DateTime.UtcNow;
         public long? UserId { get; set; }
         public User? UserExp { get; set; }

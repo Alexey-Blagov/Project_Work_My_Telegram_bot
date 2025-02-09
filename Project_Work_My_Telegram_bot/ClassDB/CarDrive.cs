@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_Work_My_Telegram_bot;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
@@ -20,11 +21,12 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //UserCr: Екземплыр класса Юсера Null машина конторская или нет машины  конторская или нет ее 
         public int CarId { get; set; }
         public string? CarName { get; set; }
-        public bool isPersonalCar { get; set; } = true;
+        public bool isPersonalCar { get; set; } = false;
         public string? CarNumber { get; set; }
-        public double GasСonsum { get; set; } = 0.0;
+        public double? GasСonsum { get; set; } 
         public int TypeFuel { get; set; } = (int)Fuel.ai92;
-        public ObjectPath? objectPath { get; set; }
-        public List<User> User { get; set; } = new();
+        public long? PersonalId {  get; set; }
+        public User? UserPersonal { get; set; } 
+        public List<ObjectPath> ObjectPaths { get; set; } = new();
     }
 }

@@ -13,11 +13,11 @@ namespace Project_Work_My_Telegram_bot.Configurations
             builder.
                 HasKey(a => a.CarId);
             builder.
-                HasOne(p => p.objectPath).
-                WithOne(c => c.CarDrive).
-                HasForeignKey<ObjectPath>(i => i.CarId);
+                HasAlternateKey(u => u.CarNumber);
             builder.
-                HasAlternateKey(u => u.CarNumber); 
+                HasOne(u => u.UserPersonal).
+                WithOne(c => c.PersonalCar).
+                HasForeignKey<CarDrive>(c => c.PersonalId);
         }
     }
 }

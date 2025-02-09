@@ -22,21 +22,6 @@ namespace Project_Work_My_Telegram_bot.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CarDriveUser", b =>
-                {
-                    b.Property<int>("CarsCarId")
-                        .HasColumnType("integer");
-
-                    b.Property<long>("UserIdTg")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CarsCarId", "UserIdTg");
-
-                    b.HasIndex("UserIdTg");
-
-                    b.ToTable("CarDriveUser");
-                });
-
             modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.CarDrive", b =>
                 {
                     b.Property<int>("CarId")
@@ -52,8 +37,11 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("GasСonsum")
+                    b.Property<double?>("GasСonsum")
                         .HasColumnType("double precision");
+
+                    b.Property<long?>("PersonalId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("TypeFuel")
                         .HasColumnType("integer");
@@ -64,6 +52,9 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.HasKey("CarId");
 
                     b.HasAlternateKey("CarNumber");
+
+                    b.HasIndex("PersonalId")
+                        .IsUnique();
 
                     b.ToTable("CarDrives");
                 });
@@ -83,10 +74,9 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ObjectName")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("PathLengh")
+                    b.Property<double?>("PathLengh")
                         .HasColumnType("double precision");
 
                     b.Property<long?>("UserId")
@@ -94,8 +84,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
 
                     b.HasKey("IdPath");
 
-                    b.HasIndex("CarId")
-                        .IsUnique();
+                    b.HasIndex("CarId");
 
                     b.HasIndex("UserId");
 
@@ -110,14 +99,13 @@ namespace Project_Work_My_Telegram_bot.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ExpId"));
 
-                    b.Property<decimal>("Coast")
+                    b.Property<decimal?>("Coast")
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("DateTimeExp")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("NameExpense")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<long?>("UserId")
@@ -156,26 +144,20 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CarDriveUser", b =>
+            modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.CarDrive", b =>
                 {
-                    b.HasOne("Project_Work_My_Telegram_bot.ClassDB.CarDrive", null)
-                        .WithMany()
-                        .HasForeignKey("CarsCarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Project_Work_My_Telegram_bot.ClassDB.User", "UserPersonal")
+                        .WithOne("PersonalCar")
+                        .HasForeignKey("Project_Work_My_Telegram_bot.ClassDB.CarDrive", "PersonalId");
 
-                    b.HasOne("Project_Work_My_Telegram_bot.ClassDB.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserIdTg")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("UserPersonal");
                 });
 
             modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.ObjectPath", b =>
                 {
                     b.HasOne("Project_Work_My_Telegram_bot.ClassDB.CarDrive", "CarDrive")
-                        .WithOne("objectPath")
-                        .HasForeignKey("Project_Work_My_Telegram_bot.ClassDB.ObjectPath", "CarId");
+                        .WithMany("ObjectPaths")
+                        .HasForeignKey("CarId");
 
                     b.HasOne("Project_Work_My_Telegram_bot.ClassDB.User", "UserPath")
                         .WithMany("ObjectPaths")
@@ -197,7 +179,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
 
             modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.CarDrive", b =>
                 {
-                    b.Navigation("objectPath");
+                    b.Navigation("ObjectPaths");
                 });
 
             modelBuilder.Entity("Project_Work_My_Telegram_bot.ClassDB.User", b =>
@@ -205,6 +187,8 @@ namespace Project_Work_My_Telegram_bot.Migrations
                     b.Navigation("ObjectPaths");
 
                     b.Navigation("OtherExpenses");
+
+                    b.Navigation("PersonalCar");
                 });
 #pragma warning restore 612, 618
         }

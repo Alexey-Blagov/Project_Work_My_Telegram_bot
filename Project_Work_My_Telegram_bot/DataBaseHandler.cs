@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Project_Work_My_Telegram_bot;
 using Project_Work_My_Telegram_bot.ClassDB;
 using System;
 using System.Collections.Generic;
@@ -37,19 +38,18 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.Users.FirstOrDefaultAsync(x => x  == newUser);
+                var user = await db.Users.FirstOrDefaultAsync(x => x == newUser);
                 if (user is null)
                 {
                     await db.AddAsync(newUser);
                 }
                 else
-                {  
+                {
                     db.Users.Update(newUser);
                 }
                 await db.SaveChangesAsync();
             };
         }
-
 
         public static async Task SetNewObjectPathAsync(ObjectPath newObjPath)
         {
@@ -67,22 +67,22 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var otherexpenses = new OtherExpenses();
+                //var otherexpenses = new OtherExpenses();
 
-                otherexpenses.NameExpense = newOtherExpenses.NameExpense;
-                otherexpenses.Coast = newOtherExpenses.Coast;
-                otherexpenses.DateTimeExp = newOtherExpenses.DateTimeExp; 
+                //otherexpenses.NameExpense = newOtherExpenses.NameExpense;
+                //otherexpenses.Coast = newOtherExpenses.Coast;
+                //otherexpenses.DateTimeExp = newOtherExpenses.DateTimeExp; 
 
 
-                await db.AddAsync(otherexpenses);
+                await db.AddAsync(newOtherExpenses);
                 await db.SaveChangesAsync();
             }
         }
-        public static async Task <bool> SetNewCarDriveAsync(CarDrive newCarDrive)
+        public static async Task<bool> SetNewCarDriveAsync(CarDrive newCarDrive)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                CarDrive? cardrive = await db.CarDrives.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
+                CarDrive? cardrive = await db.CarDrives.FirstOrDefaultAsync(c => c.PersonalId == newCarDrive.PersonalId);
 
                 if (cardrive is null)
                 {
@@ -93,40 +93,34 @@ namespace Project_Work_My_Telegram_bot
                 return false;
             }
         }
+        public static async Task UpdatePersonarCarDriveAsync(CarDrive newCarDrive)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                await db.CarDrives
+                         .Where(c => c.PersonalId == newCarDrive.PersonalId)
+                         .ExecuteUpdateAsync(s => s
+                          .SetProperty(c => c.CarNumber, newCarDrive.CarNumber)
+                          .SetProperty(c => c.CarName, newCarDrive.CarName)
+                          .SetProperty(c => c.GasСonsum, newCarDrive.GasСonsum)
+                          .SetProperty(c => c.TypeFuel, newCarDrive.TypeFuel));
+            }
+        }
         public static async Task UpdateNewCarDriveAsync(CarDrive newCarDrive)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var cardrive = await db.CarDrives.FirstOrDefaultAsync(n => n.CarNumber == newCarDrive.CarNumber);
-                cardrive  = newCarDrive;  
-
-                
-                //await db.CarDrive.Update(cardrive);  
-                await db.SaveChangesAsync();
-
+                await db.CarDrives
+                         .Where(c => c.CarNumber == newCarDrive.CarNumber)
+                         .ExecuteUpdateAsync(s => s
+                          .SetProperty(c => c.PersonalId, newCarDrive.PersonalId)
+                          .SetProperty(c => c.isPersonalCar, newCarDrive.isPersonalCar)
+                          .SetProperty(c => c.CarName, newCarDrive.CarName)
+                          .SetProperty(c => c.GasСonsum, newCarDrive.GasСonsum)
+                          .SetProperty(c => c.TypeFuel, newCarDrive.TypeFuel));
             }
+        }
 
-        }
-        
-        public static async Task SetUserJobTitleAsync(long IdTg, string jobTitle)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
-                if (user is null)
-                {
-                    User newuser = new User();
-                    newuser!.JobTitlel = jobTitle;
-                    await db.AddAsync(newuser);
-                }
-                else
-                {
-                    user!.JobTitlel = jobTitle;
-                    db.Users.Update(user);
-                }
-                await db.SaveChangesAsync();
-            };
-        }
         public static async Task<int> GetUserRoleAsync(long IdTg)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -142,12 +136,11 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                CarDrive? usercar = await db.CarDrives.FirstOrDefaultAsync(x => x.isPersonalCar == true);
+                CarDrive? userCar = await db.CarDrives.FirstOrDefaultAsync(x => x.PersonalId == IdTg);
                 // случай если нет юзера в БД возврат Null 
-                return usercar!; 
+                return userCar!;
             }
         }
-
         public static async Task SetUserRoleAsync(long IdTg, UserType role)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -168,45 +161,58 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             }
         }
-        public static async Task <User> GetUserAsync (long IdTg) 
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            { 
-                User? user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
-                
-                return user!;
-            }
-        } 
-        public static async Task <bool> SetNewUserAsync(User newUser)  
+        public static async Task<User> GetUserAsync(long IdTg)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == newUser.IdTg); 
-                
-                if (user is null)
-                {
-                    db.Users.Add(newUser); 
-                    await db.SaveChangesAsync();
-                    return true; 
-                }
-                return false; 
+                User? user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+
+                return user!;
             }
         }
-        public static async Task  UpdateUserAsync(User newUser)
+        public static async Task SetOrUpdateUserAsync(User newUser)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
                 var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == newUser.IdTg);
-                user.TgUserName = (user.TgUserName == string.Empty) ? newUser.TgUserName : user.TgUserName;
-                user.UserName = (user.UserName == string.Empty) ? newUser.UserName : user.UserName;
-                user.JobTitlel = (user.JobTitlel == string.Empty) ? newUser.JobTitlel : user.JobTitlel;
 
-                user.OtherExpenses = newUser.OtherExpenses;
-                db.Users.Update(user);
-                await db.SaveChangesAsync();
+                if (user is null)
+                {
+                    db.Users.Add(newUser);
+                    await db.SaveChangesAsync();
+                }
+                else
+                {
+                    await db.Users
+                        .Where(c => c.IdTg == newUser.IdTg)
+                        .ExecuteUpdateAsync(s => s
+                         .SetProperty(c => c.UserName, newUser.UserName)
+                         .SetProperty(c => c.TgUserName, newUser.TgUserName)
+                         .SetProperty(c => c.JobTitlel, newUser.JobTitlel)
+                         .SetProperty(c => c.UserRol, newUser.UserRol));
+                }
             }
         }
-        //public long IdTg { get; set; }
-        //public int UserRol { get; set; } = (int)UserType.FirstEnter;
+
+        internal static async Task<List<CarDrive>> GetCarsDataList()
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                return await db.CarDrives
+                    .AsNoTracking()
+                    .Where(c => c.isPersonalCar == false)
+                    .ToListAsync();
+            }
+        }
+
+        internal static async Task<CarDrive?> GetUserPersonalCar(long IdTg)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                CarDrive? userCar = await db.CarDrives.FirstOrDefaultAsync(x => x.PersonalId == IdTg);
+                // случай если нет юзера в БД возврат Null 
+                return userCar;  
+            }
+        }
     }
 }
