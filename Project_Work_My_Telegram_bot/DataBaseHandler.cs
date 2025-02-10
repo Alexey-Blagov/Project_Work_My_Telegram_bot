@@ -214,5 +214,10 @@ namespace Project_Work_My_Telegram_bot
                 return userCar;  
             }
         }
+
+        internal static async Task<bool> SetNewExpensesAsync(OtherExpenses expenses)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
