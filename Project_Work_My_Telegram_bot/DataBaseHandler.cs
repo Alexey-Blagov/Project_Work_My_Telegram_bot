@@ -55,8 +55,7 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var objPath = await db.ObjectPaths.FirstOrDefaultAsync(o => o == newObjPath);
-                if (objPath is null)
+                if (newObjPath is not null)
                 {
                     await db.AddAsync(newObjPath);
                     await db.SaveChangesAsync();
@@ -67,15 +66,11 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                //var otherexpenses = new OtherExpenses();
-
-                //otherexpenses.NameExpense = newOtherExpenses.NameExpense;
-                //otherexpenses.Coast = newOtherExpenses.Coast;
-                //otherexpenses.DateTimeExp = newOtherExpenses.DateTimeExp; 
-
-
-                await db.AddAsync(newOtherExpenses);
-                await db.SaveChangesAsync();
+                if (newOtherExpenses is not null)
+                {
+                    await db.AddAsync(newOtherExpenses);
+                    await db.SaveChangesAsync();
+                }
             }
         }
         public static async Task<bool> SetNewCarDriveAsync(CarDrive newCarDrive)
@@ -120,7 +115,6 @@ namespace Project_Work_My_Telegram_bot
                           .SetProperty(c => c.TypeFuel, newCarDrive.TypeFuel));
             }
         }
-
         public static async Task<int> GetUserRoleAsync(long IdTg)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -211,13 +205,17 @@ namespace Project_Work_My_Telegram_bot
             {
                 CarDrive? userCar = await db.CarDrives.FirstOrDefaultAsync(x => x.PersonalId == IdTg);
                 // случай если нет юзера в БД возврат Null 
-                return userCar;  
+                return userCar;
             }
         }
 
-        internal static async Task<bool> SetNewExpensesAsync(OtherExpenses expenses)
+        internal static async Task SetNewExpensesAsync(OtherExpenses expenses)
         {
-            throw new NotImplementedException();
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                db.OtherExpenses.Add(expenses);
+                await db.SaveChangesAsync();
+            }
         }
     }
 }
