@@ -21,7 +21,7 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //ObjectPath Объекты все пути 
         //OtherExpenses: 
         public long IdTg { get; set; } 
-        public string TgUserName { get; set; }
+        public string TgUserName { get; set; } = string.Empty; 
         public int UserRol { get; set; } = (int)UserType.Non;
         public string? UserName { get; set; }
         public string? JobTitlel { get; set; }

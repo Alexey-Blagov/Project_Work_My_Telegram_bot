@@ -59,12 +59,12 @@ namespace Project_Work_My_Telegram_bot
         public async Task OnTextMessage(Message message)
         {
             //Проверка юзера 
-            if (_isRole is not UserType.Non)
-            {
-                _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
-                _users[message.Chat.Id].TgUserName = message.Chat.Username ?? "Нет имени профиля";
-                _isRole = (UserType)_users[message.Chat.Id].UserRol;
-            }
+            //if (_isRole is not UserType.Non)
+            //{
+            //    _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
+            //    _isRole = (UserType)_users[message.Chat.Id].UserRol;
+            //}
+            
 
             //Получить данные юзера из БД в обработку   
 
@@ -342,15 +342,7 @@ namespace Project_Work_My_Telegram_bot
 
                 case "closed":
                     //Машины у Юзера может и не быть 
-                    //if (_carDrives[msg.Chat.Id] is null)
-                    //{
-                    //    OnCallbackQuery -= ClosedEnterProfil;
-                    //    await _botClient!.SendMessage(
-                    //     chatId: chatId,
-                    //     text: $"Регистрация/изменение профиля:",
-                    //     replyMarkup: KeyBoardSetting.profile);
-                    //    return;
-                    //}
+         
 
                     var user = _users[msg.Chat.Id];
                     var car = _carDrives[msg.Chat.Id];
@@ -529,7 +521,7 @@ namespace Project_Work_My_Telegram_bot
                     break;
             };
         }
-
+        //Методы вывода данны
         private bool GetCarDataString(CarDrive car, out string str)
         {
             if (car.CarName is null || car.CarNumber is null || car.GasСonsum is null)
@@ -607,7 +599,6 @@ namespace Project_Work_My_Telegram_bot
                   $"Сохранить данные ДА/НЕТ?";
             return true;
         }
-
         // Методы обработчики Event 
         private async Task ChoiceCarPath(Message msg)
         {
@@ -1327,9 +1318,8 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Ф.И.О {text}",
                          replyMarkup: new ReplyKeyboardRemove());
             //Сохранение данных в БД
-
-            await DataBaseHandler.SetUserNameAsync(msg.Chat.Id, text);
-
+            //await DataBaseHandler.SetUserNameAsync(msg.Chat.Id, text);
+            _users[msg.Chat.Id].UserName = text; 
             OnCallbackQuery -= InsertUser;
         }
         private static bool CarNumberParse(string text, out string? carnumber)

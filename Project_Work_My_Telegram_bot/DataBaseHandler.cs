@@ -137,22 +137,27 @@ namespace Project_Work_My_Telegram_bot
         }
         public static async Task SetUserRoleAsync(long IdTg, UserType role)
         {
+           
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
-                if (user is null)
+                try
                 {
-                    User newuser = new User();
-                    newuser!.UserRol = (int)role;
-                    newuser!.IdTg = IdTg;
-                    await db.AddAsync(newuser);
+                    var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
+                    if (user is null)
+                    {
+                        User newuser = new User();
+                        newuser!.UserRol = (int)role;
+                        newuser!.IdTg = IdTg;
+                        await db.AddAsync(newuser);
+                    }
+                    else
+                    {
+                        user!.UserRol = (int)role;
+                        db.Users.Update(user);
+                    }
+                    await db.SaveChangesAsync();
                 }
-                else
-                {
-                    user!.UserRol = (int)role;
-                    db.Users.Update(user);
-                }
-                await db.SaveChangesAsync();
+                catch (Exception ex) {Console.WriteLine(ex.ToString());}    
             }
         }
         public static async Task<User> GetUserAsync(long IdTg)
