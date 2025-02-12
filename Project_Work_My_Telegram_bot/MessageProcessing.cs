@@ -59,9 +59,9 @@ namespace Project_Work_My_Telegram_bot
         }
         public async Task OnTextMessage(Message message)
         {
-            //Проверка юзера 
+            //Проверка роли 
 
-            _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
+            _isRole = (UserType)await DataBaseHandler.GetUserRoleAsync(message.Chat.Id);
 
             //Получить данные юзера из БД в обработку   
             //модуль обрабоки сообщений 
@@ -95,7 +95,7 @@ namespace Project_Work_My_Telegram_bot
                 case "👤 Профиль": //Обработан Sub menu 
                     if (_isRole == UserType.Non) return;
                     //создаем в дикт экземпляр личного авто в класс CarDrive и обработчик User 
-                    _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id) ?? new ClassDB.User();
+                    _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
                     _users[message.Chat.Id].TgUserName = message.Chat.Username ?? "Нет имени профиля";
                     _carDrives[message.Chat.Id] = new CarDrive();
                     _carDrives[message.Chat.Id].isPersonalCar = true;
@@ -111,18 +111,39 @@ namespace Project_Work_My_Telegram_bot
                     break;
                 case "📚 Вывести отчет": //Обработан Sub menu 
                     if (_isRole == UserType.Non) return;
+                    _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
                     await _botClient!.DeleteMessage(
                        message.Chat,
                        messageId: message.MessageId - 1);
 
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
-                         text: $"Отчет:",
-                         replyMarkup: KeyBoardSetting.report);
+                         text: $"Меню вывода отчета:",
+                         replyMarkup: KeyBoardSetting.keyboardReportUser);
                     break;
+                case "📚 Сформировать отчет за текущий месяц":
+                    
+                    var datanow = DateTime.Now.ToShortDateString();  //текущая дата
+                    
+                    
+                    await _botClient!.SendMessage(
+                         chatId: message.Chat,
+                         text: $"Меню вывода отчета:", 
+                         replyMarkup: new ReplyKeyboardRemove());
+                    break;
+                case "💼 Сформировать отчет за выбранный месяц":
+                    
+
+                    break;
+                case "🗞 Возврат в основное меню":
+                    if (_isRole == UserType.Non) return;
+                    await OnCommand("/start", "", message);
+                    break;
+
                 case "📝 Регистрация поездки": //Обработан Sub menu 
                     if (_isRole == UserType.Non) return;
-
+                    //Получаем юзера из БД
+                    _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
                     //Проверка регистарции профиля 
                     if (_users[message.Chat.Id].UserName is null || _users[message.Chat.Id].JobTitlel is null)
                     {
@@ -135,7 +156,6 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Необходимо зарегестрировать профиль:",
                          replyMarkup: KeyBoardSetting.profile);
                     }
-
                     //Создаем запись в класс тип ObjectPath поездки для каждого пользователя в ТГ 
                     _objPaths[message.Chat.Id] = new ObjectPath();
                     _objPaths[message.Chat.Id].UserId = _users[message.Chat.Id].IdTg;
@@ -151,6 +171,8 @@ namespace Project_Work_My_Telegram_bot
                 case "💰 Регистрация трат": //Обработан Sub menu 
 
                     if (_isRole == UserType.Non) return;
+                    //Получаем юзера из БД
+                    _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
                     //Проверка регистарции профиля 
                     if (_users[message.Chat.Id].UserName is null || _users[message.Chat.Id].JobTitlel is null)
                     {
@@ -176,6 +198,8 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: KeyBoardSetting.regCost);
                     break;
                 case "👤 Установка пороля User": //Обработано
+                    //Получаем юзера из БД
+                    _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
 
                     if (_isRole != UserType.Admin)
                     {
@@ -196,6 +220,8 @@ namespace Project_Work_My_Telegram_bot
                 case "📝 Регистрация автопарка компании": //Обработано Sub меню
 
                     if (_isRole != UserType.Admin) return;
+                    //Получаем юзера из БД
+                    _users[message.Chat.Id] = await DataBaseHandler.GetUserAsync(message.Chat.Id);
                     _carDrives[message.Chat.Id] = new CarDrive();
 
                     //Машина автопарка компании 
@@ -464,7 +490,7 @@ namespace Project_Work_My_Telegram_bot
                     }
                     break;
                 case "coastAi92":
-                    if (_isRole != UserType.Admin) return; 
+                    if (_isRole != UserType.Admin) return;
                     await _botClient!.SendMessage(
                             chatId: msg.Chat,
                             text: $"По рынку 🔋 AИ-92 цена составляет {_averagePriceFuelOnMarket.Ai92.ToString()} руб." + "\n" +
@@ -583,7 +609,7 @@ namespace Project_Work_My_Telegram_bot
                   $"Должность: {user.JobTitlel}" + "\n" +
                   $"Название машины: {car.CarName} " + "\n" +
                   $"Гос. номер: {car.CarNumber}" + "\n" +
-                  $"Средний расход на 100 км. в л. : {car.GasСonsum} км" + "\n" +
+                  $"Средний расход на 100 км. в л. : {car.GasСonsum}" + "\n" +
                   $"Транспорт: {isPersonalCarString}  " + "\n" +
                   $"Сохранить данные ДА/НЕТ?";
             return true;
@@ -764,7 +790,7 @@ namespace Project_Work_My_Telegram_bot
             var text = msg!.Text!;
             var chatId = msg.Chat.Id;
 
-            if (text == "ДА") 
+            if (text == "ДА")
             {
                 await _botClient.SendMessage(
                  chatId: chatId,
@@ -780,7 +806,7 @@ namespace Project_Work_My_Telegram_bot
                  chatId: chatId,
                  text: $"Ввeдите Стоимость бензина 🔋 AИ-92, в формате 0.00",
                  replyMarkup: new ReplyKeyboardRemove());
-                return; 
+                return;
             }
             //Cлучаи ввода данных парсим текст 
             if (decimal.TryParse(text.Replace(",", "."),
@@ -883,7 +909,7 @@ namespace Project_Work_My_Telegram_bot
                 text: $"Введена стоимость бензина марки 🪫 ДТ Дизель  {coastgas.ToString()}",
                 replyMarkup: new ReplyKeyboardRemove());
                 // отписываемся от сообщений
-                OnCallbackQuery -= MessageCoastGasDizel; 
+                OnCallbackQuery -= MessageCoastGasDizel;
                 //Сохранение в ФАЙЛ Данных по стоимости 
 
                 return;
@@ -894,7 +920,7 @@ namespace Project_Work_My_Telegram_bot
                     chatId: chatId,
                     text: $"Не коректные данные стоимости 🪫 ДТ, введите еще раз в формате 0,00 руб",
                     replyMarkup: new ReplyKeyboardRemove());
-            }  
+            }
         }
         private async Task SetPassword(Message msg)
         {
@@ -1020,8 +1046,8 @@ namespace Project_Work_My_Telegram_bot
                              chatId: chatId,
                              text: $"Пороль введен не корректно попробуйте снова",
                              replyMarkup: new ReplyKeyboardRemove());
-                _isRole = UserType.Non;
-                await DataBaseHandler.SetUserRoleAsync(msg.Chat.Id, _isRole);
+                //_isRole = UserType.Non;
+                //await DataBaseHandler.SetUserRoleAsync(msg.Chat.Id, _isRole);
                 OnMeessage -= MessageHandlePassAdmin;
                 await OnCommand("/start", "", msg);
             }

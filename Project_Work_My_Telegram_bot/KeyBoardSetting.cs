@@ -73,6 +73,17 @@ namespace Project_Work_My_Telegram_bot
         {
             ResizeKeyboard = true,
         };
+        //Клавиатура вывода отчета по пользователю тип Юзер 
+        public static KeyboardButton[][] ReportUser =
+        [
+            ["📚 Сформировать отчет за текущий месяц", "💼 Сформировать отчет за выбранный месяц "],
+            ["🗞 Возврат в основное меню"]
+        ];
+        public static ReplyKeyboardMarkup keyboardReportUser = new(keyboard: ReportUser)
+        {
+            ResizeKeyboard = true,
+        };
+
         // Инлайнер клапвиатура регистрации пользователя         
         public static InlineKeyboardMarkup profile = new(new[]
         {
@@ -97,18 +108,18 @@ namespace Project_Work_My_Telegram_bot
               },
         });
         // Инлайнер клавиатура регистрации пользователя тип Admin регистрация 
-        public static InlineKeyboardMarkup report = new(new[]
-        {
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Сформировать отчет за месяц", callbackData: "reportbyMonth"),
-                InlineKeyboardButton.WithCallbackData(text: "👤 Должность", callbackData: "jobtitle"),
-            },
-            new []
-            {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedReport")
-            },
-        });
+        //public static InlineKeyboardMarkup report = new(new[]
+        //{
+        //    new []
+        //    {
+        //        InlineKeyboardButton.WithCallbackData(text: "Сформировать отчет за месяц", callbackData: "reportbyMonth"),
+        //        InlineKeyboardButton.WithCallbackData(text: "👤 Должность", callbackData: "jobtitle"),
+        //    },
+        //    new []
+        //    {
+        //        InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedReport")
+        //    },
+        //});
         // Инлайн клапвиатура регистрации пути следования User регистрация Пути следования
         public static InlineKeyboardMarkup regPath = new(new[]
         {
@@ -177,8 +188,6 @@ namespace Project_Work_My_Telegram_bot
             ResizeKeyboard = true
         };
 
-
-        
         public static InlineKeyboardMarkup regCoastFuel = new(new[]
         {
             new []

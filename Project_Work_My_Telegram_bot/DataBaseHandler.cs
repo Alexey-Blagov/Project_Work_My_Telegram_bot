@@ -179,7 +179,7 @@ namespace Project_Work_My_Telegram_bot
                     else
                     {
                         user!.UserRol = (int)role;
-                        db.Users.Update(user);
+                       
                     }
                     await db.SaveChangesAsync();
                 }
