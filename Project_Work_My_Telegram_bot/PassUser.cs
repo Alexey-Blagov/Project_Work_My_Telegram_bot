@@ -11,7 +11,15 @@ namespace Project_Work_My_Telegram_bot
     {
         private string _passwordUser = "12345";
         private string _passwordAdmin = "qwerty"; 
+        
         public readonly string token = "7516165506:AAHgVKs9K2zHsyKJqVwSFzY4D8BsDIpVLLE";
+
+       public readonly string bdToken = 
+                "Host=localhost;" +
+                "Port=5432;" +
+                "Database=MySqlTab;" +
+                "Username=postgres;" +
+                "Password=20071978";
         public string PasswordUser
         {
             get

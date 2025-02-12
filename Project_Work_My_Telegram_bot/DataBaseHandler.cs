@@ -4,6 +4,7 @@ using Project_Work_My_Telegram_bot;
 using Project_Work_My_Telegram_bot.ClassDB;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -55,11 +56,15 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                if (newObjPath is not null)
+                try
                 {
-                    await db.AddAsync(newObjPath);
-                    await db.SaveChangesAsync();
+                    if (newObjPath is not null)
+                    {
+                        await db.AddAsync(newObjPath);
+                        await db.SaveChangesAsync();
+                    }
                 }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
         }
         public static async Task SetNewOtherExpesesAsync(OtherExpenses newOtherExpenses)
@@ -73,8 +78,9 @@ namespace Project_Work_My_Telegram_bot
                 }
             }
         }
-        public static async Task<bool> SetNewCarDriveAsync(CarDrive newCarDrive)
+        public static async Task<bool> SetNewPersonalCarDriveAsync(CarDrive newCarDrive)
         {
+            bool isset = false;
             using (ApplicationContext db = new ApplicationContext())
             {
                 CarDrive? cardrive = await db.CarDrives.FirstOrDefaultAsync(c => c.PersonalId == newCarDrive.PersonalId);
@@ -83,10 +89,30 @@ namespace Project_Work_My_Telegram_bot
                 {
                     await db.AddAsync(newCarDrive);
                     await db.SaveChangesAsync();
-                    return true;
+                    isset = true;
                 }
-                return false;
+                else isset = false;
             }
+            return isset;
+        }
+        public static async Task<bool> SetNewCommercialCarDriveAsync(CarDrive newCarDrive)
+        {
+            bool isset = false;
+            using (ApplicationContext db = new ApplicationContext())
+            {
+
+                //Поиск в БД по номеру если такая сущ выдаем false 
+                CarDrive? cardrive = await db.CarDrives.FirstOrDefaultAsync(c => c.CarNumber == newCarDrive.CarNumber);
+
+                if (cardrive is null)
+                {
+                    await db.AddAsync(newCarDrive);
+                    await db.SaveChangesAsync();
+                    isset = true;
+                }
+                else isset = false;
+            }
+            return isset;
         }
         public static async Task UpdatePersonarCarDriveAsync(CarDrive newCarDrive)
         {
@@ -137,7 +163,7 @@ namespace Project_Work_My_Telegram_bot
         }
         public static async Task SetUserRoleAsync(long IdTg, UserType role)
         {
-           
+
             using (ApplicationContext db = new ApplicationContext())
             {
                 try
@@ -157,7 +183,7 @@ namespace Project_Work_My_Telegram_bot
                     }
                     await db.SaveChangesAsync();
                 }
-                catch (Exception ex) {Console.WriteLine(ex.ToString());}    
+                catch (Exception ex) { Console.WriteLine(ex.ToString()); }
             }
         }
         public static async Task<User> GetUserAsync(long IdTg)
@@ -208,9 +234,9 @@ namespace Project_Work_My_Telegram_bot
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                CarDrive? userCar = await db.CarDrives.FirstOrDefaultAsync(x => x.PersonalId == IdTg);
-                // случай если нет юзера в БД возврат Null 
-                return userCar;
+                var userCar = await db.CarDrives.FirstOrDefaultAsync(c => c.PersonalId == IdTg && c.isPersonalCar);
+                //Если Null тогда не нашли такого совпаения 
+                return userCar!;
             }
         }
 
@@ -220,6 +246,15 @@ namespace Project_Work_My_Telegram_bot
             {
                 db.OtherExpenses.Add(expenses);
                 await db.SaveChangesAsync();
+            }
+        }
+        internal static async Task<CarDrive> GetCarDataForPath(int? carId)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                CarDrive? car = await db.CarDrives.FirstOrDefaultAsync(x => x.CarId == carId);
+
+                return car!;
             }
         }
     }
