@@ -11,6 +11,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Project_Work_My_Telegram_bot
 {
+    /// <summary>
+    /// Класс который хранит данные по клавиатурам Машин для ТГБота  
+    /// </summary>
     public static class KeyBoardSetting
     {
         // Клапвиатура Start  
@@ -42,7 +45,31 @@ namespace Project_Work_My_Telegram_bot
             var keyboard = GenerateKeyboard(buttonCarDrivesData);
             return new ReplyKeyboardMarkup(keyboard) { ResizeKeyboard = true };
         }
-        
+
+        //Метод формирования клавиатуры по списку строк 
+        public static KeyboardButton[][] GenerateKeyboardTypeString(List <string>  button)
+        {
+            List<KeyboardButton[]> keyboard = new List<KeyboardButton[]>();
+
+            for (int i = 0; i < button.Count; i += 2)
+            {
+                if (i + 1 < button.Count)
+                {
+                    keyboard.Add(new KeyboardButton[] { new KeyboardButton(button[i] + " "), new KeyboardButton(button[i + 1])}); 
+                }
+                else
+                {
+                    keyboard.Add(new KeyboardButton[] { new KeyboardButton(button[i]) });
+                }
+            }
+            return keyboard.ToArray();
+        }
+        public static ReplyKeyboardMarkup GetReplyMarkupTypeString(List<string> button)
+        {
+            var keyboard = GenerateKeyboardTypeString(button);
+            return new ReplyKeyboardMarkup(keyboard) { ResizeKeyboard = true };
+        }
+
         // Клавиатура Main тип Юзер 
         public static KeyboardButton[][] keyboardUser =
         [
@@ -58,7 +85,8 @@ namespace Project_Work_My_Telegram_bot
         public static KeyboardButton[][] keyboardAdmin =
         [
             ["👤 Установка пороля User", "💰 Стоимость бензина"],
-            ["📝 Регистрация автопарка компании", "Смена статуа Admin/User"]
+            ["📝 Регистрация автопарка компании", "📚 Вывести отчет по параметрам"],
+            ["Смена статуа Admin/User"]
         ];
         public static ReplyKeyboardMarkup keyboardMainAdmin = new(keyboard: keyboardAdmin)
         {

@@ -15,10 +15,10 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         //PathLeng: Дина пути с учетом обратного тип  (float) Path Length   ++
         //DatePath: Дата поездки 2 варианта(клавиатура (Сегодня поездка) или ввести в формате ДД.ММ.ГГГГ)
         //UserId: Форинкей на юзера Юсера осуществивший поездку 
-        //UserExp: Екземплыр класса Юсера осуществивший траты   
-        //CarId: Id на связь с CarDrive осуществивший поездку 
-        //CarDrive: Екземплыр класса машины осуществившей поездуку осуществивший траты
-       
+        //UserPath: Екземплыр класса Юсера осуществивший поездку
+        //CarId: Форинкей Id на связь с CarDrive осуществивший поездку 
+        //CarDrive: Екземпляр класса машины осуществившей поездку
+
         public int IdPath { get; set; }
         public string? ObjectName { get; set; }
         public double? PathLengh { get; set; } = null; 

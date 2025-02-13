@@ -9,9 +9,9 @@ namespace Project_Work_My_Telegram_bot.ClassDB
 {
     public class OtherExpenses
     {
-        //ExpId  ++ (ID затрат) 
-        //NameExpense Наименование затрат(string) ++
-        //Coast: Стоимость затрат тип Decimal ++ 
+        //ExpId
+        //NameExpense Наименование затрат
+        //Coast: Стоимость затрат
         //dateTimeExp Дата трат  
         //UserId Форинкей на юзера Юсера осуществивший траты
         //UserExp: Екземплыр класса Юсера осуществивший траты

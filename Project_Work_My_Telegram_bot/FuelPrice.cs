@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot
 {
+    /// <summary>
+    /// Класс который получет информацию с URL и парсит ее в свои свойста стоимость бензина 
+    /// </summary>
     public class FuelPrice
     {
         public decimal Ai92 { get; private set; }

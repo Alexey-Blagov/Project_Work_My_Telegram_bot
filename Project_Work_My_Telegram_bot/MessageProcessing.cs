@@ -27,13 +27,12 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Runtime.ConstrainedExecution;
 using System.IO;
 
-
-
-
 namespace Project_Work_My_Telegram_bot
 {
     public delegate Task Handelmessage(Message message);
-
+    /// <summary>
+    /// Основной класс обработчик сообщений ТГБота типа 
+    /// </summary>
     public class MessageProcessing
     {
         private TelegramBotClient _botClient;
@@ -122,17 +121,16 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: KeyBoardSetting.keyboardReportUser);
                     break;
                 case "📚 Сформировать отчет за текущий месяц":
-                    
-                    var datanow = DateTime.Now.ToShortDateString();  //текущая дата
-                    
-                    
+
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
-                         text: $"Меню вывода отчета:", 
+                         text: $"Меню вывода отчета:",
                          replyMarkup: new ReplyKeyboardRemove());
+                    OnMeessage += GerReportHandlerbyCurrentMonth;
                     break;
+
                 case "💼 Сформировать отчет за выбранный месяц":
-                    
+
 
                     break;
                 case "🗞 Возврат в основное меню":
@@ -242,8 +240,6 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: KeyBoardSetting.regCoastFuel);
 
                     break;
-
-
                 case "Смена статуа Admin/User":
                     if (_isRole == UserType.Non) return;
                     await _botClient!.SendMessage(
@@ -255,14 +251,32 @@ namespace Project_Work_My_Telegram_bot
 
                     await OnCommand("/start", "", message);
                     break;
+                case "📚 Вывести отчет по параметрам":
+                      
+                    break;
+                
 
                 default:
                     OnMeessage?.Invoke(message);
                     OnCallbackQuery?.Invoke(message);
                     break;
             }
-            //await OnCommand("/start", "", message); // Запускаем комманду старт /start
         }
+
+        private async Task GerReportHandlerbyCurrentMonth(Message msg)
+        {
+            if (_isRole == UserType.Non) return;
+            var datanow = DateTime.Now;  //текущая дата
+            var dataFirstDay = new DateTime(datanow.Year, datanow.Month, 1);
+            var text = msg.Text;
+            var chatId = msg.Chat.Id;
+            var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
+
+            await repositoryReport.GetUserObjectPathsByTgId(chatId, dataFirstDay, datanow); 
+
+            OnMeessage -= GerReportHandlerbyCurrentMonth;
+        }
+
         public async Task BotClientOnCallbackQuery(CallbackQuery callbackQuery)
         {
             OnCallbackQuery = null;
@@ -1426,21 +1440,6 @@ namespace Project_Work_My_Telegram_bot
             string[] words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             return words.Length > 0 ? words[^1] : string.Empty;
         }
-        private static string GetTypeUserRolString(UserType userrol)
-        {
-            switch (userrol)
-            {
-                case UserType.User:
-                    return "Пользователь";
-
-                case UserType.Admin:
-                    return "Администратор";
-
-                case UserType.Non:
-                    return "Не зарегестрированный";
-            }
-            return "не известный тип";
-        }
         private static string GetTypeFuelString(Fuel fuel)
         {
             switch (fuel)
@@ -1489,9 +1488,29 @@ namespace Project_Work_My_Telegram_bot
                     break;
             }
         }
+        public static List<dynamic> GetPreviousSixMonths()
+        {
+            var result = new List<dynamic>();
+            DateTime today = DateTime.Today;
+
+            for (int i = 0; i < 6; i++)
+            {
+                DateTime currentDate = today.AddMonths(-i);
+                DateTime startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
+                DateTime endDate = startDate.AddMonths(1).AddDays(-1);
+               
+                //Анонимный метод вывода данных 
+                result.Add(new
+                {
+                    MonthName = currentDate.ToString("MMMM yyyy"), // Название месяца и год
+                    StartDate = startDate, // Дата начала месяца
+                    EndDate = endDate // Дата конца месяца
+                });
+            }
+            return result;
+        }
     }
-
-
 }
+
 
 
