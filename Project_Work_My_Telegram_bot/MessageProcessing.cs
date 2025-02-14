@@ -123,9 +123,9 @@ namespace Project_Work_My_Telegram_bot
                 case "📚 Сформировать отчет за текущий месяц":
 
                     await _botClient!.SendMessage(
-                         chatId: message.Chat,
-                         text: $"Меню вывода отчета:",
-                         replyMarkup: new ReplyKeyboardRemove());
+                          chatId: message.Chat,
+                          text: $"Выести отчет на экран? ДА/НЕТ:",
+                          replyMarkup: KeyBoardSetting.actionAccept);
                     OnMeessage += GerReportHandlerbyCurrentMonth;
                     break;
 
@@ -272,7 +272,24 @@ namespace Project_Work_My_Telegram_bot
             var chatId = msg.Chat.Id;
             var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
 
-            await repositoryReport.GetUserObjectPathsByTgId(chatId, dataFirstDay, datanow); 
+            switch (text)
+            {
+                case "ДА":
+                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, dataFirstDay, datanow);
+                    OnMeessage -= GerReportHandlerbyCurrentMonth;
+                    break;
+                case "НЕТ":
+                    
+                    await _botClient.SendMessage(
+                     chatId: chatId,
+                     text: $"Возврат в основное меню",
+                     replyMarkup: new ReplyKeyboardRemove());
+                    break;
+            }
+            await OnCommand("/main", "", msg);
+
+
+            
 
             OnMeessage -= GerReportHandlerbyCurrentMonth;
         }

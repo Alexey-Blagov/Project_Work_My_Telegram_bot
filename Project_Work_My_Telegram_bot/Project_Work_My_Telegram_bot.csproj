@@ -29,4 +29,10 @@
     <PackageReference Include="Telegram.Bots.Extensions.Polling" Version="5.9.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="PassConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
