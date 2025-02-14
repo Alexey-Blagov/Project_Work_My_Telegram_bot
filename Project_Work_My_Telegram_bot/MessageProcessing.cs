@@ -36,12 +36,13 @@ namespace Project_Work_My_Telegram_bot
     public class MessageProcessing
     {
         private TelegramBotClient _botClient;
-
+        private PassUser _passUser= new PassUser();
         //После убрать пороль в текст 
 
-        private string _passwordUser = "12345";
-        private string _passwordAdmin = "qwerty";
+        private string _passwordUser; 
+        private string _passwordAdmin;
         private string? _setpassword = null;
+        
         private UserType _isRole = UserType.Non;
 
         private Dictionary<long, ClassDB.User> _users = new Dictionary<long, ClassDB.User>();
@@ -58,15 +59,14 @@ namespace Project_Work_My_Telegram_bot
         }
         public async Task OnTextMessage(Message message)
         {
-            //Проверка роли 
-
+            _passwordUser = _passUser.PasswordUser;
+            _passwordAdmin = _passUser.PasswordAdmin;
+            //Получить данные пользователя тип роли 
             _isRole = (UserType)await DataBaseHandler.GetUserRoleAsync(message.Chat.Id);
-
-            //Получить данные юзера из БД в обработку   
+            
             //модуль обрабоки сообщений 
             switch (message.Text)
             {
-
                 case "Администратор": //Обработан 
                     if (_isRole == UserType.Admin)
                         await _botClient.SendMessage(
@@ -212,7 +212,7 @@ namespace Project_Work_My_Telegram_bot
                              chatId: message.Chat,
                              text: $"Введите новый пороль:",
                              replyMarkup: new ReplyKeyboardRemove());
-                        OnMeessage += SetPassword;
+                        OnMeessage += SetPasswordUser;
                     }
                     break;
                 case "📝 Регистрация автопарка компании": //Обработано Sub меню
@@ -275,7 +275,7 @@ namespace Project_Work_My_Telegram_bot
             switch (text)
             {
                 case "ДА":
-                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, dataFirstDay, datanow);
+                    //var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, dataFirstDay, datanow);
                     OnMeessage -= GerReportHandlerbyCurrentMonth;
                     break;
                 case "НЕТ":
@@ -953,7 +953,7 @@ namespace Project_Work_My_Telegram_bot
                     replyMarkup: new ReplyKeyboardRemove());
             }
         }
-        private async Task SetPassword(Message msg)
+        private async Task SetPasswordUser(Message msg)
         {
             var text = msg!.Text!.ToString();
             if (_setpassword is null)
@@ -979,8 +979,9 @@ namespace Project_Work_My_Telegram_bot
                             chatId: msg.Chat,
                             text: $"Пороль успешно изменен для входа User",
                             replyMarkup: new ReplyKeyboardRemove());
-                _passwordUser = _setpassword;
-                OnMeessage -= SetPassword;
+                _passUser.UpdatePasswordsUser(_setpassword);
+                OnMeessage -= SetPasswordUser;
+                await OnCommand("/start", "", msg);
             }
         }
         private async Task MessageTypeFuel(Message msg) //++++

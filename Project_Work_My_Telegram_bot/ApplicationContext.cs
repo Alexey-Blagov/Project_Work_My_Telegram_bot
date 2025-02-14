@@ -11,6 +11,7 @@ namespace Project_Work_My_Telegram_bot
 {
     public class ApplicationContext : DbContext
     {
+        private PassUser _passUser = new PassUser();
         public DbSet<User> Users { get; set; }
         public DbSet<CarDrive> CarDrives{ get; set; }
         public DbSet<ObjectPath> ObjectPaths { get; set; }
@@ -21,12 +22,7 @@ namespace Project_Work_My_Telegram_bot
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(
-                "Host=localhost;" +
-                "Port=5432;" +
-                "Database=MySqlTab;" +
-                "Username=postgres;" +
-                "Password=20071978");           
+            optionsBuilder.UseNpgsql(_passUser.BdToken);           
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {       

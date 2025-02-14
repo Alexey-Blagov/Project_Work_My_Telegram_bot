@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+﻿using Microsoft.Extensions.Configuration;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,24 +10,20 @@ namespace Project_Work_My_Telegram_bot
 {
     internal class PassUser
     {
-        private string _passwordUser = "12345";
-        private string _passwordAdmin = "qwerty"; 
-        
-        public readonly string token = "7516165506:AAHgVKs9K2zHsyKJqVwSFzY4D8BsDIpVLLE";
+        private string _passwordUser;
+        private string _passwordAdmin;
+        private readonly string _filePath;
 
-       public readonly string bdToken = 
-                "Host=localhost;" +
-                "Port=5432;" +
-                "Database=MySqlTab;" +
-                "Username=postgres;" +
-                "Password=20071978";
+        private string _token;
+
+        private string _bdToken;
         public string PasswordUser
         {
             get
             {
                 return _passwordUser;
             }
-            set
+            private set
             {
                 _passwordUser = value;
             }
@@ -37,10 +34,74 @@ namespace Project_Work_My_Telegram_bot
             {
                 return _passwordAdmin;
             }
-            set
+            private set
             {
                 _passwordAdmin = value;
             }
+        }
+
+        public string Token
+        {
+            get
+            {
+                return _token;
+            }
+        }
+        public string BdToken
+        {
+            get
+            {
+                return _bdToken;
+            }
+        }
+
+        public PassUser()
+        {
+            _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "userPass.json");
+            LoadFromJson();
+        }
+        private void LoadFromJson()
+        {
+            if (File.Exists(_filePath))
+            {
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("userPass.json", optional: false, reloadOnChange: true)
+                    .Build();
+                _passwordUser = configuration["PasswordUser"] ?? throw new InvalidDataException("Поле PasswordUser отсутствует в файле.");
+                _passwordAdmin = configuration["PasswordAdmin"] ?? throw new InvalidDataException("Поле PasswordAdmin отсутствует в файле.");
+                _token = configuration["Token"] ?? throw new InvalidDataException("Поле Token отсутствует в файле.");
+                _bdToken = configuration["BdToken"] ?? throw new InvalidDataException("Поле BdToken отсутствует в файле.");
+            }
+            else
+            {
+                SaveToJson();
+            }
+        }
+        private void SaveToJson()
+        {
+            var jsonData = new
+            {
+                PasswordUser,
+                PasswordAdmin,
+                Token,
+                BdToken
+            };
+            File.WriteAllText(_filePath, System.Text.Json.JsonSerializer.Serialize(jsonData));
+        }
+        public void UpdatePasswordsAdmin(string passAdmin)
+        {
+            _passwordAdmin = passAdmin;
+            Console.WriteLine($"Введен и сохранен новый пароль для администратора: {passAdmin}");
+            SaveToJson();
+            Console.WriteLine("Пароли успешно обновлены и сохранены в файл. ");
+        }
+        public void UpdatePasswordsUser(string passUser)
+        {
+            _passwordUser = passUser;
+            Console.WriteLine($"Введен и сохранен новый пароль для администратора: {passUser}");
+            SaveToJson();
+            Console.WriteLine("Пароли успешно обновлены и сохранены в файл. ");
         }
     }
 }

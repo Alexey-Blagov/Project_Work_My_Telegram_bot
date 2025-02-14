@@ -10,9 +10,8 @@ namespace Project_Work_My_Telegram_bot
     public enum Fuel { dizel = 0, ai95 = 1, ai92 = 2 };
     internal class Program
     {
-        //Убрать токен в файл 
-        private const string _token = "7516165506:AAHgVKs9K2zHsyKJqVwSFzY4D8BsDIpVLLE";
 
+        private static string? _token;
         private static TelegramBotClient? _myBot;
         private static CancellationTokenSource? _cts;
         private static MessageProcessing _messageProcessing;
@@ -22,13 +21,14 @@ namespace Project_Work_My_Telegram_bot
 
             PassUser passUser = new PassUser();
             var getfuel = new FuelPrice();
+            
 
             Console.WriteLine(getfuel.Ai92);
             Console.WriteLine(getfuel.Ai95);
             Console.WriteLine(getfuel.Diesel);
-           
-            //SetPassUser();
 
+            //SetPassUser();
+            _token = passUser.Token;
             _cts = new CancellationTokenSource();
             _myBot = new TelegramBotClient(_token, cancellationToken: _cts.Token);
 
