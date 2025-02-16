@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Project_Work_My_Telegram_bot.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMigration : Migration
+    public partial class InitCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,7 +60,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     NameExpense = table.Column<string>(type: "text", nullable: true),
                     Coast = table.Column<decimal>(type: "numeric", nullable: true),
-                    DateTimeExp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DateTimeExp = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -81,7 +81,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ObjectName = table.Column<string>(type: "text", nullable: true),
                     PathLengh = table.Column<double>(type: "double precision", nullable: true),
-                    DatePath = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DatePath = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CarId = table.Column<int>(type: "integer", nullable: true),
                     UserId = table.Column<long>(type: "bigint", nullable: true)
                 },

@@ -13,6 +13,9 @@ namespace Project_Work_My_Telegram_bot.Configurations
             builder.
                 HasKey(a => a.IdPath);
             builder
+              .Property(op => op.DatePath)
+              .HasColumnType("timestamp without time zone");
+            builder
               .HasOne(c=> c.CarDrive)
               .WithMany(v => v.ObjectPaths)
               .HasForeignKey(r => r.CarId);

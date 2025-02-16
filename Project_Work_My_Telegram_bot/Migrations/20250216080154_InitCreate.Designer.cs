@@ -12,15 +12,15 @@ using Project_Work_My_Telegram_bot;
 namespace Project_Work_My_Telegram_bot.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250209114556_InitMigration")]
-    partial class InitMigration
+    [Migration("20250216080154_InitCreate")]
+    partial class InitCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -74,7 +74,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("DatePath")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ObjectName")
                         .HasColumnType("text");
@@ -106,7 +106,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("DateTimeExp")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("NameExpense")
                         .HasColumnType("text");

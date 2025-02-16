@@ -19,7 +19,7 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         public int ExpId { get; set; }
         public string? NameExpense { get; set; }
         public decimal? Coast { get; set; }
-        public DateTime DateTimeExp { get; set; } = DateTime.UtcNow;
+        public DateTime DateTimeExp { get; set; } = DateTime.Now;
         public long? UserId { get; set; }
         public User? UserExp { get; set; }
     }

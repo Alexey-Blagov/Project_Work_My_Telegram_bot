@@ -26,6 +26,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Runtime.ConstrainedExecution;
 using System.IO;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Project_Work_My_Telegram_bot
 {
@@ -36,13 +37,13 @@ namespace Project_Work_My_Telegram_bot
     public class MessageProcessing
     {
         private TelegramBotClient _botClient;
-        private PassUser _passUser= new PassUser();
+        private PassUser _passUser = new PassUser();
         //После убрать пороль в текст 
 
-        private string _passwordUser; 
+        private string _passwordUser;
         private string _passwordAdmin;
         private string? _setpassword = null;
-        
+
         private UserType _isRole = UserType.Non;
 
         private Dictionary<long, ClassDB.User> _users = new Dictionary<long, ClassDB.User>();
@@ -63,7 +64,7 @@ namespace Project_Work_My_Telegram_bot
             _passwordAdmin = _passUser.PasswordAdmin;
             //Получить данные пользователя тип роли 
             _isRole = (UserType)await DataBaseHandler.GetUserRoleAsync(message.Chat.Id);
-            
+
             //модуль обрабоки сообщений 
             switch (message.Text)
             {
@@ -121,17 +122,22 @@ namespace Project_Work_My_Telegram_bot
                          replyMarkup: KeyBoardSetting.keyboardReportUser);
                     break;
                 case "📚 Сформировать отчет за текущий месяц":
-
                     await _botClient!.SendMessage(
                           chatId: message.Chat,
                           text: $"Выести отчет на экран? ДА/НЕТ:",
                           replyMarkup: KeyBoardSetting.actionAccept);
-                    OnMeessage += GerReportHandlerbyCurrentMonth;
+                    OnMeessage += GetReportHandlerbyCurrentMonth;
                     break;
-
                 case "💼 Сформировать отчет за выбранный месяц":
-
-
+                    if (_isRole == UserType.Non) return;
+                    
+                    var monsthList = GetPreviousSixMonths();
+                    List<string?> buttons = monsthList.Select(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString()).ToList();
+                    await _botClient.SendMessage(
+                     chatId: message.Chat,
+                     text: $"Выберете период отчета",
+                     replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttons));
+                    OnCallbackQuery += GetPerodHandlerByChoiceMonth;
                     break;
                 case "🗞 Возврат в основное меню":
                     if (_isRole == UserType.Non) return;
@@ -252,9 +258,8 @@ namespace Project_Work_My_Telegram_bot
                     await OnCommand("/start", "", message);
                     break;
                 case "📚 Вывести отчет по параметрам":
-                      
+
                     break;
-                
 
                 default:
                     OnMeessage?.Invoke(message);
@@ -263,11 +268,35 @@ namespace Project_Work_My_Telegram_bot
             }
         }
 
-        private async Task GerReportHandlerbyCurrentMonth(Message msg)
+        private async Task GetPerodHandlerByChoiceMonth(Message msg)
         {
             if (_isRole == UserType.Non) return;
-            var datanow = DateTime.Now;  //текущая дата
-            var dataFirstDay = new DateTime(datanow.Year, datanow.Month, 1);
+            var endDate = DateTime.Now.Date;
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var text = msg.Text;
+            var chatId = msg.Chat.Id;
+            var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
+            switch (text)
+            {
+                case "ДА":
+                    
+
+                    OnCallbackQuery -= GetPerodHandlerByChoiceMonth;
+
+                    break;
+                case "НЕТ":
+                    break;
+
+            }
+        }
+
+        private async Task GetReportHandlerbyCurrentMonth(Message msg)
+        {
+            if (_isRole == UserType.Non) return;
+
+            var endDate = DateTime.Now.Date;
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
             var text = msg.Text;
             var chatId = msg.Chat.Id;
             var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
@@ -275,25 +304,54 @@ namespace Project_Work_My_Telegram_bot
             switch (text)
             {
                 case "ДА":
-                    //var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, dataFirstDay, datanow);
-                    OnMeessage -= GerReportHandlerbyCurrentMonth;
+                    string concatinfistring = $"Отчет за {endDate.ToString("MMMM")} месяц " + "\n";
+                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
+                    var reportsDynamic = (dynamic)reportlist;
+                    foreach (var report in reportsDynamic)
+                    {
+                        concatinfistring += (string)report.UserName + "\n";
+                        concatinfistring += GetConcatStringToBotPath(report.ObjectPaths) ?? "Нет данных";
+                        await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: concatinfistring,
+                        replyMarkup: new ReplyKeyboardRemove());
+                    }
+                    OnMeessage -= GetReportHandlerbyCurrentMonth;
+
                     break;
                 case "НЕТ":
                     
-                    await _botClient.SendMessage(
-                     chatId: chatId,
-                     text: $"Возврат в основное меню",
-                     replyMarkup: new ReplyKeyboardRemove());
                     break;
             }
             await OnCommand("/main", "", msg);
 
-
-            
-
-            OnMeessage -= GerReportHandlerbyCurrentMonth;
+            OnMeessage -= GetReportHandlerbyCurrentMonth;
         }
 
+        private string? GetConcatStringToBotPath(dynamic report)
+        {
+            var date = DateTime.Now.Date;
+            string str = "";
+            if (report != null)
+            {
+                foreach (var path in report)
+                {
+                    string getdatePath = path.GetType().GetProperty("DatePath")?.GetValue(path).ToString();
+                    string objectName = path.GetType().GetProperty("ObjectName")?.GetValue(path).ToString() ?? "нет данных";
+                    string pathLengh = path.GetType().GetProperty("PathLengh")?.GetValue(path).ToString() ?? "нет данных";
+                    string strData = DateTime.TryParse(getdatePath, out date) ? date.ToShortDateString() : "нет данных";
+                    string carName = path.GetType().GetProperty("CarName")?.GetValue(path).ToString() ?? "нет данных";
+                    string carNumber = path.GetType().GetProperty("CarNumber")?.GetValue(path).ToString() ?? "нет данных";
+                    str += $"Объект наименование : {objectName}" + "\n" +
+                           $"Общий путь до объекта:  {pathLengh}" + "\n" +
+                           $"Дата поездки :  {strData} " + "\n" +
+                           $"Машина: {carName} гос. номер {carNumber} " + "\n" + "\n";
+                }
+                return str;
+            }
+            else
+                return null;
+        }
         public async Task BotClientOnCallbackQuery(CallbackQuery callbackQuery)
         {
             OnCallbackQuery = null;
@@ -591,7 +649,7 @@ namespace Project_Work_My_Telegram_bot
         }
         private bool GetPathDataString(ObjectPath path, CarDrive carPath, out string str)
         {
-            if (path.ObjectName is null || path.PathLengh is null)
+            if (path.ObjectName is null || path.PathLengh is null || carPath is null)
             {
                 str = "Недостаточно данных";
                 return false;
@@ -1111,7 +1169,7 @@ namespace Project_Work_My_Telegram_bot
         {
             var text = msg!.Text!;
             var chatId = msg.Chat;
-            var inputdate = DateTime.Now;
+            var inputdate = DateTime.Now.Date;
 
             if (text == "ДА")
             {
@@ -1119,7 +1177,7 @@ namespace Project_Work_My_Telegram_bot
                  chatId: chatId,
                  text: $"Введена дата {inputdate.ToShortDateString()}",
                  replyMarkup: new ReplyKeyboardRemove());
-                _otherExpenses[msg.Chat.Id].DateTimeExp = inputdate.ToUniversalTime();
+                _otherExpenses[msg.Chat.Id].DateTimeExp = inputdate;
                 // отписываемся от сообщений ввода даты 
                 OnCallbackQuery -= AcceptCurrentDateExpenses;
                 return;
@@ -1151,7 +1209,7 @@ namespace Project_Work_My_Telegram_bot
                       text: $"Введена и сохранены дата ",
                       replyMarkup: new ReplyKeyboardRemove());
 
-            _otherExpenses[msg.Chat.Id].DateTimeExp = inputdate;
+            _otherExpenses[msg.Chat.Id].DateTimeExp = inputdate.Date;
             Console.WriteLine($"Введена дата затрат {inputdate.ToShortDateString} ");
         }
         private async Task ClosedPath(Message msg) // ++++
@@ -1217,7 +1275,7 @@ namespace Project_Work_My_Telegram_bot
         {
             var text = msg!.Text!;
             var chatId = msg.Chat;
-            var inputdate = DateTime.Now;
+            var inputdate = DateTime.Now.Date;
 
             if (text == "ДА")
             {
@@ -1249,7 +1307,7 @@ namespace Project_Work_My_Telegram_bot
                 OnCallbackQuery -= AcceptCurrentDatePath;
             }
             //Сохранение в БД 
-            _objPaths[msg.Chat.Id].DatePath = inputdate.ToUniversalTime();
+            _objPaths[msg.Chat.Id].DatePath = inputdate.Date;
             Console.WriteLine($"Введена дата поездки {inputdate.ToShortDateString()} ");
         }
         private async Task EnterNameCost(Message msg)
@@ -1506,23 +1564,21 @@ namespace Project_Work_My_Telegram_bot
                     break;
             }
         }
-        public static List<dynamic> GetPreviousSixMonths()
+        public static List<object> GetPreviousSixMonths()
         {
-            var result = new List<dynamic>();
+            var result = new List<object>();
             DateTime today = DateTime.Today;
 
             for (int i = 0; i < 6; i++)
             {
-                DateTime currentDate = today.AddMonths(-i);
+                DateTime currentDate = today.AddMonths(-i).Date;
                 DateTime startDate = new DateTime(currentDate.Year, currentDate.Month, 1);
                 DateTime endDate = startDate.AddMonths(1).AddDays(-1);
-               
-                //Анонимный метод вывода данных 
                 result.Add(new
                 {
                     MonthName = currentDate.ToString("MMMM yyyy"), // Название месяца и год
-                    StartDate = startDate, // Дата начала месяца
-                    EndDate = endDate // Дата конца месяца
+                    StartDate = startDate.Date, // Дата начала месяца
+                    EndDate = endDate.Date // Дата конца месяца
                 });
             }
             return result;

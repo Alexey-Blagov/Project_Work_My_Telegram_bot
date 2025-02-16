@@ -135,21 +135,34 @@ namespace Project_Work_My_Telegram_bot
                   InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохраниеть", callbackData: "closed")
               },
         });
-        // Инлайнер клавиатура регистрации пользователя тип Admin регистрация 
-        //public static InlineKeyboardMarkup report = new(new[]
-        //{
-        //    new []
-        //    {
-        //        InlineKeyboardButton.WithCallbackData(text: "Сформировать отчет за месяц", callbackData: "reportbyMonth"),
-        //        InlineKeyboardButton.WithCallbackData(text: "👤 Должность", callbackData: "jobtitle"),
-        //    },
-        //    new []
-        //    {
-        //        InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedReport")
-        //    },
-        //});
-        // Инлайн клапвиатура регистрации пути следования User регистрация Пути следования
-        public static InlineKeyboardMarkup regPath = new(new[]
+        // Инлайнер клавиатура произвольного типа формируемя сисок кнопок в 2 столбца тип string 
+            public static InlineKeyboardMarkup GenerateInlineKeyboardByString(List<string> buttons)
+            {
+            buttons.Add("⬅️"); 
+                List<List<InlineKeyboardButton>> keyboard = new List<List<InlineKeyboardButton>>();
+            
+                for (int i = 0; i < buttons.Count; i += 2)
+                {
+                    if (i + 1 < buttons.Count)
+                    {
+                        keyboard.Add(new List<InlineKeyboardButton>
+                {
+                    InlineKeyboardButton.WithCallbackData(buttons[i], callbackData: buttons[i]),
+                    InlineKeyboardButton.WithCallbackData(buttons[i + 1], callbackData: buttons[i + 1])
+                });
+                    }
+                    else
+                    {
+                        keyboard.Add(new List<InlineKeyboardButton>
+                {
+                    InlineKeyboardButton.WithCallbackData(buttons[i], callbackData: buttons[i])
+                });
+                    }
+                }
+                return new InlineKeyboardMarkup(keyboard);
+            }
+            // Инлайн клапвиатура регистрации пути следования User регистрация Пути следования
+            public static InlineKeyboardMarkup regPath = new(new[]
         {
             new []
             {
@@ -183,7 +196,7 @@ namespace Project_Work_My_Telegram_bot
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "ClosedExpenses")
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "ClosedExpenses")
              }
         });
         //Инлайн клапвиатура регистрации Автомобилей 
@@ -201,7 +214,7 @@ namespace Project_Work_My_Telegram_bot
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedDrive")
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedDrive")
              }
         });
 
@@ -232,7 +245,7 @@ namespace Project_Work_My_Telegram_bot
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохранить", callbackData: "closedFuel")
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedFuel")
             }
         });
     }

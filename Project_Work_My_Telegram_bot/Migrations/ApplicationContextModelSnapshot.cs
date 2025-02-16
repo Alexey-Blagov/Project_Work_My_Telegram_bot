@@ -17,7 +17,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -71,7 +71,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("DatePath")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ObjectName")
                         .HasColumnType("text");
@@ -103,7 +103,7 @@ namespace Project_Work_My_Telegram_bot.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("DateTimeExp")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("NameExpense")
                         .HasColumnType("text");

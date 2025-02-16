@@ -9,7 +9,10 @@ namespace Project_Work_My_Telegram_bot.Configurations
         public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<OtherExpenses> builder)
         {
             builder.
-                HasKey(a => a.ExpId);     
+                HasKey(a => a.ExpId);
+            builder
+              .Property(op => op.DateTimeExp)
+              .HasColumnType("timestamp without time zone");
         }
     }
 }

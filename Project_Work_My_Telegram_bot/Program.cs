@@ -14,7 +14,7 @@ namespace Project_Work_My_Telegram_bot
         private static string? _token;
         private static TelegramBotClient? _myBot;
         private static CancellationTokenSource? _cts;
-        private static MessageProcessing _messageProcessing;
+        private static MessageProcessing? _messageProcessing;
 
         static async Task Main(string[] args)
         {
@@ -27,7 +27,6 @@ namespace Project_Work_My_Telegram_bot
             Console.WriteLine(getfuel.Ai95);
             Console.WriteLine(getfuel.Diesel);
 
-            //SetPassUser();
             _token = passUser.Token;
             _cts = new CancellationTokenSource();
             _myBot = new TelegramBotClient(_token, cancellationToken: _cts.Token);
@@ -47,7 +46,7 @@ namespace Project_Work_My_Telegram_bot
             _myBot.OnUpdate += OnUpdate;
 
             Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
-      
+
             while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
             _cts.Cancel(); // stop the bot
 
@@ -67,7 +66,7 @@ namespace Project_Work_My_Telegram_bot
                 {
                     case { CallbackQuery: { } callbackQuery }:
 
-                        await _messageProcessing.BotClientOnCallbackQuery(callbackQuery);
+                        await _messageProcessing!.BotClientOnCallbackQuery(callbackQuery);
                         break;
                     default:
                         Console.WriteLine($"Получена необработанный Update {update.Type}");
