@@ -29,10 +29,11 @@ using System.IO;
 using Microsoft.Extensions.Logging.Abstractions;
 
 
+
 namespace Project_Work_My_Telegram_bot
 {
     public delegate Task Handelmessage(Message message);
-    public delegate Task HandelQallback(CallbackQuery callbackQuery); 
+    public delegate Task HandelСallback(CallbackQuery callbackQuery);
     /// <summary>
     /// Основной класс обработчик сообщений ТГБота типа 
     /// </summary>
@@ -52,10 +53,11 @@ namespace Project_Work_My_Telegram_bot
         private Dictionary<long, CarDrive> _carDrives = new Dictionary<long, CarDrive>();
         private Dictionary<long, ObjectPath> _objPaths = new Dictionary<long, ObjectPath>();
         private Dictionary<long, OtherExpenses> _otherExpenses = new Dictionary<long, OtherExpenses>();
+        private Dictionary<long, object> _choiceMonth = new Dictionary<long, object>();
 
         public event Handelmessage? OnMessage;
         public event Handelmessage? OnCallbackQueryMessage;
-        public event HandelQallback? OnPressCallbeckQuery; 
+        public event HandelСallback? OnPressCallbeckQuery;
 
         private FuelPrice _averagePriceFuelOnMarket;
         public MessageProcessing(TelegramBotClient botClient)
@@ -134,26 +136,28 @@ namespace Project_Work_My_Telegram_bot
                     break;
                 case "💼 Сформировать отчет за выбранный месяц":
                     if (_isRole == UserType.Non) return;
-
                     var monsthList = GetPreviousSixMonths();
-                    List<string?> buttons = monsthList.Select(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString()).ToList();
-                    await _botClient.SendMessage(
-                     chatId: message.Chat,
-                     text: $"Выберете период отчета",
-                     replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttons));
-                    OnCallbackQueryMessage += GetPerodHandlerByChoiceMonth;
-
-
-
-
-
+                    if (_choiceMonth[message.Chat.Id] is null)
+                    {
+                        List<string?> buttons = monsthList.Select(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString()).ToList();
+                        await _botClient.SendMessage(
+                        chatId: message.Chat,
+                        text: $"Выберете период отчета",
+                        replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttons!));
+                        //Подписываемся на события 
+                        OnPressCallbeckQuery += ChoiceMonthFromBot;
+                    }
+                    await _botClient!.SendMessage(
+                          chatId: message.Chat,
+                          text: $"Выести отчет на экран? ДА/НЕТ:",
+                          replyMarkup: KeyBoardSetting.actionAccept);
+                    OnMessage += GetReportHandlerbyCurrentMonth;
 
                     break;
                 case "🗞 Возврат в основное меню":
                     if (_isRole == UserType.Non) return;
                     await OnCommand("/start", "", message);
                     break;
-
                 case "📝 Регистрация поездки": //Обработан Sub menu 
                     if (_isRole == UserType.Non) return;
                     //Получаем юзера из БД
@@ -287,16 +291,91 @@ namespace Project_Work_My_Telegram_bot
             var chatId = msg.Chat.Id;
             var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
             //Подписываемся по нажатию кнопок 
-            OnPressCallbeckQuery += CoiceMonthFromBot;
+            switch (text)
+            {
+                case "ДА":
+                    string concatinfistring = $"Отчет за {endDate.ToString("MMMM")} месяц " + "\n";
+                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
+                    var reportsDynamic = (dynamic)reportlist;
+                    foreach (var report in reportsDynamic)
+                    {
+                        concatinfistring += (string)report.UserName + "\n";
+                        concatinfistring += GetConcatStringToBotPath(report.ObjectPaths) ?? "Нет данных";
+                        await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: concatinfistring,
+                        replyMarkup: new ReplyKeyboardRemove());
+                    }
+                    OnMessage -= GetReportHandlerbyCurrentMonth;
 
+                    break;
+                case "НЕТ":
 
+                    break;
+            }
+            await OnCommand("/main", "", msg);
+            OnPressCallbeckQuery += ChoiceMonthFromBot;
         }
 
-        private async Task CoiceMonthFromBot(CallbackQuery callbackQuery)
+        private async Task ChoiceMonthFromBot(CallbackQuery callbackQuery)
         {
-            throw new NotImplementedException();
+            var monsthList = GetPreviousSixMonths();
+            var chatId = callbackQuery.Message!.Chat.Id;
+            var msg = callbackQuery.Message!;
+            var reponsDate = monsthList.FirstOrDefault(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString().Contains(callbackQuery.Data));
+            if (reponsDate is not null)
+            {
+                await _botClient!.DeleteMessage(
+                msg.Chat,
+                    messageId: msg.MessageId - 1);
+                _choiceMonth[chatId] = reponsDate;
+                OnPressCallbeckQuery -= ChoiceMonthFromBot;
+            }
+            else
+            {
+                await _botClient!.SendMessage(
+                    chatId: chatId,
+                    replyMarkup: new ReplyKeyboardRemove(),
+                    text: $"Не получено данных нет совпадений");
+            }
         }
+        private async Task GetReportHandlerbyChoisMonth(Message msg)
+        {
+            if (_isRole == UserType.Non) return;
+            xxx
+            var endDate = DateTime.Now.Date;
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
+            var text = msg.Text;
+            var chatId = msg.Chat.Id;
+            var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
+
+            switch (text)
+            {
+                case "ДА":
+                    string concatinfistring = $"Отчет за {endDate.ToString("MMMM")} месяц " + "\n";
+                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
+                    var reportsDynamic = (dynamic)reportlist;
+                    foreach (var report in reportsDynamic)
+                    {
+                        concatinfistring += (string)report.UserName + "\n";
+                        concatinfistring += GetConcatStringToBotPath(report.ObjectPaths) ?? "Нет данных";
+                        await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: concatinfistring,
+                        replyMarkup: new ReplyKeyboardRemove());
+                    }
+                    OnMessage -= GetReportHandlerbyCurrentMonth;
+
+                    break;
+                case "НЕТ":
+
+                    break;
+            }
+            await OnCommand("/main", "", msg);
+
+            OnMessage -= GetReportHandlerbyCurrentMonth;
+        }
         private async Task GetReportHandlerbyCurrentMonth(Message msg)
         {
             if (_isRole == UserType.Non) return;
@@ -334,7 +413,6 @@ namespace Project_Work_My_Telegram_bot
 
             OnMessage -= GetReportHandlerbyCurrentMonth;
         }
-
         private string? GetConcatStringToBotPath(dynamic report)
         {
             var date = DateTime.Now.Date;
@@ -909,7 +987,7 @@ namespace Project_Work_My_Telegram_bot
                 replyMarkup: new ReplyKeyboardRemove());
                 // отписываемся от сообщений
                 OnCallbackQueryMessage -= MessageCoastGasai92;
-               
+
                 //Сохранение в ФАЙЛ Данных по стоимости 
                 return;
             }
