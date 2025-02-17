@@ -27,7 +27,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Runtime.ConstrainedExecution;
 using System.IO;
 using Microsoft.Extensions.Logging.Abstractions;
-
+using Microsoft.AspNetCore.Identity;
 
 
 namespace Project_Work_My_Telegram_bot
@@ -53,7 +53,7 @@ namespace Project_Work_My_Telegram_bot
         private Dictionary<long, CarDrive> _carDrives = new Dictionary<long, CarDrive>();
         private Dictionary<long, ObjectPath> _objPaths = new Dictionary<long, ObjectPath>();
         private Dictionary<long, OtherExpenses> _otherExpenses = new Dictionary<long, OtherExpenses>();
-        private Dictionary<long, object> _choiceMonth = new Dictionary<long, object>();
+        private Dictionary<long, object?> _choiceMonth = new Dictionary<long, object?>();
 
         public event Handelmessage? OnMessage;
         public event Handelmessage? OnCallbackQueryMessage;
@@ -136,23 +136,16 @@ namespace Project_Work_My_Telegram_bot
                     break;
                 case "💼 Сформировать отчет за выбранный месяц":
                     if (_isRole == UserType.Non) return;
+                    _choiceMonth[message.Chat.Id] = null;
                     var monsthList = GetPreviousSixMonths();
-                    if (_choiceMonth[message.Chat.Id] is null)
-                    {
-                        List<string?> buttons = monsthList.Select(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString()).ToList();
-                        await _botClient.SendMessage(
-                        chatId: message.Chat,
-                        text: $"Выберете период отчета",
-                        replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttons!));
-                        //Подписываемся на события 
-                        OnPressCallbeckQuery += ChoiceMonthFromBot;
-                    }
-                    await _botClient!.SendMessage(
-                          chatId: message.Chat,
-                          text: $"Выести отчет на экран? ДА/НЕТ:",
-                          replyMarkup: KeyBoardSetting.actionAccept);
-                    OnMessage += GetReportHandlerbyCurrentMonth;
 
+                    //Выводим InlineKeyboard 
+                    List<string?> buttons = monsthList.Select(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString()).ToList();
+                    await _botClient.SendMessage(
+                    chatId: message.Chat,
+                    text: $"Выберете период отчета",
+                    replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttons!));
+                    OnPressCallbeckQuery += ChoiceMonthFromBot;
                     break;
                 case "🗞 Возврат в основное меню":
                     if (_isRole == UserType.Non) return;
@@ -274,168 +267,11 @@ namespace Project_Work_My_Telegram_bot
                 case "📚 Вывести отчет по параметрам":
 
                     break;
-
                 default:
                     OnMessage?.Invoke(message);
                     OnCallbackQueryMessage?.Invoke(message);
                     break;
             }
-        }
-
-        private async Task GetPerodHandlerByChoiceMonth(Message msg)
-        {
-            if (_isRole == UserType.Non) return;
-            var endDate = DateTime.Now.Date;
-            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            var text = msg.Text;
-            var chatId = msg.Chat.Id;
-            var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
-            //Подписываемся по нажатию кнопок 
-            switch (text)
-            {
-                case "ДА":
-                    string concatinfistring = $"Отчет за {endDate.ToString("MMMM")} месяц " + "\n";
-                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
-                    var reportsDynamic = (dynamic)reportlist;
-                    foreach (var report in reportsDynamic)
-                    {
-                        concatinfistring += (string)report.UserName + "\n";
-                        concatinfistring += GetConcatStringToBotPath(report.ObjectPaths) ?? "Нет данных";
-                        await _botClient.SendMessage(
-                        chatId: chatId,
-                        text: concatinfistring,
-                        replyMarkup: new ReplyKeyboardRemove());
-                    }
-                    OnMessage -= GetReportHandlerbyCurrentMonth;
-
-                    break;
-                case "НЕТ":
-
-                    break;
-            }
-            await OnCommand("/main", "", msg);
-            OnPressCallbeckQuery += ChoiceMonthFromBot;
-        }
-
-        private async Task ChoiceMonthFromBot(CallbackQuery callbackQuery)
-        {
-            var monsthList = GetPreviousSixMonths();
-            var chatId = callbackQuery.Message!.Chat.Id;
-            var msg = callbackQuery.Message!;
-            var reponsDate = monsthList.FirstOrDefault(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString().Contains(callbackQuery.Data));
-            if (reponsDate is not null)
-            {
-                await _botClient!.DeleteMessage(
-                msg.Chat,
-                    messageId: msg.MessageId - 1);
-                _choiceMonth[chatId] = reponsDate;
-                OnPressCallbeckQuery -= ChoiceMonthFromBot;
-            }
-            else
-            {
-                await _botClient!.SendMessage(
-                    chatId: chatId,
-                    replyMarkup: new ReplyKeyboardRemove(),
-                    text: $"Не получено данных нет совпадений");
-            }
-        }
-        private async Task GetReportHandlerbyChoisMonth(Message msg)
-        {
-            if (_isRole == UserType.Non) return;
-            xxx
-            var endDate = DateTime.Now.Date;
-            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-
-            var text = msg.Text;
-            var chatId = msg.Chat.Id;
-            var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
-
-            switch (text)
-            {
-                case "ДА":
-                    string concatinfistring = $"Отчет за {endDate.ToString("MMMM")} месяц " + "\n";
-                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
-                    var reportsDynamic = (dynamic)reportlist;
-                    foreach (var report in reportsDynamic)
-                    {
-                        concatinfistring += (string)report.UserName + "\n";
-                        concatinfistring += GetConcatStringToBotPath(report.ObjectPaths) ?? "Нет данных";
-                        await _botClient.SendMessage(
-                        chatId: chatId,
-                        text: concatinfistring,
-                        replyMarkup: new ReplyKeyboardRemove());
-                    }
-                    OnMessage -= GetReportHandlerbyCurrentMonth;
-
-                    break;
-                case "НЕТ":
-
-                    break;
-            }
-            await OnCommand("/main", "", msg);
-
-            OnMessage -= GetReportHandlerbyCurrentMonth;
-        }
-        private async Task GetReportHandlerbyCurrentMonth(Message msg)
-        {
-            if (_isRole == UserType.Non) return;
-
-            var endDate = DateTime.Now.Date;
-            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-
-            var text = msg.Text;
-            var chatId = msg.Chat.Id;
-            var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
-
-            switch (text)
-            {
-                case "ДА":
-                    string concatinfistring = $"Отчет за {endDate.ToString("MMMM")} месяц " + "\n";
-                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
-                    var reportsDynamic = (dynamic)reportlist;
-                    foreach (var report in reportsDynamic)
-                    {
-                        concatinfistring += (string)report.UserName + "\n";
-                        concatinfistring += GetConcatStringToBotPath(report.ObjectPaths) ?? "Нет данных";
-                        await _botClient.SendMessage(
-                        chatId: chatId,
-                        text: concatinfistring,
-                        replyMarkup: new ReplyKeyboardRemove());
-                    }
-                    OnMessage -= GetReportHandlerbyCurrentMonth;
-
-                    break;
-                case "НЕТ":
-
-                    break;
-            }
-            await OnCommand("/main", "", msg);
-
-            OnMessage -= GetReportHandlerbyCurrentMonth;
-        }
-        private string? GetConcatStringToBotPath(dynamic report)
-        {
-            var date = DateTime.Now.Date;
-            string str = "";
-            if (report != null)
-            {
-                foreach (var path in report)
-                {
-                    string getdatePath = path.GetType().GetProperty("DatePath")?.GetValue(path).ToString() ?? "нет данных";
-                    string objectName = path.GetType().GetProperty("ObjectName")?.GetValue(path).ToString() ?? "нет данных";
-                    string pathLengh = path.GetType().GetProperty("PathLengh")?.GetValue(path).ToString() ?? "нет данных";
-                    string strData = DateTime.TryParse(getdatePath, out date) ? date.ToShortDateString() : "нет данных";
-                    string carName = path.GetType().GetProperty("CarName")?.GetValue(path).ToString() ?? "нет данных";
-                    string carNumber = path.GetType().GetProperty("CarNumber")?.GetValue(path).ToString() ?? "нет данных";
-                    str += $"Объект наименование : {objectName}" + "\n" +
-                           $"Общий путь до объекта:  {pathLengh}" + "\n" +
-                           $"Дата поездки :  {strData} " + "\n" +
-                           $"Машина: {carName} гос. номер {carNumber} " + "\n" + "\n";
-                }
-                return str;
-            }
-            else
-                return null;
         }
         public async Task BotClientOnCallbackQuery(CallbackQuery callbackQuery)
         {
@@ -452,7 +288,6 @@ namespace Project_Work_My_Telegram_bot
             switch (option)
             {
                 case "username":
-
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите Ф.И.О:",
@@ -698,10 +533,219 @@ namespace Project_Work_My_Telegram_bot
                  replyMarkup: new ReplyKeyboardRemove());
                     await OnCommand("/start", "", callbackQuery.Message!);
                     break;
+                case "⬅️":
+                    await _botClient!.DeleteMessage(
+                    msg.Chat,
+                    messageId: msg.MessageId - 1);
+
+                    await OnCommand("/start", "", callbackQuery.Message!);
+                    break;
                 default:
                     OnPressCallbeckQuery?.Invoke(callbackQuery!);
                     break;
             };
+        }
+        private async Task ChoiceMonthFromBot(CallbackQuery callbackQuery)
+        {
+            var monsthList = GetPreviousSixMonths();
+            var chatId = callbackQuery.Message!.Chat.Id;
+            var msg = callbackQuery.Message!;
+            var responsDate = monsthList.FirstOrDefault(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString().Contains(callbackQuery.Data));
+            if (responsDate is not null)
+            {
+                await _botClient!.DeleteMessage(
+                msg.Chat,
+                    messageId: msg.MessageId - 1);
+                _choiceMonth[chatId] = responsDate;
+                await _botClient!.SendMessage(
+                          chatId: msg.Chat,
+                          text: $"Выести отчет на экран? ДА/НЕТ:",
+                          replyMarkup: KeyBoardSetting.actionAccept);
+                OnPressCallbeckQuery -= ChoiceMonthFromBot;
+                OnMessage += GetReportHandlerbyChoiceMonth;
+            }
+            else
+            {
+                await _botClient!.SendMessage(
+                    chatId: chatId,
+                    replyMarkup: new ReplyKeyboardRemove(),
+                    text: $"Не получено данных нет совпадений");
+            }
+        }
+        private async Task GetReportHandlerbyChoiceMonth(Message msg)
+        {
+            var tgId = msg.Chat.Id;
+            var endDate = (DateTime)_choiceMonth[tgId].GetType().GetProperty("EndDate")?.GetValue(_choiceMonth[tgId]);
+            var startOfMonth = (DateTime)_choiceMonth[tgId].GetType().GetProperty("StartDate")?.GetValue(_choiceMonth[tgId]);
+
+            var text = msg.Text;
+            var chatId = msg.Chat.Id;
+            var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
+
+            switch (text)
+            {
+                case "ДА":
+                    string titlestring = $"Отчет, поездки за  {endDate.ToString("MMMM")} месяц " + "\n";
+
+                    await SendMessageStringBlood(msg, titlestring);
+                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
+                    var reportsDynamic = (dynamic)reportlist;
+
+                    string concatinfistring = string.Empty;
+                    foreach (var report in reportsDynamic)
+                    {
+                        concatinfistring += (string)report.UserName + "\n";
+                        concatinfistring += (GetConcatStringToBotPath(report.ObjectPaths) != string.Empty) ?
+                                                                                GetConcatStringToBotPath(report.ObjectPaths) : "Нет данных";
+
+                    }
+                    await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: concatinfistring,
+                        replyMarkup: new ReplyKeyboardRemove());
+
+                    //Вывод трат 
+                    titlestring = $"Отчет по затратам {endDate.ToString("MMMM")} месяц " + "\n";
+                    await SendMessageStringBlood(msg, titlestring);
+                    concatinfistring = string.Empty;
+
+                    reportlist = await repositoryReport.GetUserExpensesByTgId(chatId, startOfMonth.Date, endDate);
+                    reportsDynamic = (dynamic)reportlist;
+                    foreach (var report in reportsDynamic)
+                    {
+                        concatinfistring += (GetConcatStringToBotExpenses(report.OtherExpenses) != string.Empty) ?
+                                                                                GetConcatStringToBotExpenses(report.OtherExpenses) : "Нет данных по затратам";
+                        await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: concatinfistring,
+                        replyMarkup: new ReplyKeyboardRemove());
+                    }
+                    OnMessage -= GetReportHandlerbyChoiceMonth;
+                    break;
+                case "НЕТ":
+
+                    break;
+            }
+            await OnCommand("/main", "", msg);
+
+            OnMessage -= GetReportHandlerbyCurrentMonth;
+        }
+        private async Task GetReportHandlerbyCurrentMonth(Message msg)
+        {
+            if (_isRole == UserType.Non) return;
+
+            var endDate = DateTime.Now.Date;
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+            var text = msg.Text;
+            var chatId = msg.Chat.Id;
+            var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
+
+            switch (text)
+            {
+                case "ДА":
+                    string titlestring = $"Отчет, поездки за {endDate.ToString("MMMM")} месяц " + "\n";
+                    await SendMessageStringBlood(msg, titlestring);
+
+                    var concatinfistring = string.Empty;
+                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
+                    var reportsDynamic = (dynamic)reportlist;
+                    foreach (var report in reportsDynamic)
+                    {
+                        concatinfistring += (string)report.UserName + "\n";
+                        concatinfistring += (GetConcatStringToBotPath(report.ObjectPaths) != string.Empty) ?
+                                                                                GetConcatStringToBotPath(report.ObjectPaths) : "Нет данных";
+                    }
+                    await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: concatinfistring,
+                        replyMarkup: new ReplyKeyboardRemove());
+                    //Вывод трат 
+                    concatinfistring = string.Empty;
+                    titlestring = $"Отчет по затратам {endDate.ToString("MMMM")} месяц " + "\n";
+                    await SendMessageStringBlood(msg, titlestring);
+
+                    reportlist = await repositoryReport.GetUserExpensesByTgId(chatId, startOfMonth.Date, endDate);
+                    reportsDynamic = (dynamic)reportlist;
+                    foreach (var report in reportsDynamic)
+                    {
+                        concatinfistring += (GetConcatStringToBotExpenses(report.OtherExpenses) != string.Empty) ?
+                                                                                GetConcatStringToBotExpenses(report.OtherExpenses) : "Нет данных по затратам";
+
+                    }
+                    await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: concatinfistring,
+                        replyMarkup: new ReplyKeyboardRemove());
+                    OnMessage -= GetReportHandlerbyCurrentMonth;
+                    break;
+                case "НЕТ":
+
+                    break;
+            }
+            await OnCommand("/main", "", msg);
+
+            OnMessage -= GetReportHandlerbyCurrentMonth;
+        }
+        private async Task SendMessageStringBlood(Message msg, string strmessage)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                string url = $"https://api.telegram.org/bot{_passUser.Token}/sendMessage";
+                var parameters = new Dictionary<string, string>
+                {
+                            { "chat_id", msg.Chat.Id.ToString()  },
+                            { "text", $"*{strmessage}*" },
+                            { "parse_mode", "Markdown" }
+                        };
+                HttpResponseMessage response = await client.PostAsync(url, new FormUrlEncodedContent(parameters));
+                response.EnsureSuccessStatusCode();
+            }
+        }
+        private string? GetConcatStringToBotExpenses(dynamic expenses)
+        {
+            var date = DateTime.Now.Date;
+            string? str = string.Empty;
+            if (expenses != null)
+            {
+                foreach (var expens in expenses)
+                {
+                    string getdateExpenses = expens.GetType().GetProperty("DateTimeExp")?.GetValue(expens).ToString() ?? "нет данных";
+                    string nameExpense = expens.GetType().GetProperty("NameExpense")?.GetValue(expens).ToString() ?? "нет данных";
+                    string coast = expens.GetType().GetProperty("Coast")?.GetValue(expens).ToString() ?? "нет данных";
+                    string strData = DateTime.TryParse(getdateExpenses, out date) ? date.ToShortDateString() : "нет данных";
+                    str += $"Наименование затрат : {nameExpense}" + "\n" +
+                         $"Стоимость:  {coast}" + "\n" +
+                         $"Дата затрат:  {strData} " + "\n" + "\n";
+                }
+                return str;
+            }
+            else
+                return null;
+        }
+        private string? GetConcatStringToBotPath(dynamic report)
+        {
+            var date = DateTime.Now.Date;
+            string? str = string.Empty;
+            if (report != null)
+            {
+                foreach (var path in report)
+                {
+                    string getdatePath = path.GetType().GetProperty("DatePath")?.GetValue(path).ToString() ?? "нет данных";
+                    string objectName = path.GetType().GetProperty("ObjectName")?.GetValue(path).ToString() ?? "нет данных";
+                    string pathLengh = path.GetType().GetProperty("PathLengh")?.GetValue(path).ToString() ?? "нет данных";
+                    string strData = DateTime.TryParse(getdatePath, out date) ? date.ToShortDateString() : "нет данных";
+                    string carName = path.GetType().GetProperty("CarName")?.GetValue(path).ToString() ?? "нет данных";
+                    string carNumber = path.GetType().GetProperty("CarNumber")?.GetValue(path).ToString() ?? "нет данных";
+                    str += $"Объект наименование : {objectName}" + "\n" +
+                           $"Общий путь до объекта:  {pathLengh}" + "\n" +
+                           $"Дата поездки :  {strData} " + "\n" +
+                           $"Машина: {carName} гос. номер {carNumber} " + "\n" + "\n";
+                }
+                return str;
+            }
+            else
+                return null;
         }
 
         //Методы вывода данных в бот по введеным таблицам и словорям
@@ -1216,8 +1260,6 @@ namespace Project_Work_My_Telegram_bot
                              chatId: chatId,
                              text: $"Пороль введен не корректно попробуйте снова",
                              replyMarkup: new ReplyKeyboardRemove());
-                //_isRole = UserType.Non;
-                //await DataBaseHandler.SetUserRoleAsync(msg.Chat.Id, _isRole);
                 OnMessage -= MessageHandlePassAdmin;
                 await OnCommand("/start", "", msg);
             }
