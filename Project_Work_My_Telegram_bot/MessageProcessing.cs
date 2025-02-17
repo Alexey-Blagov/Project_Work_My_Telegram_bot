@@ -109,7 +109,6 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.DeleteMessage(
                          message.Chat,
                          messageId: message.MessageId - 1);
-
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Регистрация/изменение профиля:",
