@@ -30,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="FuelSetPrice.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="userPass.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

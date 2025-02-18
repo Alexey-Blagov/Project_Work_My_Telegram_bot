@@ -576,27 +576,25 @@ namespace Project_Work_My_Telegram_bot
             var tgId = msg.Chat.Id;
             var endDate = (DateTime)_choiceMonth[tgId].GetType().GetProperty("EndDate")?.GetValue(_choiceMonth[tgId]);
             var startOfMonth = (DateTime)_choiceMonth[tgId].GetType().GetProperty("StartDate")?.GetValue(_choiceMonth[tgId]);
-
             var text = msg.Text;
             var chatId = msg.Chat.Id;
             var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
-
+            var reportlistPaths = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
+            var reportsDynamicPaths = (dynamic)reportlistPaths;
+            var reportlistExpenses = await repositoryReport.GetUserExpensesByTgId(chatId, startOfMonth.Date, endDate);
+            var reportsDynamicExpenses = (dynamic)reportlistExpenses;
             switch (text)
             {
                 case "ДА":
                     string titlestring = $"Отчет, поездки за  {endDate.ToString("MMMM")} месяц " + "\n";
-
                     await SendMessageStringBlood(msg, titlestring);
-                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
-                    var reportsDynamic = (dynamic)reportlist;
-
                     string concatinfistring = string.Empty;
-                    foreach (var report in reportsDynamic)
+                    
+                    foreach (var report in reportsDynamicPaths)  
                     {
                         concatinfistring += (string)report.UserName + "\n";
                         concatinfistring += (GetConcatStringToBotPath(report.ObjectPaths) != string.Empty) ?
                                                                                 GetConcatStringToBotPath(report.ObjectPaths) : "Нет данных";
-
                     }
                     await _botClient.SendMessage(
                         chatId: chatId,
@@ -606,11 +604,8 @@ namespace Project_Work_My_Telegram_bot
                     //Вывод трат 
                     titlestring = $"Отчет по затратам {endDate.ToString("MMMM")} месяц " + "\n";
                     await SendMessageStringBlood(msg, titlestring);
-                    concatinfistring = string.Empty;
-
-                    reportlist = await repositoryReport.GetUserExpensesByTgId(chatId, startOfMonth.Date, endDate);
-                    reportsDynamic = (dynamic)reportlist;
-                    foreach (var report in reportsDynamic)
+                    concatinfistring = string.Empty;       
+                    foreach (var report in reportsDynamicExpenses)
                     {
                         concatinfistring += (GetConcatStringToBotExpenses(report.OtherExpenses) != string.Empty) ?
                                                                                 GetConcatStringToBotExpenses(report.OtherExpenses) : "Нет данных по затратам";
@@ -622,7 +617,15 @@ namespace Project_Work_My_Telegram_bot
                     OnMessage -= GetReportHandlerbyChoiceMonth;
                     break;
                 case "НЕТ":
+                    
+                    FileExcelHandler _sendtoFile = new FileExcelHandler();
+                    var setFile = _sendtoFile.ExportUsersToExcel(reportsDynamicPaths, reportsDynamicExpenses); 
+                    if (setFile) 
+                    {
 
+
+                        OnMessage -= GetReportHandlerbyChoiceMonth;
+                    }
                     break;
             }
             await OnCommand("/main", "", msg);
@@ -1019,7 +1022,7 @@ namespace Project_Work_My_Telegram_bot
                  text: $"Ввeдите Стоимость бензина 🔋 AИ-92, в формате 0.00",
                  replyMarkup: new ReplyKeyboardRemove());
                 return;
-            }
+            }   
             //Cлучаи ввода данных парсим текст 
             if (decimal.TryParse(text.Replace(",", "."),
                                     System.Globalization.CultureInfo.InvariantCulture, out coastgas))

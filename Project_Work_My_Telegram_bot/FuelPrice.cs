@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,13 +16,44 @@ namespace Project_Work_My_Telegram_bot
     /// </summary>
     public class FuelPrice
     {
-        public decimal Ai92 { get; private set; }
-        public decimal Ai95 { get; private set; }
-        public decimal Diesel { get; private set; }
+        private readonly string _filePath;
+        public decimal Ai92 { get; set; }
+        public decimal Ai95 { get; set; }
+        public decimal Diesel { get; set; }
 
         public FuelPrice()
         {
             Task.Run(() => GetData()).Wait();
+            _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FuelSetPrice.json");
+            LoadFromJson();
+        }
+        public void SaveToJson()
+        {
+            var jsonData = new
+            {
+                Ai92,
+                Ai95,
+                Diesel,
+            };
+            File.WriteAllText(_filePath, System.Text.Json.JsonSerializer.Serialize(jsonData));
+        }
+        private void LoadFromJson()
+        {
+            if (File.Exists(_filePath))
+            {
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("FuelSetPrice.json", optional: false, reloadOnChange: true)
+                    .Build();
+                Ai92 = ParsePrice(configuration["Ai92"] ?? throw new InvalidDataException("Поле Ai92 отсутствует в файле."));
+                Ai95 = ParsePrice(configuration["Ai95"] ?? throw new InvalidDataException("Поле Ai95 отсутствует в файле."));
+                Diesel = ParsePrice(configuration["Diesel"] ?? throw new InvalidDataException("Поле Diesel отсутствует в файле."));
+
+            }
+            else
+            {
+                SaveToJson();
+            }
         }
         private async Task GetData()
         {

@@ -10,18 +10,18 @@ namespace Project_Work_My_Telegram_bot
 {
     internal class PassUser
     {
-        private string _passwordUser;
-        private string _passwordAdmin;
+        private string? _passwordUser;
+        private string? _passwordAdmin;
         private readonly string _filePath;
 
-        private string _token;
+        private string? _token;
 
-        private string _bdToken;
+        private string? _bdToken;
         public string PasswordUser
         {
             get
             {
-                return _passwordUser;
+                return _passwordUser!;
             }
             private set
             {
@@ -32,7 +32,7 @@ namespace Project_Work_My_Telegram_bot
         {
             get
             {
-                return _passwordAdmin;
+                return _passwordAdmin!;
             }
             private set
             {
@@ -44,14 +44,14 @@ namespace Project_Work_My_Telegram_bot
         {
             get
             {
-                return _token;
+                return _token!;
             }
         }
         public string BdToken
         {
             get
             {
-                return _bdToken;
+                return _bdToken!;
             }
         }
 

@@ -27,8 +27,8 @@ namespace Project_Work_My_Telegram_bot
                 {
                     UserName = u.UserName,
                     ObjectPaths = u.ObjectPaths
-                    .Where(op => op.DatePath  >= startDate  && op.DatePath  <= endDate)
-                    .OrderBy (op => op.DatePath)
+                    .Where(op => op.DatePath >= startDate && op.DatePath <= endDate)
+                    .OrderBy(op => op.DatePath)
                     // Фильтрация по дате
                     .Select(op => new
                     {
@@ -36,9 +36,12 @@ namespace Project_Work_My_Telegram_bot
                         PathLengh = op.PathLengh,
                         DatePath = op.DatePath,
                         CarName = op.CarDrive != null ? op.CarDrive.CarName : null,
-                        CarNumber = op.CarDrive != null ? op.CarDrive.CarNumber : null
+                        CarNumber = op.CarDrive != null ? op.CarDrive.CarNumber : null,
+                        GasConsum = op.CarDrive != null ? op.CarDrive.GasСonsum : null,
+                        TypeFuel = op.CarDrive != null ? op.CarDrive.TypeFuel : 2
+
                     })
-                    .ToList() 
+                    .ToList()
                 })
         .ToListAsync();
             return result.Cast<object>().ToList();
