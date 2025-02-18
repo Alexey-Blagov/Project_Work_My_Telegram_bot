@@ -23,7 +23,7 @@ namespace Project_Work_My_Telegram_bot
             //Хранение формирующего файла в базовой дериктории 
             _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Template.xlsx");
         }
-        public bool ExportUsersToExcel(List<dynamic> dataPath, List<dynamic> dataExpenses)
+        public string ExportUsersToExcel(List<dynamic> dataPath, List<dynamic> dataExpenses, DateTime monthReport)
         {
             // Инициализация EPPlus
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -44,57 +44,58 @@ namespace Project_Work_My_Telegram_bot
                     DateTime getdate = DateTime.Now.Date; 
 
                     //Первая сторка в файле 
-                    worksheet.Cells[row, 1].Value = nameUser + $"Отчет, поездки за  {getdate.ToString("MMMM")} месяц " + "\n"; ;
+                    worksheet.Cells[row, 1].Value = nameUser + $"Отчет, поездки за  {monthReport.ToString("MMMM yyyy")} г." + "\n"; 
 
                     row++;
                     //Создаем имя выходного файла  
-                    _outputPath = (_outputPath is null) ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, nameUser + getdate.ToString("MMMM")) : _outputPath;
+                    _outputPath = (_outputPath is null) ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, nameUser + monthReport.ToString("MMMM yyyy") + ".xlsx") : _outputPath;
 
                     foreach (var path in datp.ObjectPaths)
                     {
                         getdate = path.GetType().GetProperty("DatePath")?.GetValue(path);
                         string? objectName = path.GetType().GetProperty("ObjectName")?.GetValue(path).ToString();
-                        double pathLengh = path.GetType().GetProperty("PathLengh")?.GetValue(path) ?? 0;
-                        double gasConsume = path.GetType().GetProperty("GasСonsum")?.GetValue(path) ?? 0;
+                        double pathLengh = path.GetType().GetProperty("PathLengh")?.GetValue(path) ?? 0;   
                         string strData = getdate.ToShortDateString();
                         string? carName = path.GetType().GetProperty("CarName")?.GetValue(path).ToString();
                         string? carNumber = path.GetType().GetProperty("CarNumber")?.GetValue(path).ToString();
                         Fuel _fuel = (Fuel)(path.GetType().GetProperty("TypeFuel")?.GetValue(path) ?? 2);
+                        double gasConsume = path.GetType().GetProperty("GasConsum")?.GetValue(path) ?? 0.0;
                         priceOfFuel = GetPriceFuel(_fuel);
-                        coastGasOnPath = priceOfFuel * (decimal)gasConsume * (decimal)pathLengh / 100;
-
+                        coastGasOnPath = priceOfFuel * (decimal)gasConsume * (decimal)pathLengh / 100m;
+                        sumCoastPath += coastGasOnPath;
                         worksheet.Cells[row, 1].Value = objectName ?? "Нет данных";
                         worksheet.Cells[row, 2].Value = strData ?? "Нет данных";
                         worksheet.Cells[row, 3].Value = carName ?? "Нет данных";
                         worksheet.Cells[row, 4].Value = carNumber ?? "Нет данных";
-                        worksheet.Cells[row, 5].Value = coastGasOnPath.ToString() + "руб.";
-                        sumCoastPath += coastGasOnPath;
+                        worksheet.Cells[row, 5].Value = pathLengh.ToString("F1") ?? "Нет данных";
+                        worksheet.Cells[row, 6].Value = coastGasOnPath.ToString("F2") + "руб.";
                         row++;
                     }
-                    worksheet.Cells[row, 1].Value = "Итого топливо: ";
-                    worksheet.Cells[row, 5].Value = (sumCoastPath == 0m) ? "нет данных по тратам" : sumCoastPath + "руб.";
+                    worksheet.Cells[row, 1].Value = "Итого топливо: ";                                
+                    worksheet.Cells[row, 6].Value = (sumCoastPath == 0m) ? "нет данных по тратам" : sumCoastPath.ToString("F2") + "руб.";
                     row++;
                 }
                 // Выводим данные по затратам если они существуют  
-                foreach (var expens in dataExpenses!!!)
+                foreach (var expens in dataExpenses[0].OtherExpenses)
                 {
-                    DateTime getdate = expens[0].OtherExpenses.GetType().GetProperty("DateTimeExp")?.GetValue(expens);
-                    string? nameExpense = expens.OtherExpenses.GetType().GetProperty("NameExpense")?.GetValue(expens).ToString();
-                    decimal coast = expens.OtherExpenses.GetType().GetProperty("Coast")?.GetValue(expens) ?? 0m;
+                    DateTime getdate = expens.GetType().GetProperty("DateTimeExp")?.GetValue(expens);
+                    string? nameExpense = expens.GetType().GetProperty("NameExpense")?.GetValue(expens).ToString();
+                    decimal coast = expens.GetType().GetProperty("Coast")?.GetValue(expens) ?? 0m;
 
                     worksheet.Cells[row, 1].Value = nameExpense ?? "Нет данных";
                     worksheet.Cells[row, 2].Value = getdate.ToShortDateString() ?? "Нет данных";
-                    worksheet.Cells[row, 5].Value = coast.ToString() ?? "Нет данных";
+                    worksheet.Cells[row, 6].Value = coast.ToString("F2") + "руб." ?? "Нет данных";
                     sumCoastExpenses += coast;
                     row++;
                 }
-                worksheet.Cells[row, 1].Value = "Итого затраты: ";
-                worksheet.Cells[row, 5].Value = (sumCoastPath == 0m) ? "нет данных по тратам" : sumCoastPath + "руб.";
+                worksheet.Cells[row, 1].Value = "Итого затраты сумма: ";
+                worksheet.Cells[row, 6].Value = (sumCoastPath == 0m) ? "нет данных по тратам" : sumCoastExpenses.ToString("F2") + "руб.";
                 // Сохраняем изменения в новый файл
                 package.SaveAs(new FileInfo(_outputPath!));
-                return true;
+                return _outputPath!;
             }
-        }
+
+        } 
         private decimal GetPriceFuel(Fuel fuel)
         {
             _fuelPrice = new FuelPrice();

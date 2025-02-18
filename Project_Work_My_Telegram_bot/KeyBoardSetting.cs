@@ -179,7 +179,8 @@ namespace Project_Work_My_Telegram_bot
             },
             new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedpath")
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedpath"),
+                 InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              },
         });
         //Инлайн клапвиатура регистрации доп. завтрат 
@@ -196,7 +197,8 @@ namespace Project_Work_My_Telegram_bot
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "ClosedExpenses")
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "ClosedExpenses"),
+                InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              }
         });
         //Инлайн клапвиатура регистрации Автомобилей 
@@ -214,7 +216,8 @@ namespace Project_Work_My_Telegram_bot
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedDrive")
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedDrive"),
+                InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              }
         });
 
@@ -245,7 +248,8 @@ namespace Project_Work_My_Telegram_bot
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedFuel")
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedFuel"),
+                InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData:"⬅️")
             }
         });
     }

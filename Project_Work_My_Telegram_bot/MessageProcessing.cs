@@ -586,7 +586,7 @@ namespace Project_Work_My_Telegram_bot
             switch (text)
             {
                 case "ДА":
-                    string titlestring = $"Отчет, поездки за  {endDate.ToString("MMMM")} месяц " + "\n";
+                    string titlestring = $"Отчет, поездки за  {endDate.ToString("MMMM yyyy")}" + "\n";
                     await SendMessageStringBlood(msg, titlestring);
                     string concatinfistring = string.Empty;
                     
@@ -602,7 +602,7 @@ namespace Project_Work_My_Telegram_bot
                         replyMarkup: new ReplyKeyboardRemove());
 
                     //Вывод трат 
-                    titlestring = $"Отчет по затратам {endDate.ToString("MMMM")} месяц " + "\n";
+                    titlestring = $"Отчет по затратам {endDate.ToString("MMMM yyyy")} г. " + "\n";
                     await SendMessageStringBlood(msg, titlestring);
                     concatinfistring = string.Empty;       
                     foreach (var report in reportsDynamicExpenses)
@@ -617,13 +617,11 @@ namespace Project_Work_My_Telegram_bot
                     OnMessage -= GetReportHandlerbyChoiceMonth;
                     break;
                 case "НЕТ":
-                    
                     FileExcelHandler _sendtoFile = new FileExcelHandler();
-                    var setFile = _sendtoFile.ExportUsersToExcel(reportsDynamicPaths, reportsDynamicExpenses); 
-                    if (setFile) 
-                    {
-
-
+                    string pathFile = _sendtoFile.ExportUsersToExcel(reportsDynamicPaths, reportsDynamicExpenses, startOfMonth);
+                    { 
+                        //Пуляем файл в чатбот
+                        await SendFileToTbot (chatId, pathFile);
                         OnMessage -= GetReportHandlerbyChoiceMonth;
                     }
                     break;
@@ -632,6 +630,28 @@ namespace Project_Work_My_Telegram_bot
 
             OnMessage -= GetReportHandlerbyCurrentMonth;
         }
+
+        private async Task SendFileToTbot(long chatId, string pathFile)
+        {
+            if (!File.Exists(pathFile))
+            {
+                Console.WriteLine("Файл не найден!");
+                return;
+            }
+            try
+            {
+                await using var fileStream = new FileStream(pathFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                Telegram.Bot.Types.InputFileStream inputFileToSend = new InputFileStream(fileStream, pathFile);
+
+                // Отправляем файл
+                await _botClient.SendDocument(chatId, inputFileToSend);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString); 
+            }
+        }
+
         private async Task GetReportHandlerbyCurrentMonth(Message msg)
         {
             if (_isRole == UserType.Non) return;
@@ -642,17 +662,18 @@ namespace Project_Work_My_Telegram_bot
             var text = msg.Text;
             var chatId = msg.Chat.Id;
             var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
+            var concatinfistring = string.Empty;
+            var reportlistPaths = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
+            var reportsDynamicPaths = (dynamic)reportlistPaths;
+            var reportlistExpenses = await repositoryReport.GetUserExpensesByTgId(chatId, startOfMonth.Date, endDate);
+            var reportsDynamicExpenses = (dynamic)reportlistExpenses;
 
             switch (text)
             {
                 case "ДА":
-                    string titlestring = $"Отчет, поездки за {endDate.ToString("MMMM")} месяц " + "\n";
+                    string titlestring = $"Отчет, поездки за {endDate.ToString("MMMM yyyy")} г." + "\n";
                     await SendMessageStringBlood(msg, titlestring);
-
-                    var concatinfistring = string.Empty;
-                    var reportlist = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
-                    var reportsDynamic = (dynamic)reportlist;
-                    foreach (var report in reportsDynamic)
+                    foreach (var report in reportsDynamicPaths)
                     {
                         concatinfistring += (string)report.UserName + "\n";
                         concatinfistring += (GetConcatStringToBotPath(report.ObjectPaths) != string.Empty) ?
@@ -664,16 +685,12 @@ namespace Project_Work_My_Telegram_bot
                         replyMarkup: new ReplyKeyboardRemove());
                     //Вывод трат 
                     concatinfistring = string.Empty;
-                    titlestring = $"Отчет по затратам {endDate.ToString("MMMM")} месяц " + "\n";
-                    await SendMessageStringBlood(msg, titlestring);
-
-                    reportlist = await repositoryReport.GetUserExpensesByTgId(chatId, startOfMonth.Date, endDate);
-                    reportsDynamic = (dynamic)reportlist;
-                    foreach (var report in reportsDynamic)
+                    titlestring = $"Отчет по затратам {endDate.ToString("MMMM yyyy")} г." + "\n";
+                    await SendMessageStringBlood(msg, titlestring);                   
+                    foreach (var report in reportsDynamicExpenses)
                     {
                         concatinfistring += (GetConcatStringToBotExpenses(report.OtherExpenses) != string.Empty) ?
                                                                                 GetConcatStringToBotExpenses(report.OtherExpenses) : "Нет данных по затратам";
-
                     }
                     await _botClient.SendMessage(
                         chatId: chatId,
@@ -682,7 +699,13 @@ namespace Project_Work_My_Telegram_bot
                     OnMessage -= GetReportHandlerbyCurrentMonth;
                     break;
                 case "НЕТ":
-
+                    FileExcelHandler _sendtoFile = new FileExcelHandler();
+                    string pathFile = _sendtoFile.ExportUsersToExcel(reportsDynamicPaths, reportsDynamicExpenses, startOfMonth);
+                    {
+                        //Пуляем файл в чатбот
+                        await SendFileToTbot(chatId, pathFile);
+                        OnMessage -= GetReportHandlerbyChoiceMonth;
+                    }
                     break;
             }
             await OnCommand("/main", "", msg);
