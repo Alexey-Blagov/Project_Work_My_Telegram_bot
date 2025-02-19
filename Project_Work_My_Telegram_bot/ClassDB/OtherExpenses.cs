@@ -9,13 +9,14 @@ namespace Project_Work_My_Telegram_bot.ClassDB
 {
     public class OtherExpenses
     {
-        //ExpId
-        //NameExpense Наименование затрат
-        //Coast: Стоимость затрат
-        //dateTimeExp Дата трат  
-        //UserId Форинкей на юзера Юсера осуществивший траты
-        //UserExp: Екземплыр класса Юсера осуществивший траты
-     
+        /// <summary>
+        /// ExpId Ключ БД 
+        /// NameExpense Наименование затрат
+        /// Coast: Стоимость затрат decimal 
+        /// dateTimeExp Дата трат 
+        /// UserId Форинкей на юзера Юсера осуществивший траты
+        /// UserExp: Екземплыр класса Юсера осуществивший траты
+        /// </summary>
         public int ExpId { get; set; }
         public string? NameExpense { get; set; }
         public decimal? Coast { get; set; }

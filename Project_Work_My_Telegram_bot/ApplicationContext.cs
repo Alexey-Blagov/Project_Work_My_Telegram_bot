@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot
 {
+    /// <summary>
+    /// Класс формирования БД EF контект доступ и формирование миграций 
+    /// </summary>
     public class ApplicationContext : DbContext
     {
         private PassUser _passUser = new PassUser();

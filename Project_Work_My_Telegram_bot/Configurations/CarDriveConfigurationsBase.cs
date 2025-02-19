@@ -5,6 +5,9 @@ using Telegram.Bot.Types;
 
 namespace Project_Work_My_Telegram_bot.Configurations
 {
+    /// <summary>
+    /// Класс настройки миграции CarDrive
+    /// </summary>
     public class CarDriveConfigurations : IEntityTypeConfiguration<CarDrive>
 
     {

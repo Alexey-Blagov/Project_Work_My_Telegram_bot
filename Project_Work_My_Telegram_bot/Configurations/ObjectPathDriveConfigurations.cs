@@ -5,6 +5,9 @@ using System.Reflection.Emit;
 
 namespace Project_Work_My_Telegram_bot.Configurations
 {
+    /// <summary>
+    /// Класс настройки миграции сущностей ObjectPath 
+    /// </summary>
     public class ObjectPathDriveConfigurations : IEntityTypeConfiguration<ObjectPath>
 
     {

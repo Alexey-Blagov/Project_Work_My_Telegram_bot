@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot
 {
+    /// <summary>
+    /// Класс чтения из файла данных по поролям запись в User  
+    /// </summary>
     internal class PassUser
     {
         private string? _passwordUser;
         private string? _passwordAdmin;
         private readonly string _filePath;
-
         private string? _token;
-
         private string? _bdToken;
         public string PasswordUser
         {

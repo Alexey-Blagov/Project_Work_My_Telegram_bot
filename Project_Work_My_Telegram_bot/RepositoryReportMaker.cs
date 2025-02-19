@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot
 {
+  /// <summary>
+  /// Репозиторий данных для формирования отчетов 
+  /// </summary>
     public class RepositoryReportMaker
     {
         private readonly ApplicationContext _reportDb;
@@ -18,6 +21,13 @@ namespace Project_Work_My_Telegram_bot
         {
             _reportDb = reportDb;
         }
+        /// <summary>
+        /// Метод формирования анонимного типа данных с необходимыми полями 
+        /// </summary>
+        /// <param name="tgId"></param> long tgId
+        /// <param name="startDate"></param> Дата начала отчета
+        /// <param name="endDate"></param> Дата окончания отчета 
+        /// <returns></returns> UserName, ObjectName, PathLengh, CarName, CarNumber, GasConsum, TypeFuel 
         public async Task<List<object>> GetUserObjectPathsByTgId(long tgId, DateTime startDate, DateTime endDate)
         {
             var result = await _reportDb.Users
@@ -25,8 +35,8 @@ namespace Project_Work_My_Telegram_bot
                 .Where(u => u.IdTg == tgId)
                 .Select(u => new
                 {
-                    UserName = u.UserName,
-                    ObjectPaths = u.ObjectPaths
+                     UserName = u.UserName,
+                     ObjectPaths = u.ObjectPaths
                     .Where(op => op.DatePath >= startDate && op.DatePath <= endDate)
                     .OrderBy(op => op.DatePath)
                     // Фильтрация по дате
@@ -46,6 +56,13 @@ namespace Project_Work_My_Telegram_bot
         .ToListAsync();
             return result.Cast<object>().ToList();
         }
+        /// <summary>
+        /// Метод формирования затрат выводит анониммный тип 
+        /// </summary>
+        /// <param name="tgId"></param> long Id 
+        /// <param name="startDate"></param> Дата стартового отчета 
+        /// <param name="endDate"></param> Дата конечного отчета 
+        /// <returns></returns> NameExpense, Coast, DateTimeExp
         public async Task<List<object>> GetUserExpensesByTgId(long tgId, DateTime startDate, DateTime endDate)
         {
             var result = await _reportDb.Users
@@ -68,7 +85,11 @@ namespace Project_Work_My_Telegram_bot
                  }).ToListAsync();
             return result.Cast<object>().ToList();
         }
-        public async Task<List <object>> GetListUsersByTgId()
+        /// <summary>
+        /// Метод вывода анонимного Типа данных с полями всех пользователей
+        /// </summary>
+        /// <returns></returns> UserId long,  UserName string
+        public async Task<List <object>> GetListUsersByTgIdAsync()
         {
             var result = await _reportDb.Users
                 .AsNoTracking()
@@ -78,7 +99,6 @@ namespace Project_Work_My_Telegram_bot
                     UserName = u.UserName
 
                 }).ToListAsync(); 
-
             return result.Cast<object>().ToList(); ;
     
         }

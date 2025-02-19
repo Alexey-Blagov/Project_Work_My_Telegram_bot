@@ -9,14 +9,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-    //UserId = назначается телеграм ботом ID
-    //UserRol: Идентификатор User права доступа  
-    //TgUsername: Имя при регистрации в боте (может быть не указано от телеграм бота) 
-    //UserName: ФИО   
-    //JobTitle: Должность 
-    //Рersonalcar: Экземпляр персональной авто на данном User  
-    //ObjectPath Объекты все пути связанные с юзером из БД  
-    //OtherExpenses: Объекты все траты связанные с юзером из БД  
+    /// <summary>
+    /// IdTg Ключ назначается телеграм ботом 
+    /// TgUsername: Имя при регистрации в боте (может быть не указано от телеграм бота)
+    /// UserRol: Идентификатор User права доступа 
+    /// UserName: Имя ФИО пользователя 
+    /// JobTitle: Должность в компании 
+    /// Рersonalcar: Экземпляр персональной авто на данном User  
+    /// ObjectPath Список объектов все пути связанные с юзером из БД  
+    /// OtherExpenses: Свисок объектов все траты связанные с юзером из БД 
+    /// </summary>
     public class User
     {
         public long IdTg { get; set; } 

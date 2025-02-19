@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 namespace Project_Work_My_Telegram_bot
 {
     /// <summary>
-    /// Класс который получет информацию с URL и парсит ее в свои свойста стоимость бензина 
+    /// Класс который получет информацию с URL и парсит ее в свои свойста стоимость бензина, храним в файлк Json поля меняются 
+    /// через ТГ Бот по требованию Юзера тип роли Admin 
     /// </summary>
     public class FuelPrice
     {
@@ -23,9 +24,12 @@ namespace Project_Work_My_Telegram_bot
 
         public FuelPrice()
         {
-            Task.Run(() => GetData()).Wait();
+            Task.Run(() => GetDataAsync()).Wait();
             LoadFromJson(); 
         }
+        /// <summary>
+        /// Метод сохранения данных в файл по стоимости топлива
+        /// </summary>
         public void SaveToJson()
         {
             var jsonData = new
@@ -34,8 +38,12 @@ namespace Project_Work_My_Telegram_bot
                 Ai95,
                 Diesel,
             };
-            File.WriteAllText(_filePath, System.Text.Json.JsonSerializer.Serialize(jsonData));
+            File.WriteAllText(_filePath!, System.Text.Json.JsonSerializer.Serialize(jsonData));
         }
+        /// <summary>
+        /// Мтеод выгрузки в поля класса данны из файла 
+        /// </summary>
+        /// <exception cref="InvalidDataException"></exception>
         public void LoadFromJson()
         {
             _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FuelSetPrice.json");
@@ -46,9 +54,9 @@ namespace Project_Work_My_Telegram_bot
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("FuelSetPrice.json", optional: false, reloadOnChange: true)
                     .Build();
-                Ai92 = ParsePrice(configuration["Ai92"] ?? throw new InvalidDataException("Поле Ai92 отсутствует в файле."));
-                Ai95 = ParsePrice(configuration["Ai95"] ?? throw new InvalidDataException("Поле Ai95 отсутствует в файле."));
-                Diesel = ParsePrice(configuration["Diesel"] ?? throw new InvalidDataException("Поле Diesel отсутствует в файле."));
+                Ai92 = ParsePrice(configuration["Ai92"]!);
+                Ai95 = ParsePrice(configuration["Ai95"]!);
+                Diesel = ParsePrice(configuration["Diesel"]!);
 
             }
             else
@@ -57,7 +65,11 @@ namespace Project_Work_My_Telegram_bot
                 SaveToJson();
             }
         }
-        private async Task GetData()
+        /// <summary>
+        /// Метод выгрузки с сайта данных по МСК региону о топливе записывается в поля класса при создании 
+        /// </summary>
+        /// <returns></returns>
+        private async Task GetDataAsync()
         {
             var url = "https://card-oil.ru/fuel-cost/moskovskaya-oblast/";
 
@@ -90,6 +102,11 @@ namespace Project_Work_My_Telegram_bot
                 }
             }
         }
+        /// <summary>
+        /// Метод парсинга цены с исключением мусорных символов
+        /// </summary>
+        /// <param name="priceText"></param> входящая цена тип 
+        /// <returns></returns> decimal Цена 
         private decimal ParsePrice(string priceText)
         {
             return decimal.TryParse(priceText.Replace(" руб.", "").Replace(",", "."),

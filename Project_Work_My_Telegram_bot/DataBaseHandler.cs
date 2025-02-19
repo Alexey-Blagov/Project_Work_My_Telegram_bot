@@ -14,44 +14,32 @@ using Telegram.Bot.Requests;
 
 namespace Project_Work_My_Telegram_bot
 {
+    /// <summary>
+    /// Клас обработчик сущностей и запись в БД PGSQL 
+    /// </summary>
     public class DataBaseHandler
     {
-        public static async Task SetUserNameAsync(long IdTg, string name)
+        /// <summary>
+        /// Метод получени информции по его роли из БД 
+        /// </summary>
+        /// <param name="IdTg"></param>
+        /// <returns></returns> Возрат тип пользователя int 
+        public static async Task<int> GetUserRoleAsync(long IdTg)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
                 var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
-                if (user is null)
-                {
-                    User newuser = new User();
-                    newuser!.UserName = name;
-                    await db.AddAsync(newuser);
-                }
-                else
-                {
-                    user!.UserName = name;
-                    db.Users.Update(user);
-                }
-                await db.SaveChangesAsync();
-            };
-        }
-        public static async Task SetUserAsync(User newUser)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                var user = await db.Users.FirstOrDefaultAsync(x => x == newUser);
-                if (user is null)
-                {
-                    await db.AddAsync(newUser);
-                }
-                else
-                {
-                    db.Users.Update(newUser);
-                }
-                await db.SaveChangesAsync();
-            };
-        }
+                // случай если нет юзера в БД возврат Non 
+                if (user == null) return 0;
 
+                return user.UserRol;
+            }
+        }
+        /// <summary>
+        /// Метод сохранения в БД информации о пути следования 
+        /// </summary>
+        /// <param name="newObjPath"></param> Сформированный класс 
+        /// <returns></returns>
         public static async Task SetNewObjectPathAsync(ObjectPath newObjPath)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -59,7 +47,7 @@ namespace Project_Work_My_Telegram_bot
                 try
                 {
                     if (newObjPath is not null)
-                    {   
+                    {
                         await db.AddAsync(newObjPath);
                         await db.SaveChangesAsync();
                     }
@@ -67,17 +55,11 @@ namespace Project_Work_My_Telegram_bot
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
         }
-        public static async Task SetNewOtherExpesesAsync(OtherExpenses newOtherExpenses)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                if (newOtherExpenses is not null)
-                {
-                    await db.AddAsync(newOtherExpenses);
-                    await db.SaveChangesAsync();
-                }
-            }
-        }
+        /// <summary>
+        /// Метод внесения в БД машины сформированой и указаной в поле Профиль тип личный транспорт 
+        /// </summary>
+        /// <param name="newCarDrive"></param> Сформированный класс в БД 
+        /// <returns></returns> true если данные успешно внесены
         public static async Task<bool> SetNewPersonalCarDriveAsync(CarDrive newCarDrive)
         {
             bool isset = false;
@@ -95,6 +77,11 @@ namespace Project_Work_My_Telegram_bot
             }
             return isset;
         }
+        /// <summary>
+        /// Метод записи данных по машинам в гараже комппании 
+        /// </summary>
+        /// <param name="newCarDrive"></param> Класс данных для сохранения 
+        /// <returns></returns> true если данные внесены в БД 
         public static async Task<bool> SetNewCommercialCarDriveAsync(CarDrive newCarDrive)
         {
             bool isset = false;
@@ -114,6 +101,12 @@ namespace Project_Work_My_Telegram_bot
             }
             return isset;
         }
+        /// <summary>
+        /// Метод обновления информции по личному транспорту в случае если в БД есть такая запись на Id 
+        /// </summary>
+        /// <param name="newCarDrive"></param>
+        /// <returns></returns>
+        /// 
         public static async Task UpdatePersonarCarDriveAsync(CarDrive newCarDrive)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -127,6 +120,11 @@ namespace Project_Work_My_Telegram_bot
                           .SetProperty(c => c.TypeFuel, newCarDrive.TypeFuel));
             }
         }
+        /// <summary>
+        /// Метод обновления инфомрации по транспорту ГАРАЖ компании 
+        /// </summary>
+        /// <param name="newCarDrive"></param> Сформировный класс 
+        /// <returns></returns>
         public static async Task UpdateNewCarDriveAsync(CarDrive newCarDrive)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -141,26 +139,12 @@ namespace Project_Work_My_Telegram_bot
                           .SetProperty(c => c.TypeFuel, newCarDrive.TypeFuel));
             }
         }
-        public static async Task<int> GetUserRoleAsync(long IdTg)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                var user = await db.Users.FirstOrDefaultAsync(x => x.IdTg == IdTg);
-                // случай если нет юзера в БД возврат Non 
-                if (user == null) return 0;
-
-                return user.UserRol;
-            }
-        }
-        public static async Task<CarDrive> GetIsUserCar(long IdTg)
-        {
-            using (ApplicationContext db = new ApplicationContext())
-            {
-                CarDrive? userCar = await db.CarDrives.FirstOrDefaultAsync(x => x.PersonalId == IdTg);
-                // случай если нет юзера в БД возврат Null 
-                return userCar!;
-            }
-        }
+        /// <summary>
+        /// Метод установки роли пользователя по tgId
+        /// </summary>
+        /// <param name="IdTg"></param> long IdTg
+        /// <param name="role"></param> Type role 
+        /// <returns></returns>
         public static async Task SetUserRoleAsync(long IdTg, UserType role)
         {
 
@@ -179,13 +163,18 @@ namespace Project_Work_My_Telegram_bot
                     else
                     {
                         user!.UserRol = (int)role;
-                       
+
                     }
                     await db.SaveChangesAsync();
                 }
                 catch (Exception ex) { Console.WriteLine(ex.ToString()); }
             }
         }
+        /// <summary>
+        /// Метод получения данных о пользователе 
+        /// </summary>
+        /// <param name="IdTg"></param> long IdTg 
+        /// <returns></returns> класс User 
         public static async Task<User> GetUserAsync(long IdTg)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -195,6 +184,11 @@ namespace Project_Work_My_Telegram_bot
                 return user!;
             }
         }
+        /// <summary>
+        /// Метод сохранения или обнволения информации User 
+        /// </summary>
+        /// <param name="newUser"></param> User класс 
+        /// <returns></returns> 
         public static async Task SetOrUpdateUserAsync(User newUser)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -218,8 +212,11 @@ namespace Project_Work_My_Telegram_bot
                 }
             }
         }
-
-        internal static async Task<List<CarDrive>> GetCarsDataList()
+        /// <summary>
+        /// Метод получения списка автомашин автопарка гаража 
+        /// </summary>
+        /// <returns></returns> List <CarDrive> 
+        public static async Task<List<CarDrive>> GetCarsDataListAsync()
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -229,8 +226,12 @@ namespace Project_Work_My_Telegram_bot
                     .ToListAsync();
             }
         }
-
-        internal static async Task<CarDrive?> GetUserPersonalCar(long IdTg)
+        /// <summary>
+        /// Метод получить автомашину из БД для пользователя по IdTg 
+        /// </summary>
+        /// <param name="IdTg"></param> long 
+        /// <returns></returns> Класc CarDrive 
+        public static async Task<CarDrive?> GetUserPersonalCarAsync(long IdTg)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -239,8 +240,12 @@ namespace Project_Work_My_Telegram_bot
                 return userCar!;
             }
         }
-
-        internal static async Task SetNewExpensesAsync(OtherExpenses expenses)
+        /// <summary>
+        /// Метод записи данных в БД по затратам 
+        /// </summary>
+        /// <param name="expenses"></param> Сформированный класс OtherExpenses
+        /// <returns></returns> 
+        public static async Task SetNewExpensesAsync(OtherExpenses expenses)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
@@ -248,7 +253,12 @@ namespace Project_Work_My_Telegram_bot
                 await db.SaveChangesAsync();
             }
         }
-        internal static async Task<CarDrive> GetCarDataForPath(int? carId)
+        /// <summary>
+        /// Метод получения данных по Id из БД 
+        /// </summary>
+        /// <param name="carId"></param> int ключ из БД 
+        /// <returns></returns> Класс CarDrive
+        internal static async Task<CarDrive> GetCarDataForPathAsync(int? carId)
         {
             using (ApplicationContext db = new ApplicationContext())
             {

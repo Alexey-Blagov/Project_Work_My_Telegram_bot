@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot
 {
+    /// <summary>
+    /// Класс формирования файлов для записи отчетов в ТГБот 
+    /// </summary>
     public class FileExcelHandler
     {
         private string? _filePath;
@@ -76,7 +79,7 @@ namespace Project_Work_My_Telegram_bot
                     worksheet.Cells[row, 6].Value = (sumCoastPath == 0m) ? "нет данных по тратам" : sumCoastPath.ToString("F2") + "руб.";
                     row++;
                 }
-                // Выводим данные по затратам если они существуют  
+                // Выводим данные по затратам 
                 foreach (var expens in dataExpenses[0].OtherExpenses)
                 {
                     DateTime getdate = expens.GetType().GetProperty("DateTimeExp")?.GetValue(expens);
@@ -98,8 +101,8 @@ namespace Project_Work_My_Telegram_bot
         } 
         private decimal GetPriceFuel(Fuel fuel)
         {
-             //Читаем данные из файла без пересоздания классов
-            _fuelPrice.LoadFromJson();
+             //Читаем данные из файла метод чтения из файла 
+            _fuelPrice!.LoadFromJson();
             switch (fuel)
             {
                 case Fuel.ai92:

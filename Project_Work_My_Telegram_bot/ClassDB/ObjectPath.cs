@@ -8,17 +8,18 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-        //IdPath Id даблицы в пути             
-        //ObjectName Наименование пункта назначения(string) : ++
-        //PathLeng: Дина пути с учетом обратного тип  (float) Path Length   ++
-        //DatePath: Дата поездки 2 варианта(клавиатура (Сегодня поездка) или ввести в формате ДД.ММ.ГГГГ)
-        //UserId: Форинкей на юзера Юсера осуществивший поездку 
-        //UserPath: Екземплыр класса Юсера осуществивший поездку
-        //CarId: Форинкей Id на связь с CarDrive осуществивший поездку 
-        //CarDrive: Екземпляр класса машины осуществившей поездку
+    /// <summary>
+    /// IdPath Id ключ пути 
+    /// ObjectName Наименование пункта назначения (string)
+    /// PathLeng: Дина пути с учетом обратного пути 
+    /// DatePath: Дата поездки 2 в формате ДД.ММ.ГГГГ 
+    /// CarId: Форинкей Id на связь с CarDrive осуществивший поездку 
+    /// CarDrive: Екземпляр класса машины осуществившей поездку
+    /// UserId: Форинкей на юзера Юсера осуществивший поездку 
+    /// UserPath: Екземпяр класса Юсера осуществивший поездку
+    /// </summary>
     public class ObjectPath
     {
-        
         public int IdPath { get; set; }
         public string? ObjectName { get; set; }
         public double? PathLengh { get; set; } = null; 

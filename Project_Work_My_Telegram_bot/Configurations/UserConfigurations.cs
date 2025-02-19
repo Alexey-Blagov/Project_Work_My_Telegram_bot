@@ -10,8 +10,10 @@ using Project_Work_My_Telegram_bot;
 
 namespace Project_Work_My_Telegram_bot.Configurations
 {
+    /// <summary>
+    /// Класс настройки миграции сущнсотей User
+    /// </summary>
     public class UserConfigurations : IEntityTypeConfiguration<User>
-
     {
         public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<User> builder)
         {

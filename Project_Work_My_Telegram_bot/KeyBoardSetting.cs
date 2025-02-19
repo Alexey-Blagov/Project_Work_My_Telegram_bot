@@ -12,7 +12,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace Project_Work_My_Telegram_bot
 {
     /// <summary>
-    /// Класс который хранит данные по клавиатурам Машин для ТГБота  
+    /// Класс который хранит данные по клавиатурам для ТГБота виды InlineKeyboard и KeyboardMarkup
     /// </summary>
     public static class KeyBoardSetting
     {
@@ -75,7 +75,7 @@ namespace Project_Work_My_Telegram_bot
         [
             ["👤 Профиль", "📚 Вывести отчет"],
             ["📝 Регистрация поездки", "💰 Регистрация трат"],
-            ["Смена статуа Admin/User"]
+            ["Смена статуcа Admin/User"]
         ];
         public static ReplyKeyboardMarkup keyboardMainUser = new(keyboard: keyboardUser)
         {
@@ -86,7 +86,7 @@ namespace Project_Work_My_Telegram_bot
         [
             ["👤 Установка пороля User", "💰 Стоимость бензина"],
             ["📝 Регистрация автопарка компании", "📚 Вывести отчет по User"],
-            ["Смена статуа Admin/User"]
+            ["Смена статуcа Admin/User"]
         ];
         public static ReplyKeyboardMarkup keyboardMainAdmin = new(keyboard: keyboardAdmin)
         {
@@ -125,17 +125,14 @@ namespace Project_Work_My_Telegram_bot
                 InlineKeyboardButton.WithCallbackData(text: "🚗 Марка машины", callbackData: "carname"),
                 InlineKeyboardButton.WithCallbackData(text: "🇷🇺 Госномер", callbackData: "carnumber"),
              },
-              new []{
+              new []
+              {
                 InlineKeyboardButton.WithCallbackData(text: "Используемое топливо", callbackData: "typefuel"),
                 InlineKeyboardButton.WithCallbackData(text: "Средний расход л.на 100 км. ", callbackData: "gasconsum"),
               },
               new []
               {
-                  InlineKeyboardButton.WithCallbackData(text: "Смена User/Admin", callbackData: "change"),
-                  InlineKeyboardButton.WithCallbackData(text: "Закончить и сохраниеть", callbackData: "closed")
-              },
-            new []
-              {
+                  InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить и сохраниеть", callbackData: "closed"),
                   InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
               }
         });

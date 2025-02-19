@@ -9,14 +9,19 @@ using System.Threading.Tasks;
 
 namespace Project_Work_My_Telegram_bot.ClassDB
 {
-    //CarId: 
-    //CarName: Марка машины
-    //isPersonalCar: true машина личная, false машина конторская или нет машины false 
-    //CarNumber: Нимер машины по шаблону H 000 EE 150
-    //GasСonsum: Средний расход бензина на 100 км.пути
-    //TypeFuel Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 из типа Enum 
-    //User: Екземпляр класса Юзера связвного с пользователем 
-        public class CarDrive
+    /// <summary>
+    /// Класс сущнсотей Автопарка 
+    /// CarId: Ключ БД 
+    /// CarName: Марка машины
+    /// isPersonalCar: true машина личная, false машина конторская или нет машины false 
+    /// CarNumber: Номер машины по шаблону H 000 EE 150
+    /// GasСonsum: Средний расход бензина на 100 км.пути
+    /// TypeFuel Марка бензина для транспорта выбор из: ТД, АИ95, АИ92 из типа Enum 
+    /// PersonalId: Данные пользователя по БД порсональный авто 
+    /// UserPersonal: Экземпляр класса на кого зарегестрирована авто 
+    /// ObjectPaths: Сптисок поездок классов пути
+    /// </summary>
+    public class CarDrive
         {
             public int CarId { get; set; }
             public string? CarName { get; set; }

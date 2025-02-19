@@ -10,26 +10,26 @@ namespace Project_Work_My_Telegram_bot
     public enum Fuel { dizel = 0, ai95 = 1, ai92 = 2 };
     internal class Program
     {
-
         private static string? _token;
         private static TelegramBotClient? _myBot;
         private static CancellationTokenSource? _cts;
         private static MessageProcessing? _messageProcessing;
-
+        //Точка входа в программу 
         static async Task Main(string[] args)
         {
+            try
+            {
 
-            PassUser passUser = new PassUser();
-            var getfuel = new FuelPrice();
+                PassUser passUser = new PassUser();
+                _token = passUser.Token;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
             
-
-            Console.WriteLine(getfuel.Ai92);
-            Console.WriteLine(getfuel.Ai95);
-            Console.WriteLine(getfuel.Diesel);
-
-            _token = passUser.Token;
             _cts = new CancellationTokenSource();
-            _myBot = new TelegramBotClient(_token, cancellationToken: _cts.Token);
+            _myBot = new TelegramBotClient(_token!, cancellationToken: _cts.Token);
 
             _messageProcessing = new MessageProcessing(_myBot);
             var receiverOptions = new ReceiverOptions
@@ -51,12 +51,22 @@ namespace Project_Work_My_Telegram_bot
             _cts.Cancel(); // stop the bot
 
         }
-
+        /// <summary>
+        /// Метод обработки ошибок ТГБота 
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
         private static async Task OnError(Exception exception, HandleErrorSource source)
         {
             Console.WriteLine(exception);
             await Task.Delay(2000);
         }
+        /// <summary>
+        /// Мтеод работы с типом UPdate из ТГБота
+        /// </summary>
+        /// <param name="update"></param>
+        /// <returns></returns>
         private static async Task OnUpdate(Update update)
         {
             try
@@ -66,7 +76,7 @@ namespace Project_Work_My_Telegram_bot
                 {
                     case { CallbackQuery: { } callbackQuery }:
 
-                        await _messageProcessing!.BotClientOnCallbackQuery(callbackQuery);
+                        await _messageProcessing!.BotClientOnCallbackQueryAsync(callbackQuery);
                         break;
                     default:
                         Console.WriteLine($"Получена необработанный Update {update.Type}");
@@ -78,6 +88,12 @@ namespace Project_Work_My_Telegram_bot
                 await OnError(ex, HandleErrorSource.PollingError);
             }
         }
+        /// <summary>
+        /// Метод обработки сообщений Message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private static async Task OnMessage(Message message, UpdateType type)
         {
             var chatId = message.Chat.Id;
@@ -102,31 +118,18 @@ namespace Project_Work_My_Telegram_bot
                             return; // command was not targeted at me
 
                     //обработчик комманд
-                    await _messageProcessing.OnCommand(command, text[space..].TrimStart(), message);
+                    await _messageProcessing.OnCommandAsync(command, text[space..].TrimStart(), message);
                 }
                 else
                 {
                     //Обработчик сообщений 
-                    await _messageProcessing.OnTextMessage(message);
+                    await _messageProcessing.OnTextMessageAsync(message);
                 }
             }
             catch (Exception ex)
             {
                 await OnError(ex, HandleErrorSource.PollingError);
             }
-        }
-
-        public static void SetPassUser()
-        {
-            PassUser passUser = new PassUser();
-
-            string filePath = "UsersPass.json";
-            if (System.IO.File.Exists(filePath))
-            {
-                string json = System.IO.File.ReadAllText(filePath);
-            }
-            string updatedJson = JsonConvert.SerializeObject(passUser, Formatting.Indented);
-            System.IO.File.WriteAllText(filePath, updatedJson);
         }
     }
 }

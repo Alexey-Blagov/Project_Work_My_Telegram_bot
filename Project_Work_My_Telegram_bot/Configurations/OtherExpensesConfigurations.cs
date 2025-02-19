@@ -3,6 +3,9 @@ using Project_Work_My_Telegram_bot.ClassDB;
 
 namespace Project_Work_My_Telegram_bot.Configurations
 {
+    /// <summary>
+    /// Класс настрйоки миграций сущностей OtherExpenses
+    /// </summary>
     public class OtherExpensesConfigurations : IEntityTypeConfiguration<OtherExpenses>
 
     {
