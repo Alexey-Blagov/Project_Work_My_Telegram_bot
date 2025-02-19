@@ -28,6 +28,7 @@ using System.Runtime.ConstrainedExecution;
 using System.IO;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection;
 
 
 namespace Project_Work_My_Telegram_bot
@@ -54,12 +55,13 @@ namespace Project_Work_My_Telegram_bot
         private Dictionary<long, ObjectPath> _objPaths = new Dictionary<long, ObjectPath>();
         private Dictionary<long, OtherExpenses> _otherExpenses = new Dictionary<long, OtherExpenses>();
         private Dictionary<long, object?> _choiceMonth = new Dictionary<long, object?>();
+        private Dictionary<long, long?> _choiceUser = new Dictionary<long, long?>();
 
         public event Handelmessage? OnMessage;
         public event Handelmessage? OnCallbackQueryMessage;
         public event HandelСallback? OnPressCallbeckQuery;
 
-        private FuelPrice _averagePriceFuelOnMarket;
+        private FuelPrice _averagePriceFuelOnMarket = new FuelPrice();
         public MessageProcessing(TelegramBotClient botClient)
         {
             this._botClient = botClient;
@@ -126,16 +128,17 @@ namespace Project_Work_My_Telegram_bot
                          text: $"Меню вывода отчета:",
                          replyMarkup: KeyBoardSetting.keyboardReportUser);
                     break;
-                case "📚 Сформировать отчет за текущий месяц":
+                case "📚 Отчет за текущий месяц":
                     await _botClient!.SendMessage(
                           chatId: message.Chat,
                           text: $"Выести отчет на экран? ДА/НЕТ:",
                           replyMarkup: KeyBoardSetting.actionAccept);
                     OnMessage += GetReportHandlerbyCurrentMonth;
                     break;
-                case "💼 Сформировать отчет за выбранный месяц":
+                case "💼 Отчет за выбранный месяц":
                     if (_isRole == UserType.Non) return;
                     _choiceMonth[message.Chat.Id] = null;
+                    _choiceUser[message.Chat.Id] = message.Chat.Id;
                     var monsthList = GetPreviousSixMonths();
 
                     //Выводим InlineKeyboard 
@@ -146,7 +149,7 @@ namespace Project_Work_My_Telegram_bot
                     replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttons!));
                     OnPressCallbeckQuery += ChoiceMonthFromBot;
                     break;
-                case "🗞 Возврат в основное меню":
+                case "⬅️ Возврат в основное меню":
                     if (_isRole == UserType.Non) return;
                     await OnCommand("/start", "", message);
                     break;
@@ -263,8 +266,18 @@ namespace Project_Work_My_Telegram_bot
 
                     await OnCommand("/start", "", message);
                     break;
-                case "📚 Вывести отчет по параметрам":
-
+                case "📚 Вывести отчет по User":
+                    if (_isRole == UserType.Non) return;
+                    _choiceMonth[message.Chat.Id] = null;
+                    _choiceUser[message.Chat.Id] = null;
+                    var repositoryUser = new RepositoryReportMaker(new ApplicationContext());
+                    var usaerList =  await repositoryUser.GetListUsersByTgId();
+                    List<string?> buttonsUsers = usaerList.Select(u => u.GetType().GetProperty("UserName").GetValue(u).ToString()).ToList(); 
+                    await _botClient.SendMessage(
+                    chatId: message.Chat,
+                    text: $"Выберете пользователя из списка",
+                    replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttonsUsers!));
+                    OnPressCallbeckQuery += ChoiceUserFromBot;
                     break;
                 default:
                     OnMessage?.Invoke(message);
@@ -275,7 +288,6 @@ namespace Project_Work_My_Telegram_bot
         public async Task BotClientOnCallbackQuery(CallbackQuery callbackQuery)
         {
             OnCallbackQueryMessage = null;
-            _averagePriceFuelOnMarket = new FuelPrice();
             string stringtobot = "";
             var datanow = DateTime.Now.ToShortDateString();
             var chatId = callbackQuery.Message!.Chat;
@@ -338,12 +350,9 @@ namespace Project_Work_My_Telegram_bot
                     OnCallbackQueryMessage += EnterGasConsum;
                     break;
                 case "closed":
-                    //Машины у Юзера может и не быть 
-
-
+                    
                     var user = _users[msg.Chat.Id];
                     var car = _carDrives[msg.Chat.Id];
-
 
                     if (GetUserDataString(user, car, out stringtobot))
                     {
@@ -542,7 +551,44 @@ namespace Project_Work_My_Telegram_bot
                 default:
                     OnPressCallbeckQuery?.Invoke(callbackQuery!);
                     break;
-            };
+            }
+        }
+        private async Task ChoiceUserFromBot(CallbackQuery callbackQuery)
+        {
+            var chatId = callbackQuery.Message!.Chat.Id;
+            var msg = callbackQuery.Message!;
+            var repositoryUser = new RepositoryReportMaker(new ApplicationContext());
+            var userList = await repositoryUser.GetListUsersByTgId(); 
+            var responsUser = userList.FirstOrDefault(m => m.GetType().GetProperty("UserName").GetValue(m, null).ToString().Contains(callbackQuery.Data));
+            if (responsUser is not null)
+            {
+                _choiceUser[chatId] = (long)responsUser.GetType().GetProperty("UserId").GetValue(responsUser); 
+
+                await _botClient!.DeleteMessage(
+                msg.Chat,
+                    messageId: msg.MessageId - 1);
+                _choiceMonth[chatId] = null;
+                OnPressCallbeckQuery -= ChoiceUserFromBot;
+
+            }
+            else
+            {
+                await _botClient!.SendMessage(
+                    chatId: chatId,
+                    replyMarkup: new ReplyKeyboardRemove(),
+                    text: $"Не получено данных нет совпадений");
+                return; 
+            }
+            //Выводим InlineKeyboard для выбора месяца 
+            var monsthList = GetPreviousSixMonths();
+            List<string?> buttons = monsthList.Select(m => m.GetType().GetProperty("MonthName").GetValue(m, null).ToString()).ToList();
+            await _botClient.SendMessage(
+            chatId: msg.Chat,
+            text: $"Выберете период отчета",
+            replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttons!));
+
+            OnPressCallbeckQuery += ChoiceMonthFromBot;
+
         }
         private async Task ChoiceMonthFromBot(CallbackQuery callbackQuery)
         {
@@ -555,7 +601,9 @@ namespace Project_Work_My_Telegram_bot
                 await _botClient!.DeleteMessage(
                 msg.Chat,
                     messageId: msg.MessageId - 1);
+                
                 _choiceMonth[chatId] = responsDate;
+
                 await _botClient!.SendMessage(
                           chatId: msg.Chat,
                           text: $"Выести отчет на экран? ДА/НЕТ:",
@@ -574,14 +622,17 @@ namespace Project_Work_My_Telegram_bot
         private async Task GetReportHandlerbyChoiceMonth(Message msg)
         {
             var tgId = msg.Chat.Id;
-            var endDate = (DateTime)_choiceMonth[tgId].GetType().GetProperty("EndDate")?.GetValue(_choiceMonth[tgId]);
-            var startOfMonth = (DateTime)_choiceMonth[tgId].GetType().GetProperty("StartDate")?.GetValue(_choiceMonth[tgId]);
             var text = msg.Text;
             var chatId = msg.Chat.Id;
+            var endDate = (DateTime)_choiceMonth[tgId].GetType().GetProperty("EndDate")?.GetValue(_choiceMonth[tgId]);
+            var startOfMonth = (DateTime)_choiceMonth[tgId].GetType().GetProperty("StartDate")?.GetValue(_choiceMonth[tgId]);
+            
+            long tgUser = (long) _choiceUser[tgId] != null ? (long) _choiceUser[tgId] : tgId; 
+           
             var repositoryReport = new RepositoryReportMaker(new ApplicationContext());
-            var reportlistPaths = await repositoryReport.GetUserObjectPathsByTgId(chatId, startOfMonth.Date, endDate);
+            var reportlistPaths = await repositoryReport.GetUserObjectPathsByTgId(tgUser, startOfMonth.Date, endDate);
             var reportsDynamicPaths = (dynamic)reportlistPaths;
-            var reportlistExpenses = await repositoryReport.GetUserExpensesByTgId(chatId, startOfMonth.Date, endDate);
+            var reportlistExpenses = await repositoryReport.GetUserExpensesByTgId(tgUser, startOfMonth.Date, endDate);
             var reportsDynamicExpenses = (dynamic)reportlistExpenses;
             switch (text)
             {
@@ -620,7 +671,7 @@ namespace Project_Work_My_Telegram_bot
                     FileExcelHandler _sendtoFile = new FileExcelHandler();
                     string pathFile = _sendtoFile.ExportUsersToExcel(reportsDynamicPaths, reportsDynamicExpenses, startOfMonth);
                     { 
-                        //Пуляем файл в чатбот
+                        //Отправляем файл в чатбот
                         await SendFileToTbot (chatId, pathFile);
                         OnMessage -= GetReportHandlerbyChoiceMonth;
                     }
@@ -651,7 +702,6 @@ namespace Project_Work_My_Telegram_bot
                 Console.WriteLine(ex.ToString); 
             }
         }
-
         private async Task GetReportHandlerbyCurrentMonth(Message msg)
         {
             if (_isRole == UserType.Non) return;
@@ -1058,6 +1108,8 @@ namespace Project_Work_My_Telegram_bot
                 OnCallbackQueryMessage -= MessageCoastGasai92;
 
                 //Сохранение в ФАЙЛ Данных по стоимости 
+                _averagePriceFuelOnMarket.Ai92 = coastgas;
+                _averagePriceFuelOnMarket.SaveToJson(); 
                 return;
             }
             else
@@ -1103,7 +1155,8 @@ namespace Project_Work_My_Telegram_bot
                 // отписываемся от сообщений
                 OnCallbackQueryMessage -= MessageCoastGasai92;
                 //Сохранение в ФАЙЛ Данных по стоимости 
-
+                _averagePriceFuelOnMarket.Ai95 = coastgas;
+                _averagePriceFuelOnMarket.SaveToJson();
                 return;
             }
             else
@@ -1149,7 +1202,8 @@ namespace Project_Work_My_Telegram_bot
                 // отписываемся от сообщений
                 OnCallbackQueryMessage -= MessageCoastGasDizel;
                 //Сохранение в ФАЙЛ Данных по стоимости 
-
+                _averagePriceFuelOnMarket.Diesel = coastgas;
+                _averagePriceFuelOnMarket.SaveToJson();
                 return;
             }
             else

@@ -68,5 +68,19 @@ namespace Project_Work_My_Telegram_bot
                  }).ToListAsync();
             return result.Cast<object>().ToList();
         }
+        public async Task<List <object>> GetListUsersByTgId()
+        {
+            var result = await _reportDb.Users
+                .AsNoTracking()
+                .Select(u => new
+                {
+                    UserId = u.IdTg,
+                    UserName = u.UserName
+
+                }).ToListAsync(); 
+
+            return result.Cast<object>().ToList(); ;
+    
+        }
     }
 }

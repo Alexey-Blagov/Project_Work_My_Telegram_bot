@@ -47,7 +47,7 @@ namespace Project_Work_My_Telegram_bot
         }
 
         //Метод формирования клавиатуры по списку строк 
-        public static KeyboardButton[][] GenerateKeyboardTypeString(List <string>  button)
+        public static KeyboardButton[][] GenerateKeyboardTypeString(List<string> button)
         {
             List<KeyboardButton[]> keyboard = new List<KeyboardButton[]>();
 
@@ -55,7 +55,7 @@ namespace Project_Work_My_Telegram_bot
             {
                 if (i + 1 < button.Count)
                 {
-                    keyboard.Add(new KeyboardButton[] { new KeyboardButton(button[i] + " "), new KeyboardButton(button[i + 1])}); 
+                    keyboard.Add(new KeyboardButton[] { new KeyboardButton(button[i] + " "), new KeyboardButton(button[i + 1]) });
                 }
                 else
                 {
@@ -85,7 +85,7 @@ namespace Project_Work_My_Telegram_bot
         public static KeyboardButton[][] keyboardAdmin =
         [
             ["👤 Установка пороля User", "💰 Стоимость бензина"],
-            ["📝 Регистрация автопарка компании", "📚 Вывести отчет по параметрам"],
+            ["📝 Регистрация автопарка компании", "📚 Вывести отчет по User"],
             ["Смена статуа Admin/User"]
         ];
         public static ReplyKeyboardMarkup keyboardMainAdmin = new(keyboard: keyboardAdmin)
@@ -96,7 +96,7 @@ namespace Project_Work_My_Telegram_bot
         public static KeyboardButton[][] keyboardGasType =
         [
             ["🪫 ДТ", "🔋 AИ-95", "🔋 AИ-92"]
-        ];       
+        ];
         public static ReplyKeyboardMarkup keyboardMainGasType = new(keyboard: keyboardGasType)
         {
             ResizeKeyboard = true,
@@ -104,8 +104,8 @@ namespace Project_Work_My_Telegram_bot
         //Клавиатура вывода отчета по пользователю тип Юзер 
         public static KeyboardButton[][] ReportUser =
         [
-            ["📚 Сформировать отчет за текущий месяц", "💼 Сформировать отчет за выбранный месяц"],
-            ["🗞 Возврат в основное меню"]
+            ["📚 Отчет за текущий месяц", "💼 Отчет за выбранный месяц"],
+            ["⬅️ Возврат в основное меню"]
         ];
         public static ReplyKeyboardMarkup keyboardReportUser = new(keyboard: ReportUser)
         {
@@ -132,45 +132,49 @@ namespace Project_Work_My_Telegram_bot
               new []
               {
                   InlineKeyboardButton.WithCallbackData(text: "Смена User/Admin", callbackData: "change"),
-                  InlineKeyboardButton.WithCallbackData(text: "Закончить регистрацию и сохраниеть", callbackData: "closed")
+                  InlineKeyboardButton.WithCallbackData(text: "Закончить и сохраниеть", callbackData: "closed")
               },
+            new []
+              {
+                  InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
+              }
         });
         // Инлайнер клавиатура произвольного типа формируемя сисок кнопок в 2 столбца тип string 
-            public static InlineKeyboardMarkup GenerateInlineKeyboardByString(List<string> buttons)
+        public static InlineKeyboardMarkup GenerateInlineKeyboardByString(List<string> buttons)
+        {
+            buttons.Add("⬅️");
+            List<List<InlineKeyboardButton>> keyboard = new List<List<InlineKeyboardButton>>();
+
+            for (int i = 0; i < buttons.Count; i += 2)
             {
-            buttons.Add("⬅️"); 
-                List<List<InlineKeyboardButton>> keyboard = new List<List<InlineKeyboardButton>>();
-            
-                for (int i = 0; i < buttons.Count; i += 2)
+                if (i + 1 < buttons.Count)
                 {
-                    if (i + 1 < buttons.Count)
-                    {
-                        keyboard.Add(new List<InlineKeyboardButton>
+                    keyboard.Add(new List<InlineKeyboardButton>
                 {
                     InlineKeyboardButton.WithCallbackData(buttons[i], callbackData: buttons[i]),
                     InlineKeyboardButton.WithCallbackData(buttons[i + 1], callbackData: buttons[i + 1])
                 });
-                    }
-                    else
-                    {
-                        keyboard.Add(new List<InlineKeyboardButton>
+                }
+                else
+                {
+                    keyboard.Add(new List<InlineKeyboardButton>
                 {
                     InlineKeyboardButton.WithCallbackData(buttons[i], callbackData: buttons[i])
                 });
-                    }
                 }
-                return new InlineKeyboardMarkup(keyboard);
             }
-            // Инлайн клапвиатура регистрации пути следования User регистрация Пути следования
-            public static InlineKeyboardMarkup regPath = new(new[]
-        {
+            return new InlineKeyboardMarkup(keyboard);
+        }
+        // Инлайн клапвиатура регистрации пути следования User регистрация Пути следования
+        public static InlineKeyboardMarkup regPath = new(new[]
+    {
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "🏢 Нач. и конечн. точка назначения", callbackData: "objectname")
+                InlineKeyboardButton.WithCallbackData(text: "🏢 Точка назначения", callbackData: "objectname")
             },
              new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "🏃‍♀️ Полный путь от начала до конца в, км", callbackData: "pathlengh")
+                InlineKeyboardButton.WithCallbackData(text: "🏃‍♀️ Полный путь в, км", callbackData: "pathlengh")
             },
             new []
             {
@@ -179,7 +183,7 @@ namespace Project_Work_My_Telegram_bot
             },
             new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedpath"),
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить и сохранить", callbackData: "closedpath"),
                  InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              },
         });
@@ -197,7 +201,7 @@ namespace Project_Work_My_Telegram_bot
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "ClosedExpenses"),
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить и сохранить", callbackData: "ClosedExpenses"),
                 InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              }
         });
@@ -216,7 +220,7 @@ namespace Project_Work_My_Telegram_bot
             },
              new []
              {
-                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedDrive"),
+                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить и сохранить", callbackData: "closedDrive"),
                 InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              }
         });
@@ -241,14 +245,13 @@ namespace Project_Work_My_Telegram_bot
              new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость 🔋 AИ-95", callbackData: "coastAi95")
-             }, 
+             },
             new []
             {
                 InlineKeyboardButton.WithCallbackData(text: "💰 Стоимость 🪫 ДТ ", callbackData: "coastDizel"),
             },
             new []
             {
-                InlineKeyboardButton.WithCallbackData(text: "🕹 Закончить регистрацию и сохранить", callbackData: "closedFuel"),
                 InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData:"⬅️")
             }
         });

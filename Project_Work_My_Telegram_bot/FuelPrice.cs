@@ -16,7 +16,7 @@ namespace Project_Work_My_Telegram_bot
     /// </summary>
     public class FuelPrice
     {
-        private readonly string _filePath;
+        private static string? _filePath;
         public decimal Ai92 { get; set; }
         public decimal Ai95 { get; set; }
         public decimal Diesel { get; set; }
@@ -24,8 +24,7 @@ namespace Project_Work_My_Telegram_bot
         public FuelPrice()
         {
             Task.Run(() => GetData()).Wait();
-            _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FuelSetPrice.json");
-            LoadFromJson();
+            LoadFromJson(); 
         }
         public void SaveToJson()
         {
@@ -37,10 +36,12 @@ namespace Project_Work_My_Telegram_bot
             };
             File.WriteAllText(_filePath, System.Text.Json.JsonSerializer.Serialize(jsonData));
         }
-        private void LoadFromJson()
+        public void LoadFromJson()
         {
+            _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FuelSetPrice.json");
             if (File.Exists(_filePath))
             {
+                
                 var configuration = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("FuelSetPrice.json", optional: false, reloadOnChange: true)
@@ -52,6 +53,7 @@ namespace Project_Work_My_Telegram_bot
             }
             else
             {
+                //Если файйл не создан то мы забираем по умолчанию данные с сайта 
                 SaveToJson();
             }
         }

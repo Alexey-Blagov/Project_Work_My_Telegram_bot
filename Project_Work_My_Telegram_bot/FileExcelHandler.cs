@@ -12,11 +12,12 @@ namespace Project_Work_My_Telegram_bot
     {
         private string? _filePath;
         private string? _outputPath;
+       
 
         private int typeFuel;
         private decimal priceOfFuel;
         //При обращении в обработчика класса читаем цены на топливо 
-        private FuelPrice? _fuelPrice;
+        private FuelPrice? _fuelPrice = new FuelPrice(); 
 
         public FileExcelHandler()
         {
@@ -94,12 +95,11 @@ namespace Project_Work_My_Telegram_bot
                 package.SaveAs(new FileInfo(_outputPath!));
                 return _outputPath!;
             }
-
         } 
         private decimal GetPriceFuel(Fuel fuel)
         {
-            _fuelPrice = new FuelPrice();
-
+             //Читаем данные из файла без пересоздания классов
+            _fuelPrice.LoadFromJson();
             switch (fuel)
             {
                 case Fuel.ai92:
