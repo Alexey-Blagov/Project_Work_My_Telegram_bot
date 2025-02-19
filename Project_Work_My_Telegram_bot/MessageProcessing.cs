@@ -569,7 +569,6 @@ namespace Project_Work_My_Telegram_bot
                     messageId: msg.MessageId - 1);
                 _choiceMonth[chatId] = null;
                 OnPressCallbeckQuery -= ChoiceUserFromBot;
-
             }
             else
             {
@@ -577,6 +576,8 @@ namespace Project_Work_My_Telegram_bot
                     chatId: chatId,
                     replyMarkup: new ReplyKeyboardRemove(),
                     text: $"Не получено данных нет совпадений");
+                OnPressCallbeckQuery -= ChoiceUserFromBot;
+                await OnCommand("/main", "", msg);
                 return; 
             }
             //Выводим InlineKeyboard для выбора месяца 
@@ -588,7 +589,6 @@ namespace Project_Work_My_Telegram_bot
             replyMarkup: KeyBoardSetting.GenerateInlineKeyboardByString(buttons!));
 
             OnPressCallbeckQuery += ChoiceMonthFromBot;
-
         }
         private async Task ChoiceMonthFromBot(CallbackQuery callbackQuery)
         {
