@@ -199,7 +199,7 @@ namespace Project_Work_My_Telegram_bot
        [
            ["📝 Повтор меню регистрация поездки", "⬅️ Возврат в основное меню"]
        ];
-        public static ReplyKeyboardMarkup RepratInlinRegPath  = new (keyboard: inlineregPath)
+        public static ReplyKeyboardMarkup RepeatInlinRegPath  = new (keyboard: inlineregPath)
         {
             ResizeKeyboard = true,
         };

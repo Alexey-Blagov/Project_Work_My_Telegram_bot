@@ -89,7 +89,7 @@ namespace Project_Work_My_Telegram_bot
         /// Метод вывода анонимного Типа данных с полями всех пользователей
         /// </summary>
         /// <returns></returns> UserId long,  UserName string
-        public async Task<List <object>> GetListUsersByTgIdAsync()
+        public async Task<List <dynamic>> GetListUsersByTgIdAsync()
         {
             var result = await _reportDb.Users
                 .AsNoTracking()
@@ -99,7 +99,7 @@ namespace Project_Work_My_Telegram_bot
                     UserName = u.UserName
 
                 }).ToListAsync(); 
-            return result.Cast<object>().ToList(); ;
+            return result.Cast<dynamic>().ToList(); ;
     
         }
     }
