@@ -1728,6 +1728,7 @@ namespace Project_Work_My_Telegram_bot
             _users[msg.Chat.Id].UserName = text;
             OnCallbackQueryMessage -= InsertUserAsync;
         }
+        
         //Вспомогательные методы 
         private static bool CarNumberParse(string text, out string? carnumber)
         {
@@ -1787,7 +1788,6 @@ namespace Project_Work_My_Telegram_bot
             }
             return "не известный тип";
         }
-
         public static List<object> GetPreviousSixMonths()
         {
             var result = new List<object>();
