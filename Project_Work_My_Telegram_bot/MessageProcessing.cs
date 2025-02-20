@@ -76,6 +76,7 @@ namespace Project_Work_My_Telegram_bot
         {
             _passwordUser = _passUser.PasswordUser;
             _passwordAdmin = _passUser.PasswordAdmin;
+
             //Получить данные пользователя тип роли по Id клиента в боте
             _isRole = (UserType)await DataBaseHandler.GetUserRoleAsync(message.Chat.Id);
 
@@ -219,7 +220,7 @@ namespace Project_Work_My_Telegram_bot
                     if (_isRole == UserType.Non) return;
                     OnCallbackQueryMessage = null;
                     OnMessage = null;
-                    OnCallbackQueryMessage = null; 
+                    OnCallbackQueryMessage = null;
                     await OnCommandAsync("/start", "", message);
                     break;
                 //Обработчики стартового меню роли Admin 
@@ -364,7 +365,7 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите марку машины",
-                    replyMarkup: _kbTypeInCase[chatId.Id]); 
+                    replyMarkup: _kbTypeInCase[chatId.Id]);
 
                     OnCallbackQueryMessage += InsertcarnameAsync;
                     break;
@@ -372,7 +373,7 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите номер авто по шаблону H 123 EE 150",
-                    replyMarkup: _kbTypeInCase[chatId.Id]);     
+                    replyMarkup: _kbTypeInCase[chatId.Id]);
 
                     OnCallbackQueryMessage += InsertcarnumberAsync;
                     break;
@@ -420,7 +421,7 @@ namespace Project_Work_My_Telegram_bot
                     }
                     break;
                 //Обработчики меню формирования поездок 
-                case "objectname": 
+                case "objectname":
 
                     await _botClient!.SendMessage(
                     chatId: chatId,
@@ -1031,7 +1032,7 @@ namespace Project_Work_My_Telegram_bot
                     break;
             }
         }
-        private async Task ClosedEnterProfilAsync(Message msg) 
+        private async Task ClosedEnterProfilAsync(Message msg)
         {
             var chatId = msg.Chat;
             var text = msg.Text;
@@ -1099,7 +1100,7 @@ namespace Project_Work_My_Telegram_bot
             }
             await OnCommandAsync("/start", "", msg);
         }
-        private async Task ClosedCarDriveAsync(Message msg) 
+        private async Task ClosedCarDriveAsync(Message msg)
         {
             var carDrive = _carDrives[msg.Chat.Id];
             var chatId = msg.Chat;
@@ -1136,7 +1137,7 @@ namespace Project_Work_My_Telegram_bot
                     await DataBaseHandler.UpdateNewCarDriveAsync(_carDrives[msg.Chat.Id]);
                     OnCallbackQueryMessage -= ClosedCarDriveAsync;
                     _carDrives.Remove(msg.Chat.Id);
-                    _kbTypeInCase[chatId.Id] = null; 
+                    _kbTypeInCase[chatId.Id] = null;
                     break;
                 case "Выйти":
                     OnCallbackQueryMessage -= ClosedCarDriveAsync;
@@ -1145,7 +1146,7 @@ namespace Project_Work_My_Telegram_bot
             //Возврат в меню по роли 
             await OnCommandAsync("/start", "", msg);
         }
-        private async Task MessageCoastGasai92Async(Message msg)  
+        private async Task MessageCoastGasai92Async(Message msg)
         {
             decimal coastgas = _averagePriceFuelOnMarket.Ai92;
             var text = msg!.Text!;
@@ -1193,7 +1194,7 @@ namespace Project_Work_My_Telegram_bot
                     replyMarkup: new ReplyKeyboardRemove());
             }
         }
-        private async Task MessageCoastGasai95Async(Message msg)  
+        private async Task MessageCoastGasai95Async(Message msg)
         {
             decimal coastgas = _averagePriceFuelOnMarket.Ai95;
             var text = msg!.Text!;
@@ -1240,7 +1241,7 @@ namespace Project_Work_My_Telegram_bot
                     replyMarkup: new ReplyKeyboardRemove());
             }
         }
-        private async Task MessageCoastGasDizelAsync(Message msg) 
+        private async Task MessageCoastGasDizelAsync(Message msg)
         {
             decimal coastgas = _averagePriceFuelOnMarket.Diesel;
             var text = msg!.Text!;
@@ -1475,8 +1476,8 @@ namespace Project_Work_My_Telegram_bot
             //Сохранение в БД 
             await _botClient.SendMessage(
                       chatId: chatId,
-                      text: $"Введена и сохранены дата ",
-                      replyMarkup: new ReplyKeyboardRemove());
+                      text: $"Введена дата {inputdate.ToShortDateString()}",
+                      replyMarkup: KeyBoardSetting.RepratInlinRegCoast);
 
             _otherExpenses[msg.Chat.Id].DateTimeExp = inputdate.Date;
             Console.WriteLine($"Введена дата затрат {inputdate.ToShortDateString} ");
@@ -1577,10 +1578,6 @@ namespace Project_Work_My_Telegram_bot
             }
             _objPaths[msg.Chat.Id].DatePath = inputdate.Date;
             Console.WriteLine($"Введена дата поездки {inputdate.ToShortDateString()} ");
-            await _botClient.SendMessage(
-                     chatId: chatId,
-                     text: $"Введена дата поездки {inputdate.ToShortDateString()}",
-                     replyMarkup: KeyBoardSetting.RepratInlinRegPath);
         }
         private async Task EnterNameCostAsync(Message msg)
         {
@@ -1645,7 +1642,7 @@ namespace Project_Work_My_Telegram_bot
             }
             await _botClient.SendMessage(
                          chatId: chatId,
-                         text: $"Длинна пути {text} км.", 
+                         text: $"Длинна пути {text} км.",
                          replyMarkup: KeyBoardSetting.RepratInlinRegPath);
 
             _objPaths[msg.Chat.Id].PathLengh = lenghpath;
@@ -1680,7 +1677,7 @@ namespace Project_Work_My_Telegram_bot
             await _botClient.SendMessage(
                          chatId: chatId,
                          text: $"Номер {carnumber} принят",
-                         replyMarkup: _kbTypeInCase[chatId.Id]);  
+                         replyMarkup: _kbTypeInCase[chatId.Id]);
             _carDrives[msg.Chat.Id].CarNumber = carnumber;
 
             OnCallbackQueryMessage -= InsertcarnumberAsync;
@@ -1790,7 +1787,7 @@ namespace Project_Work_My_Telegram_bot
             }
             return "не известный тип";
         }
-       
+
         public static List<object> GetPreviousSixMonths()
         {
             var result = new List<object>();

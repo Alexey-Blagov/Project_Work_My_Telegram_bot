@@ -14,19 +14,12 @@ namespace Project_Work_My_Telegram_bot
         private static TelegramBotClient? _myBot;
         private static CancellationTokenSource? _cts;
         private static MessageProcessing? _messageProcessing;
+       
         //Точка входа в программу 
         static async Task Main(string[] args)
         {
-            try
-            {
-
-                PassUser passUser = new PassUser();
-                _token = passUser.Token;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            PassUser passUser = new PassUser();
+            _token = passUser.Token;
             
             _cts = new CancellationTokenSource();
             _myBot = new TelegramBotClient(_token!, cancellationToken: _cts.Token);

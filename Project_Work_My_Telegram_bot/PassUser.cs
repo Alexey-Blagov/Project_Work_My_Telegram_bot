@@ -59,7 +59,14 @@ namespace Project_Work_My_Telegram_bot
         public PassUser()
         {
             _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "userPass.json");
-            LoadFromJson();
+            try
+            {
+                LoadFromJson();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
         private void LoadFromJson()
         {
