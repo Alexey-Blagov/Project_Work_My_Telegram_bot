@@ -136,6 +136,16 @@ namespace Project_Work_My_Telegram_bot
                   InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
               }
         });
+        // Клаиатура повтора меню Профиль 
+        public static KeyboardButton[][] inlineProfil =
+        [
+            ["👤 Повтор меню Профиль", "⬅️ Возврат в основное меню"]
+        ];
+        public static ReplyKeyboardMarkup RepratInlineProfil = new(keyboard: inlineProfil)
+        {
+            ResizeKeyboard = true,
+        };
+
         // Инлайнер клавиатура произвольного типа формируемя сисок кнопок в 2 столбца тип string 
         public static InlineKeyboardMarkup GenerateInlineKeyboardByString(List<string> buttons)
         {
@@ -184,8 +194,19 @@ namespace Project_Work_My_Telegram_bot
                  InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              },
         });
+        // Клавиатура повтора меню регистрации поездки 
+        public static KeyboardButton[][] inlineregPath =
+       [
+           ["📝 Повтор меню регистрация поездки", "⬅️ Возврат в основное меню"]
+       ];
+        public static ReplyKeyboardMarkup RepratInlinRegPath  = new (keyboard: inlineregPath)
+        {
+            ResizeKeyboard = true,
+        };
+
+
         //Инлайн клапвиатура регистрации доп. завтрат 
-        public static InlineKeyboardMarkup regCost = new(new[]
+        public static InlineKeyboardMarkup regCoast = new(new[]
         {
             new []
             {
@@ -202,7 +223,16 @@ namespace Project_Work_My_Telegram_bot
                 InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              }
         });
-        //Инлайн клапвиатура регистрации Автомобилей 
+        // Клавиатура повтора меню регистрации поездки 
+        public static KeyboardButton[][] inlineRegCost =
+       [
+           ["📝 Повтор меню регистрация затрат", "⬅️ Возврат в основное меню"]
+       ];
+        public static ReplyKeyboardMarkup RepratInlinRegCoast = new(keyboard: inlineRegCost)
+        {
+            ResizeKeyboard = true,
+        };
+        //Инлайн клапвиатура регистрации Автомобилей компании
         public static InlineKeyboardMarkup regDriveCar = new(new[]
         {
             new []
@@ -221,7 +251,15 @@ namespace Project_Work_My_Telegram_bot
                 InlineKeyboardButton.WithCallbackData(text: "⬅️", callbackData: "⬅️")
              }
         });
-
+        // Клавиатура повтора меню регистрации Автомобилей компании
+        public static KeyboardButton[][] inlineregDriveCar =
+       [
+           ["📝 Повтор регистрации автопарк компании", "⬅️ Возврат в основное меню"]
+       ];
+        public static ReplyKeyboardMarkup RepratInlinDriveCar = new(keyboard: inlineregDriveCar)
+        {
+            ResizeKeyboard = true,
+        };
         //Клавиатуры комманд подтверждения ДА/НЕТ 
         public static ReplyKeyboardMarkup actionAccept = new ReplyKeyboardMarkup(new[] { new KeyboardButton("ДА"), new KeyboardButton("НЕТ") })
         {
