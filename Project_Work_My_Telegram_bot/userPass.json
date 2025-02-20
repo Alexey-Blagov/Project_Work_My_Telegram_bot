@@ -1,6 +1,0 @@
-{
-  "PasswordUser": "11111",
-  "PasswordAdmin": "qwerty",
-  "Token": "7516165506:AAHgVKs9K2zHsyKJqVwSFzY4D8BsDIpVLLE",
-  "BdToken": "Host=localhost;Port=5432;Database=MySqlTab;Username=postgres;Password=20071978"
-}
