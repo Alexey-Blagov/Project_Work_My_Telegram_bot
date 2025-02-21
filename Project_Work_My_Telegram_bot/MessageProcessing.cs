@@ -29,7 +29,7 @@ using System.IO;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
-
+using OfficeOpenXml.VBA;
 
 namespace Project_Work_My_Telegram_bot
 {
@@ -56,7 +56,7 @@ namespace Project_Work_My_Telegram_bot
         private Dictionary<long, OtherExpenses> _otherExpenses = new Dictionary<long, OtherExpenses>();
         private Dictionary<long, object?> _choiceMonth = new Dictionary<long, object?>();
         private Dictionary<long, long?> _choiceUser = new Dictionary<long, long?>();
-        private Dictionary<long, ReplyKeyboardMarkup?> _kbTypeInCase = new Dictionary<long, ReplyKeyboardMarkup?>();
+        private Dictionary<long, InlineKeyboardMarkup?> _kbTypeInCase = new Dictionary<long, InlineKeyboardMarkup?>();
 
         public event Handelmessage? OnMessage;
         public event Handelmessage? OnCallbackQueryMessage;
@@ -76,7 +76,7 @@ namespace Project_Work_My_Telegram_bot
         {
             _passwordUser = _passUser.PasswordUser;
             _passwordAdmin = _passUser.PasswordAdmin;
-
+            var dddd = KeyBoardSetting.profile;
             //Получить данные пользователя тип роли по Id клиента в боте
             _isRole = (UserType)await DataBaseHandler.GetUserRoleAsync(message.Chat.Id);
 
@@ -115,14 +115,15 @@ namespace Project_Work_My_Telegram_bot
                     _users[message.Chat.Id].TgUserName = message.Chat.Username ?? "Нет имени профиля";
                     _carDrives[message.Chat.Id] = new CarDrive();
                     _carDrives[message.Chat.Id].isPersonalCar = true;
-                    _kbTypeInCase[message.Chat.Id] = KeyBoardSetting.RepratInlineProfil;
+                    //Старт регистрации профиля 
+                    _kbTypeInCase[message.Chat.Id] = KeyBoardSetting.profile;
                     await _botClient!.DeleteMessage(
                          message.Chat,
                          messageId: message.MessageId - 1);
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Регистрация/изменение профиля:",
-                         replyMarkup: KeyBoardSetting.profile);
+                         replyMarkup: _kbTypeInCase[message.Chat.Id]);
                     break;
                 case "📚 Вывести отчет": //Обработан Sub menu 
                     if (_isRole == UserType.Non) return;
@@ -146,17 +147,17 @@ namespace Project_Work_My_Telegram_bot
                         await _botClient!.DeleteMessage(
                         message.Chat,
                         messageId: message.MessageId - 1);
-
+                        //Доделать если нет регистрации каст на профиль  
+                        _kbTypeInCase[message.Chat.Id] = KeyBoardSetting.profile;
                         await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Необходимо зарегестрировать профиль:",
-                         replyMarkup: KeyBoardSetting.profile);
-                        _kbTypeInCase[message.Chat.Id] = KeyBoardSetting.RepratInlineProfil;
+                         replyMarkup: _kbTypeInCase[message.Chat.Id]);
                     }
                     else
                     {
                         //Создаем запись в класс тип ObjectPath поездки для каждого пользователя в ТГ 
-                        _kbTypeInCase[message.Chat.Id] = KeyBoardSetting.RepeatInlinRegPath;
+                        _kbTypeInCase[message.Chat.Id] = KeyBoardSetting.regPath;
                         _objPaths[message.Chat.Id] = new ObjectPath();
                         _objPaths[message.Chat.Id].UserId = _users[message.Chat.Id].IdTg;
                         await _botClient!.DeleteMessage(
@@ -166,7 +167,7 @@ namespace Project_Work_My_Telegram_bot
                         await _botClient!.SendMessage(
                              chatId: message.Chat,
                              text: $"Регистрация поездки:",
-                             replyMarkup: KeyBoardSetting.regPath);
+                             replyMarkup: _kbTypeInCase[message.Chat.Id]);
                     }
                     break;
                 case "💰 Регистрация трат": //Обработан Sub menu 
@@ -185,10 +186,12 @@ namespace Project_Work_My_Telegram_bot
                          chatId: message.Chat,
                          text: $"Необходимо зарегестрировать профиль:",
                          replyMarkup: KeyBoardSetting.profile);
+
+                        //Доделать нужно каст профиля 
                     }
                     //Создаем запись в класс тип OtherExpenses допю тарты  
                     _otherExpenses[message.Chat.Id] = new OtherExpenses();
-
+                    _kbTypeInCase[message.Chat.Id] = KeyBoardSetting.regCoast;
                     await _botClient!.DeleteMessage(
                          message.Chat,
                          messageId: message.MessageId - 1
@@ -196,7 +199,7 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Регистрация доп. трат:",
-                         replyMarkup: KeyBoardSetting.regCoast);
+                         replyMarkup: _kbTypeInCase[message.Chat.Id]);
                     break;
                 //Обработчики меню вывода данных отчетов  
                 case "📚 Отчет за текущий месяц":
@@ -269,10 +272,11 @@ namespace Project_Work_My_Telegram_bot
                     break;
                 case "💰 Стоимость бензина":
                     if (_isRole != UserType.Admin) return;
+                    _kbTypeInCase[message.Chat.Id] = KeyBoardSetting.regCoastFuel;
                     await _botClient!.SendMessage(
                          chatId: message.Chat,
                          text: $"Меню выбора типа топлива:",
-                         replyMarkup: KeyBoardSetting.regCoastFuel);
+                         replyMarkup: _kbTypeInCase[message.Chat.Id]);
 
                     break;
                 case "Смена статуcа Admin/User":
@@ -316,31 +320,7 @@ namespace Project_Work_My_Telegram_bot
                         await OnCommandAsync("/start", "", message);
                     }
                     break;
-                //Вспомогательные меню повтора Инлайн 
-                case "👤 Повтор меню Профиль":
-                    await _botClient!.SendMessage(
-                         chatId: message.Chat,
-                         text: $"Регистрация/изменение профиля:",
-                         replyMarkup: KeyBoardSetting.profile);
-                    break;
-                case "📝 Повтор меню регистрация поездки":
-                    await _botClient!.SendMessage(
-                         chatId: message.Chat,
-                         text: $"📝 Повтор меню регистрация поездки:",
-                         replyMarkup: KeyBoardSetting.regPath);
-                    break;
-                case "📝 Повтор меню регистрация затрат":
-                    await _botClient!.SendMessage(
-                         chatId: message.Chat,
-                         text: $"📝 Повтор меню регистрация затрат:",
-                         replyMarkup: KeyBoardSetting.regCoast);
-                    break;
-                case "📝 Повтор регистрации автопарк компании":
-                    await _botClient!.SendMessage(
-                        chatId: message.Chat,
-                        text: $"📝 Повтор регистрации автопарк компании:",
-                        replyMarkup: KeyBoardSetting.regDriveCar);
-                    break;
+
                 default:
                     OnMessage?.Invoke(message);
                     OnCallbackQueryMessage?.Invoke(message);
@@ -369,14 +349,14 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите Ф.И.О:",
-                    replyMarkup: KeyBoardSetting.RepratInlineProfil);
+                    replyMarkup: new ReplyKeyboardRemove());
 
                     OnCallbackQueryMessage += InsertUserAsync;
                     break;
                 case " jobtitle":
                     await _botClient!.SendMessage(
                     chatId: chatId,
-                    replyMarkup: KeyBoardSetting.RepratInlineProfil,
+                    replyMarkup: new ReplyKeyboardRemove(),
                     text: $"Введите должность");
 
                     OnCallbackQueryMessage += EnterjobtitleAsync;
@@ -385,7 +365,7 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите марку машины",
-                    replyMarkup: _kbTypeInCase[chatId.Id]);
+                    replyMarkup: new ReplyKeyboardRemove());
 
                     OnCallbackQueryMessage += InsertcarnameAsync;
                     break;
@@ -393,7 +373,7 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите номер авто по шаблону H 123 EE 150",
-                    replyMarkup: _kbTypeInCase[chatId.Id]);
+                    replyMarkup: new ReplyKeyboardRemove());
 
                     OnCallbackQueryMessage += InsertcarnumberAsync;
                     break;
@@ -411,7 +391,7 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите срединй расход литров на 100 км",
-                    replyMarkup: _kbTypeInCase[chatId.Id]);
+                    replyMarkup: new ReplyKeyboardRemove());
                     OnCallbackQueryMessage += EnterGasConsumAsync;
                     break;
                 case "closed":
@@ -438,15 +418,15 @@ namespace Project_Work_My_Telegram_bot
                          chatId: chatId,
                          text: $"Регистрация/изменение профиля:",
                          replyMarkup: KeyBoardSetting.profile);
+                        //Доделать вернуться в профиль 
                     }
                     break;
                 //Обработчики меню формирования поездок 
                 case "objectname":
-
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Наименование объекта следования",
-                    replyMarkup: KeyBoardSetting.RepeatInlinRegPath);
+                    replyMarkup: new ReplyKeyboardRemove());
                     OnCallbackQueryMessage += EnterObjectAsync;
                     break;
                 case "pathlengh":
@@ -454,14 +434,14 @@ namespace Project_Work_My_Telegram_bot
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите длинну полного пути в км.",
-                    replyMarkup: KeyBoardSetting.RepeatInlinRegPath);
+                    replyMarkup: new ReplyKeyboardRemove());
                     OnCallbackQueryMessage += EnterlengthPathAsync;
                     break;
                 case "namecost":
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Введите наименование затрат",
-                    replyMarkup: KeyBoardSetting.RepratInlinRegCoast);
+                    replyMarkup: new ReplyKeyboardRemove());
                     OnCallbackQueryMessage += EnterNameCostAsync;
                     break;
                 case "closedDrive":
@@ -484,13 +464,14 @@ namespace Project_Work_My_Telegram_bot
                          chatId: msg.Chat,
                          text: $"Введите данные корректно",
                          replyMarkup: _kbTypeInCase[chatId.Id]);
+                        //Доделать !!!! Каст меню Регистрации Машины CarDrive  
                     }
                     break;
                 case "datepath":
                     await _botClient!.SendMessage(
                     chatId: chatId,
                     text: $"Дата поездки текущая? {datanow}:",
-                    replyMarkup: KeyBoardSetting.actionAccept);
+                    replyMarkup: new ReplyKeyboardRemove());
                     OnCallbackQueryMessage += AcceptCurrentDatePathAsync;
                     break;
                 case "acceptisCar":
@@ -925,7 +906,7 @@ namespace Project_Work_My_Telegram_bot
         private bool GetUserDataString(ClassDB.User user, CarDrive car, out string str)
         {
             string strCar;
-            if (user.UserName is null || user.JobTitlel is null || car == null) 
+            if (user.UserName is null || user.JobTitlel is null || car == null)
             {
                 str = "Введено Недостаточно данных";
                 return false;
@@ -1357,6 +1338,8 @@ namespace Project_Work_My_Telegram_bot
                     fuel = Fuel.ai92;
                     break;
             }
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                          _kbTypeInCase[msg.Chat.Id], "typefuel");
             await _botClient.SendMessage(
                         chatId: chatId,
                         text: $"выбрано топливо {GetTypeFuelString(fuel)}",
@@ -1569,10 +1552,12 @@ namespace Project_Work_My_Telegram_bot
 
             if (text == "ДА")
             {
+                _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                      _kbTypeInCase[msg.Chat.Id], "datepath");
                 await _botClient.SendMessage(
                  chatId: chatId,
                  text: $"Введена текущая дата {inputdate.ToShortDateString()}",
-                 replyMarkup: KeyBoardSetting.RepeatInlinRegPath);
+                 replyMarkup: _kbTypeInCase[chatId.Id]);
                 // отписываемся от сообщений ввода даты 
                 OnCallbackQueryMessage -= AcceptCurrentDatePathAsync;
             }
@@ -1596,6 +1581,12 @@ namespace Project_Work_My_Telegram_bot
                 }
                 OnCallbackQueryMessage -= AcceptCurrentDatePathAsync;
             }
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                         _kbTypeInCase[msg.Chat.Id]!, "datepath");
+            await _botClient.SendMessage(
+                chatId: chatId,
+                text: $"Введена текущая дата {inputdate.ToShortDateString()}",
+                replyMarkup: _kbTypeInCase[chatId.Id]);
             _objPaths[msg.Chat.Id].DatePath = inputdate.Date;
             Console.WriteLine($"Введена дата поездки {inputdate.ToShortDateString()} ");
         }
@@ -1604,10 +1595,12 @@ namespace Project_Work_My_Telegram_bot
             var text = msg!.Text!.ToString();
             var chatId = msg.Chat;
             Console.WriteLine("Введено наименование затрат", text);
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                        _kbTypeInCase[msg.Chat.Id]!, "namecost");
             await _botClient.SendMessage(
                             chatId: chatId,
                             text: $"Введено наименование затрат {text}",
-                            replyMarkup: KeyBoardSetting.RepratInlinRegCoast);
+                            replyMarkup: _kbTypeInCase[msg.Chat.Id]);
             _otherExpenses[msg.Chat.Id].NameExpense = text;
             OnCallbackQueryMessage -= EnterNameCostAsync;
         }
@@ -1615,13 +1608,13 @@ namespace Project_Work_My_Telegram_bot
         {
             var text = msg!.Text!.ToString();
             var chatId = msg.Chat;
-
             Console.WriteLine("Введена должность", text);
-
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                            _kbTypeInCase[msg.Chat.Id]!, " jobtitle");
             await _botClient.SendMessage(
                             chatId: chatId,
                             text: $"Введена должность {text}",
-                            replyMarkup: KeyBoardSetting.RepratInlineProfil);
+                            replyMarkup: _kbTypeInCase[msg.Chat.Id]);
             _users[msg.Chat.Id].JobTitlel = text;
             OnCallbackQueryMessage -= EnterjobtitleAsync;
         }
@@ -1660,10 +1653,12 @@ namespace Project_Work_My_Telegram_bot
                      text: $"Не коректные данные введите еще раз в формате 0.00 ");
                 return;
             }
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                        _kbTypeInCase[msg.Chat.Id]!, "pathlengh");
             await _botClient.SendMessage(
                          chatId: chatId,
                          text: $"Длинна пути {text} км.",
-                         replyMarkup: KeyBoardSetting.RepeatInlinRegPath);
+                         replyMarkup: _kbTypeInCase[msg.Chat.Id]);
 
             _objPaths[msg.Chat.Id].PathLengh = lenghpath;
             OnCallbackQueryMessage -= EnterlengthPathAsync;
@@ -1673,10 +1668,12 @@ namespace Project_Work_My_Telegram_bot
             var text = msg!.Text!.ToString();
             var chatId = msg.Chat;
             Console.WriteLine("Наименование объекта {0}", text);
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                           _kbTypeInCase[msg.Chat.Id], "objectname");
             await _botClient.SendMessage(
                            chatId: chatId,
-                           text: $"Начальная и коенчная точка назнчаения {text}",
-                           replyMarkup: KeyBoardSetting.RepeatInlinRegPath);
+                           text: $"Наименование объекта {text}",
+                           replyMarkup: _kbTypeInCase[msg.Chat.Id]);
             _objPaths[msg.Chat.Id].ObjectName = text;
             OnCallbackQueryMessage -= EnterObjectAsync;
         }
@@ -1691,9 +1688,11 @@ namespace Project_Work_My_Telegram_bot
             {
                 await _botClient.SendMessage(
                      chatId: chatId,
-                     text: $"{text} Номер введен не коректно, введите по шаблону H 000 EE 150");
+                     text: $"{text} Номер введен не коректно, введите по шаблону H000EE150");
                 return;
             }
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                            _kbTypeInCase[msg.Chat.Id]!, "carnumber");
             await _botClient.SendMessage(
                          chatId: chatId,
                          text: $"Номер {carnumber} принят",
@@ -1707,6 +1706,8 @@ namespace Project_Work_My_Telegram_bot
             var text = msg!.Text!.ToString();
             var chatId = msg.Chat;
             Console.WriteLine("Название машины {0}", text);
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                                _kbTypeInCase[msg.Chat.Id]!, "carname");
             await _botClient.SendMessage(
                          chatId: chatId,
                          text: $"Название машины {text}",
@@ -1729,6 +1730,8 @@ namespace Project_Work_My_Telegram_bot
                      text: $"Не коректные данные введите еще раз в формате 0,00 ");
                 return;
             }
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                            _kbTypeInCase[msg.Chat.Id]!, "gasconsum");
             await _botClient.SendMessage(
                          chatId: chatId,
                          text: $"Расход топлива на {text} л./100 км",
@@ -1738,13 +1741,16 @@ namespace Project_Work_My_Telegram_bot
         }
         private async Task InsertUserAsync(Message msg)
         {
+            _kbTypeInCase[msg.Chat.Id] = KeyBoardSetting.RemoveButtonByCallbackData(
+                                                _kbTypeInCase[msg.Chat.Id]!, "username");
+
             var text = msg!.Text!.ToString();
             var chatId = msg.Chat;
             Console.WriteLine("Введена Ф.И.О", text);
             await _botClient.SendMessage(
                          chatId: chatId,
                          text: $"Ф.И.О {text}",
-                         replyMarkup: KeyBoardSetting.RepratInlineProfil);
+                         replyMarkup: _kbTypeInCase[msg.Chat.Id]);
             _users[msg.Chat.Id].UserName = text;
             OnCallbackQueryMessage -= InsertUserAsync;
         }
