@@ -1,6 +1,0 @@
-﻿{
-  "PasswordUser": "12345",
-  "PasswordAdmin": "qwerty",
-  "token": "7516165506:AAHgVKs9K2zHsyKJqVwSFzY4D8BsDIpVLLE",
-  "bdToken": "Host=localhost;Port=5432;Database=MySqlTab;Username=postgres;Password=20021978"
-}

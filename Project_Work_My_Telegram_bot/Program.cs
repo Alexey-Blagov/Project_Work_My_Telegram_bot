@@ -3,6 +3,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace Project_Work_My_Telegram_bot
 {
@@ -12,12 +13,15 @@ namespace Project_Work_My_Telegram_bot
     {
         private static string? _token;
         private static TelegramBotClient? _myBot;
+        private static LogerTgBot? _loger; 
         private static CancellationTokenSource? _cts;
         private static MessageProcessing? _messageProcessing;
        
         //Точка входа в программу 
         static async Task Main(string[] args)
         {
+            _loger = new LogerTgBot();
+            
             PassUser passUser = new PassUser();
             _token = passUser.Token;
             
@@ -31,18 +35,26 @@ namespace Project_Work_My_Telegram_bot
             };
 
             var me = await _myBot.GetMe();
-            Console.WriteLine($"Bot started: {me.Username}");
+
+            _loger!.LogMessage(new
+            {
+                information = $"Бот запущен {me.Username!.ToString()}, в {DateTime.Now.ToShortTimeString()}"
+            });
+            Console.WriteLine($" Бот запущен: {me.Username}");
 
             //Подписка на обработку методов TG
             _myBot.OnError += OnError;
             _myBot.OnMessage += OnMessage;
             _myBot.OnUpdate += OnUpdate;
 
-            Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
+            Console.WriteLine($"@{me.Username} ... нажмите Escape для остановки"); 
 
             while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
-            _cts.Cancel(); // stop the bot
-
+            _cts.Cancel(); // Остановка 
+            _loger!.LogMessage(new
+            {
+                information = $"Бот остановлен {me.Username!}, в {DateTime.Now.ToShortTimeString()}"
+            });
         }
         /// <summary>
         /// Метод обработки ошибок ТГБота 
@@ -52,8 +64,8 @@ namespace Project_Work_My_Telegram_bot
         /// <returns></returns>
         private static async Task OnError(Exception exception, HandleErrorSource source)
         {
+            _loger!.LogException(exception); 
             Console.WriteLine(exception);
-            await Task.Delay(2000);
         }
         /// <summary>
         /// Мтеод работы с типом UPdate из ТГБота
@@ -64,6 +76,12 @@ namespace Project_Work_My_Telegram_bot
         {
             try
             {
+                _loger!.LogMessage(new
+                {
+                  //  date = DateTime.Now.ToShortTimeString(),
+                    chatId = update!.CallbackQuery!.Id.ToString(),
+                    data = update!.CallbackQuery.Data
+                }); 
                 //обработка Update 
                 switch (update)
                 {
@@ -97,6 +115,12 @@ namespace Project_Work_My_Telegram_bot
             //Блок обработки сообщений 
             try
             {
+                _loger!.LogMessage(new
+                {
+                    chatId = message.Chat.Id.ToString(),
+                    text = messageText,
+                    data = message.ToString()
+                }); 
                 if (messageText is not { } text)
                     Console.WriteLine($"Получено сообщение {message.Type}");
                 else if (text.StartsWith('/'))

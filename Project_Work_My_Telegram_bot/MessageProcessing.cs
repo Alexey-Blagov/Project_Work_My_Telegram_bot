@@ -297,6 +297,7 @@ namespace Project_Work_My_Telegram_bot
                     List<string?> buttonsUsers = userList
                         .Select(u => u.UserName as string)
                         .ToList();
+
                     if (buttonsUsers[0] is not null)
                     {
                         await _botClient.SendMessage(
@@ -924,7 +925,7 @@ namespace Project_Work_My_Telegram_bot
         private bool GetUserDataString(ClassDB.User user, CarDrive car, out string str)
         {
             string strCar;
-            if (user.UserName is null || user.JobTitlel is null || user.PersonalCar is null)
+            if (user.UserName is null || user.JobTitlel is null || car == null) 
             {
                 str = "Введено Недостаточно данных";
                 return false;
