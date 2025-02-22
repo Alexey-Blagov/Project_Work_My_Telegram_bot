@@ -93,6 +93,8 @@ namespace Project_Work_My_Telegram_bot
         {
             var result = await _reportDb.Users
                 .AsNoTracking()
+                .Where(u => u.UserName != null)
+                .OrderBy(u => u.UserName)
                 .Select(u => new
                 {
                     UserId = u.IdTg,

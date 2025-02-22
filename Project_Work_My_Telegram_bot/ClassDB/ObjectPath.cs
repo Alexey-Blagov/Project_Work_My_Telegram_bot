@@ -23,7 +23,7 @@ namespace Project_Work_My_Telegram_bot.ClassDB
         public int IdPath { get; set; }
         public string? ObjectName { get; set; }
         public double? PathLengh { get; set; } = null; 
-        public DateTime DatePath { get; set; } = DateTime.Now;
+        public DateTime DatePath { get; set; } = DateTime.MinValue;
         public int? CarId { get; set; } 
         public CarDrive? CarDrive { get; set; }
         public long? UserId { get; set; }
