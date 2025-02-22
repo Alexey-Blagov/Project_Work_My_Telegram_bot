@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 namespace Project_Work_My_Telegram_bot
 {
     public enum UserType {Non = 0, User = 1, Admin = 2 };
-    public enum Fuel { dizel = 0, ai95 = 1, ai92 = 2 };
+    public enum Fuel { Non = 0, dizel = 1, ai95 = 2, ai92 = 3 };
     internal class Program
     {
         private static string? _token;
@@ -140,7 +140,7 @@ namespace Project_Work_My_Telegram_bot
                 else
                 {
                     //Обработчик сообщений 
-                    await _messageProcessing.OnTextMessageAsync(message);
+                    await _messageProcessing!.OnTextMessageAsync(message);
                 }
             }
             catch (Exception ex)

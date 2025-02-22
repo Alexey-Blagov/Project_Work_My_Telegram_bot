@@ -25,7 +25,6 @@ namespace Project_Work_My_Telegram_bot
         public FuelPrice()
         {
             Task.Run(() => GetDataAsync()).Wait();
-            LoadFromJson(); 
         }
         /// <summary>
         /// Метод сохранения данных в файл по стоимости топлива
@@ -41,15 +40,13 @@ namespace Project_Work_My_Telegram_bot
             File.WriteAllText(_filePath!, System.Text.Json.JsonSerializer.Serialize(jsonData));
         }
         /// <summary>
-        /// Мтеод выгрузки в поля класса данны из файла 
+        /// Метод выгрузки в поля класса данны из файла 
         /// </summary>
-        /// <exception cref="InvalidDataException"></exception>
         public void LoadFromJson()
         {
             _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FuelSetPrice.json");
             if (File.Exists(_filePath))
             {
-                
                 var configuration = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("FuelSetPrice.json", optional: false, reloadOnChange: true)
@@ -57,7 +54,6 @@ namespace Project_Work_My_Telegram_bot
                 Ai92 = ParsePrice(configuration["Ai92"]!);
                 Ai95 = ParsePrice(configuration["Ai95"]!);
                 Diesel = ParsePrice(configuration["Diesel"]!);
-
             }
             else
             {
