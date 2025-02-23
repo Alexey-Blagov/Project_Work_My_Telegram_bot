@@ -76,8 +76,10 @@ namespace Project_Work_My_Telegram_bot
             _passwordUser = _passUser.PasswordUser;
             _passwordAdmin = _passUser.PasswordAdmin;
             var chatId = message.Chat.Id;
+
             //Получить данные роли пользователя Id клиента в боте
             _users[chatId].UserRol = await DataBaseHandler.GetUserRoleAsync(chatId);
+
             switch (message.Text)
             {
                 //Работа с ролью пользователей 
@@ -247,6 +249,7 @@ namespace Project_Work_My_Telegram_bot
                             replyMarkup: new ReplyKeyboardRemove());
                         //Переход в регистрацию профиля 
                         await StartRegistrationProfil(message);
+                        return; 
                     }
                     //Создаем запись в класс тип OtherExpenses допю тарты  
                     _otherExpenses[chatId] = new OtherExpenses();
@@ -518,6 +521,7 @@ namespace Project_Work_My_Telegram_bot
                     var car = _carDrives[chatId];
                     //Проверка введена информция по транспорту ?? 
                     _carDrives[chatId].isPersonalCar = (_carDrives[chatId].CarName is null) ? false : true;
+
                     if (GetUserDataString(user, car, out stringtobot))
                     {
                         await _botClient.SendMessage(
@@ -1024,7 +1028,6 @@ namespace Project_Work_My_Telegram_bot
             //Случай если нет автомашины на данного пользователя (водители грузового транспорта например) 
             if (car.CarName == null)
             {
-
                 strCar = $"🚗 Название машины: ❌ Машина на пользователя не зарегестрирована" + "\n";
             }
             else
