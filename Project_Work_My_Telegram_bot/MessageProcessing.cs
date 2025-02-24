@@ -42,7 +42,7 @@ namespace Project_Work_My_Telegram_bot
     {
         private TelegramBotClient _botClient;
         private PassUser _passUser = new PassUser();
-        //После убрать пороль в текст 
+        //После убрать пароль в текст 
 
         private string _passwordUser;
         private string _passwordAdmin;
@@ -91,7 +91,7 @@ namespace Project_Work_My_Telegram_bot
                         replyMarkup: KeyBoardSetting.keyboardMainAdmin);
                     await _botClient!.SendMessage(
                          chatId: chatId,
-                         text: $"Введите пороль администратора:",
+                         text: $"Введите пароль администратора:",
                          replyMarkup: new ReplyKeyboardRemove());
                     OnMessage += MessageHandlePassAdminAsync;
                     break;
@@ -103,7 +103,7 @@ namespace Project_Work_My_Telegram_bot
                        replyMarkup: KeyBoardSetting.keyboardMainUser);
                     await _botClient!.SendMessage(
                          chatId: chatId,
-                         text: $"Введите пороль пользвателя:",
+                         text: $"Введите пароль пользвателя:",
                          replyMarkup: new ReplyKeyboardRemove());
                     OnMessage += MessageHandlePassUserAsync;
                     break;
@@ -1230,6 +1230,7 @@ namespace Project_Work_My_Telegram_bot
                     _users.Remove(chatId);
                     _kbTypeInCase[chatId] = null;
                     OnCallbackQueryMessage -= ClosedEnterProfilAsync;
+                    await OnCommandAsync("/start", "", msg);
                     break;
 
                 case "НЕТ":
@@ -1488,7 +1489,7 @@ namespace Project_Work_My_Telegram_bot
             {
                 await _botClient!.SendMessage(
                              chatId: chatId,
-                             text: $"Введите пороль еще раз:",
+                             text: $"Введите пароль еще раз:",
                              replyMarkup: new ReplyKeyboardRemove());
                 _setpassword = text;
                 return;
@@ -1497,7 +1498,7 @@ namespace Project_Work_My_Telegram_bot
             {
                 await _botClient!.SendMessage(
                              chatId: chatId,
-                             text: $"Пороль введен не корреткно попробуйте снова",
+                             text: $"❌Пароль введен не корреткно попробуйте снова",
                              replyMarkup: new ReplyKeyboardRemove());
                 _setpassword = null;
             }
@@ -1505,7 +1506,7 @@ namespace Project_Work_My_Telegram_bot
             {
                 await _botClient!.SendMessage(
                             chatId: chatId,
-                            text: $"Пороль успешно изменен для входа User",
+                            text: $"Пароль успешно изменен для входа User",
                             replyMarkup: new ReplyKeyboardRemove());
                 _passUser.UpdatePasswordsUser(_setpassword);
                 OnMessage -= SetPasswordUserAsync;
@@ -1552,7 +1553,7 @@ namespace Project_Work_My_Telegram_bot
 
                 await _botClient.SendMessage(
                 chatId: chatId,
-                text: $"Введен пороль администатора",
+                text: $"Введен пароль администатора",
                 replyMarkup: new ReplyKeyboardRemove());
                 OnMessage -= MessageHandlePassAdminAsync;
                 //Сохранение пользователя с правами Admin 
@@ -1568,7 +1569,7 @@ namespace Project_Work_My_Telegram_bot
                 //Повтор запуска лога 
                 await _botClient.SendMessage(
                              chatId: chatId,
-                             text: $"Пороль введен не корректно попробуйте снова",
+                             text: $"❌ Пароль введен не корректно попробуйте снова",
                              replyMarkup: new ReplyKeyboardRemove());
                 _users[msg.Chat.Id].UserRol = (int)UserType.Non;
                 OnMessage -= MessageHandlePassAdminAsync;
@@ -1585,7 +1586,7 @@ namespace Project_Work_My_Telegram_bot
                 _users[msg.Chat.Id].UserRol = (int)UserType.User;
                 await _botClient.SendMessage(
                           chatId: chatId,
-                          text: $"Введен пороль прова доступа User",
+                          text: $"Введен пароль прова доступа User",
                           replyMarkup: new ReplyKeyboardRemove());
                 OnMessage -= MessageHandlePassUserAsync;
 
@@ -1601,7 +1602,7 @@ namespace Project_Work_My_Telegram_bot
                 //Повтор запуска лога
                 await _botClient.SendMessage(
                              chatId: chatId,
-                             text: $"Пороль введен не корректно попробуйте снова",
+                             text: $"❌ Пароль введен не корректно попробуйте снова",
                              replyMarkup: new ReplyKeyboardRemove());
                 OnMessage -= MessageHandlePassUserAsync;
                 await OnCommandAsync("/start", "", msg);
