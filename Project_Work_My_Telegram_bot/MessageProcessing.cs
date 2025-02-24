@@ -110,7 +110,7 @@ namespace Project_Work_My_Telegram_bot
                 //Обработчик меню Repkeyboard стартового меню роли User  
                 case "👤 Профиль":
                     if ((UserType)_users[chatId].UserRol == UserType.Non) return;
-                    //создаем в дикт экземпляр личного авто в класс CarDrive и обработчик User 
+                    
                     await StartRegistrationProfil(message);
                     break;
                 case "📚 Вывести отчет": //Обработан Sub menu 
@@ -135,15 +135,8 @@ namespace Project_Work_My_Telegram_bot
                             text: $"Необходимо зарегестрировать профиль:",
                             replyMarkup: new ReplyKeyboardRemove());
                         //Переход в регистрацию профиля 
-                        //создаем в дикт экземпляр личного авто в класс CarDrive и обработчик User 
-                        _users[chatId] = await DataBaseHandler.GetUserAsync(chatId);
-                        _users[chatId].TgUserName = message.Chat.Username ?? "Нет имени профиля";
-                        //Чтение данных по собсвтенной машине их класса 
-                        _carDrives[chatId] = await DataBaseHandler.GetPerconalCarDriveByUserAsync(
-                                                                            chatId) ?? new CarDrive();
-                        _carDrives[chatId].isPersonalCar = true;
-                        //Старт регистрации профиля 
-                        _kbTypeInCase[chatId] = KeyBoardSetting.profile;
+                        // Инициализация регистрации профиля 
+                        await StartRegistrationProfil(message);
                         try
                         {
                             await _botClient!.DeleteMessage(

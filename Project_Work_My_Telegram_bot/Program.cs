@@ -78,8 +78,7 @@ namespace Project_Work_My_Telegram_bot
             {
                 _loger!.LogMessage(new
                 {
-                  //  date = DateTime.Now.ToShortTimeString(),
-                    chatId = update!.CallbackQuery!.Id.ToString(),
+                  chatId = update!.CallbackQuery!.Id.ToString(),
                     data = update!.CallbackQuery.Data
                 }); 
                 //обработка Update 
